@@ -23,7 +23,7 @@ body {
   line-height: 1.5;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 /* ===== Header ===== */
@@ -50,7 +50,7 @@ header .subtitle {
 .container {
   display: flex;
   flex-direction: column;
-  height: 99%;
+  height: 100vh;
   width: 100%;
   padding: 0;
   gap: 0;
@@ -59,18 +59,19 @@ header .subtitle {
 /* Map container for mobile */
 .map-section {
   flex: 1;
-  height: 99%;
+  height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
   border-radius: 0;
   box-shadow: none;
-  order: -1; /* Makes map appear first */
+  order: -1;
+  /* Makes map appear first */
 }
 
 #map {
   width: 100%;
-  height: 99%;
+  height: 100%;
   border-radius: 0;
 }
 
@@ -81,18 +82,18 @@ header .subtitle {
   left: 0;
   right: 0;
   width: 100%;
-  max-height: 99%;
+  max-height: 250px;
   overflow-y: auto;
   margin: 0;
   padding: 0.5rem;
   border-radius: 15px 15px 0 0;
   background: var(--white);
   z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Compact controls for mobile */
-select, 
+select,
 input[type="datetime-local"] {
   height: 36px;
   margin: 0.3rem 0;
@@ -117,48 +118,58 @@ button {
 }
 
 /* Desktop layout fixes (768px and above) */
+/* ===== Layout Desktop (≥768px) ===== */
 @media (min-width: 768px) {
+  body {
+    overflow: hidden;
+  }
 
   .container {
     display: flex;
-    flex-direction: row; /* Pannello a sinistra, mappa a destra */
+    flex-direction: row; /* Pannello sinistra, mappa destra */
+    justify-content: center;
+    align-items: stretch;
     height: calc(100vh - 60px);
     padding: 1rem;
     gap: 1rem;
   }
 
-  /* --- PANNELLO SINISTRO --- */
+  /* === PANNELLO SINISTRO === */
   .panel {
-    order: 1; /* Sinistra */
+    order: 1;
     position: relative;
-    width: 100%;
+    width: 340px;
     min-width: 300px;
-    max-width: 520px;
-    height: 99%px;
+    max-width: 380px;
+    height: 100%;
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     padding: 1.2rem;
+    overflow-y: auto;
+    z-index: 10;
   }
 
-  /* --- MAPPA DESTRA --- */
+  /* === MAPPA DESTRA === */
   .map-section {
-    order: 2; /* Destra */
+    order: 2;
     flex: 1;
-    height: 99%;
+    height: 100%;
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   #map {
     width: 100%;
     height: 100%;
     border-radius: 12px;
-    margin-bottom: 20px;
   }
 
-  /* --- ELEMENTI INTERNI --- */
+  /* === ELEMENTI INTERNI === */
   select,
   input[type="datetime-local"] {
     height: 44px;
@@ -184,6 +195,123 @@ button {
   }
 }
 
+/* ===== Pannello sinistro ===== */
+/* === Panel adjustments === */
+.sidebar {
+  width: 300px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+}
+
+.panel {
+  width: 100%;
+  max-width: 100%;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  top: 0;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  position: sticky;
+  top: 1rem;
+  /* resta visibile mentre scorri la mappa */
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+select,
+input[type="datetime-local"] {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fafafa;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 44px;
+  /* Larger touch targets */
+  margin: 0.5rem 0;
+  font-size: 16px;
+  /* Prevents zoom on iOS */
+}
+
+select:focus,
+input[type="datetime-local"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
+  outline: none;
+}
+
+.info-box {
+  background: #eef5ff;
+  padding: 0.9rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  border: 1px solid #d4e3f8;
+}
+
+.controls {
+  margin: 20px 0;
+}
+
+.controls label {
+  display: block;
+  margin: 10px 0 5px 0;
+}
+
+.controls select {
+  width: 100%;
+  padding: 5px;
+}
+
+.select-group {
+  margin: 10px 0;
+}
+
+.select-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 8px;
+}
+
+.info {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 5px;
+}
+
+.info-panel {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  margin: 10px 0;
+}
+
+.info-item .label {
+  font-weight: bold;
+  margin-right: 10px;
+}
 
 /* ===== Pulsanti ===== */
 /* === Button improvements === */
@@ -218,6 +346,29 @@ button.secondary:hover {
   background: #d0d5db;
 }
 
+/* ===== Mappa ===== */
+/* === Map container === */
+.map-section {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 0.7rem;
+  height: 100%;
+  /* Set a fixed viewport height for mobile */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
 /* ===== Footer ===== */
 footer {
   text-align: center;
@@ -235,6 +386,13 @@ footer {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
