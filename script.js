@@ -225,25 +225,21 @@ function fitMapToCurrentRouteOrStops() {
 }
 
 // === Gestione orari ===
-function hhmmToDateOnOrAfter(hhmm, nowDate) {
-  const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date(nowDate);
-  d.setHours(h, m, 0, 0);
-  if (d < nowDate) d.setDate(d.getDate() + 1);
-  return d;
-}
-
 function findNextTrattaForStop(lineKey, stopId, nowDate, tripIdSpecific = "") {
   const linea = SCHEDULES[lineKey];
   if (!linea) return null;
 
   const tratte = linea.tratte || [];
+  if (!tratte.length) return null;
+
+  // Ordina le tratte in base all'orario di partenza
   const sorted = [...tratte].sort((a, b) => {
     const [ah, am] = a.partenza.split(":").map(Number);
     const [bh, bm] = b.partenza.split(":").map(Number);
     return ah * 60 + am - (bh * 60 + bm);
   });
 
+  // Se è selezionata una tratta specifica
   if (tripIdSpecific) {
     const t = sorted.find(x => x.id === tripIdSpecific);
     if (!t) return null;
@@ -254,28 +250,36 @@ function findNextTrattaForStop(lineKey, stopId, nowDate, tripIdSpecific = "") {
     return { tratta: t, stopTime: st, dateStop, diffMin, forced: true };
   }
 
+  // 🧠 Cerca la prossima corsa ancora valida oggi
+  let nextTrip = null;
+  let minDiff = Infinity;
+
   for (let t of sorted) {
     const st = t.stopTimes[stopId];
     if (!st) continue;
-    const dateStop = hhmmToDateOnOrAfter(st, nowDate);
-    if (dateStop >= nowDate) {
-      const diffMin = Math.round((dateStop - nowDate) / 60000);
-      return { tratta: t, stopTime: st, dateStop, diffMin, forced: false };
+    const [h, m] = st.split(":").map(Number);
+    const dateStop = new Date(nowDate);
+    dateStop.setHours(h, m, 0, 0);
+
+    const diffMin = Math.round((dateStop - nowDate) / 60000);
+    if (diffMin >= 0 && diffMin < minDiff) {
+      nextTrip = { tratta: t, stopTime: st, dateStop, diffMin, forced: false };
+      minDiff = diffMin;
     }
   }
 
-  if (sorted.length) {
+  // Se non c’è più nessuna corsa oggi → prendi la prima di domani
+  if (!nextTrip && sorted.length) {
     const t = sorted[0];
     const st = t.stopTimes[stopId];
-    if (!st) return null;
-    let dateStop = hhmmToDateOnOrAfter(st, nowDate);
-    if (dateStop < nowDate) dateStop.setDate(dateStop.getDate() + 1);
+    const dateStop = hhmmToDateOnOrAfter(st, nowDate);
     const diffMin = Math.round((dateStop - nowDate) / 60000);
-    return { tratta: t, stopTime: st, dateStop, diffMin, forced: false, tomorrow: true };
+    nextTrip = { tratta: t, stopTime: st, dateStop, diffMin, forced: false, tomorrow: true };
   }
 
-  return null;
+  return nextTrip;
 }
+
 
 function formatDiffText(diffMin) {
   if (diffMin > 1) return `Tra ${diffMin} min`;
@@ -388,6 +392,13 @@ fetch("linee.json")
     SCHEDULES = data;
     inizializzaMappa();
     popolaLinee();  // genera subito la prima linea
+    startAutoUpdate();
+    const firstStop = stopSelect.options[0];
+    if (firstStop) {
+      stopSelect.value = firstStop.value;
+      updateAllDisplays(); // mostra subito la prima navetta disponibile
+    }
+
     startAutoUpdate();
   })
   .catch(err => console.error("Errore nel caricamento linee.json", err));
