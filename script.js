@@ -472,7 +472,7 @@ recordBtn.addEventListener("click", () => {
           console.log("Nuovo punto:", latitude, longitude);
         },
         (err) => console.error("Errore GPS:", err),
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 25000 }
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 100000 }
       );
     } else {
       alert("Geolocalizzazione non supportata");
