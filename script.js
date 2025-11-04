@@ -449,7 +449,7 @@ document.getElementById("btnNearestStop").addEventListener("click", () => {
 // === Registrazione del percorso GPS ===
 let recording = false;
 let recordedPath = [];
-let watchId = null;
+let recordInterval = null;
 
 // Bottone per registrare percorso
 const recordBtn = document.createElement("button");
@@ -465,22 +465,33 @@ recordBtn.addEventListener("click", () => {
     recordBtn.textContent = "⏹️ Stop registrazione";
 
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          recordedPath.push([latitude.toFixed(6), longitude.toFixed(6)]);
-          console.log("Nuovo punto:", latitude, longitude);
-        },
-        (err) => console.error("Errore GPS:", err),
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 100000 }
-      );
+      // Registra subito un primo punto
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        recordedPath.push([latitude.toFixed(6), longitude.toFixed(6)]);
+        console.log("📍 Primo punto:", latitude, longitude);
+      });
+
+      // Poi continua ogni 30 secondi (30000 ms)
+      recordInterval = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            recordedPath.push([latitude.toFixed(6), longitude.toFixed(6)]);
+            console.log("Nuovo punto:", latitude, longitude);
+          },
+          (err) => console.error("Errore GPS:", err),
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 1000 }
+        );
+      }, 30000); // <-- Cambia qui per regolare la frequenza
     } else {
       alert("Geolocalizzazione non supportata");
     }
   } else {
     // Ferma registrazione
     recording = false;
-    if (watchId) navigator.geolocation.clearWatch(watchId);
+    clearInterval(recordInterval);
+    recordInterval = null;
     recordBtn.textContent = "▶️ Inizia registrazione percorso";
 
     // Formatta il percorso in JSON pronto
