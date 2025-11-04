@@ -25,14 +25,14 @@ recordBtn.addEventListener("click", () => {
           const now = Date.now();
 
           // Salva solo ogni 30 secondi
-          if (now - lastSaveTime >= 30000 || recordedPath.length === 0) {
+          if (now - lastSaveTime >= 5000 || recordedPath.length === 0) {
             recordedPath.push([latitude.toFixed(6), longitude.toFixed(6)]);
             lastSaveTime = now;
             console.log("📍 Punto salvato:", latitude, longitude);
           }
         },
         (err) => console.error("Errore GPS:", err),
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
     } else {
       alert("Geolocalizzazione non supportata");
