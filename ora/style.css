@@ -1,0 +1,391 @@
+/* ===== Variabili globali ===== */
+:root {
+  --primary: #0077cc;
+  --primary-dark: #005fa3;
+  --background: #f4f6fa;
+  --text: #222;
+  --white: #fff;
+  --border: #dcdfe3;
+}
+
+/* ===== Reset base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* ===== Header ===== */
+header {
+  background: var(--primary);
+  color: var(--white);
+  padding: 0.8rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+header .subtitle {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* ===== Layout principale ===== */
+/* === Mobile-first layout (under 768px) === */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 110px);
+  min-height: 420px;
+  width: 100%;
+  padding: 0;
+  gap: 0;
+}
+
+/* Map container for mobile */
+.map-section {
+  flex: 1;
+  height: 100%;
+  min-height: 320px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  order: -1;
+  /* Makes map appear first */
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  border-radius: 0;
+}
+
+/* Controls panel for mobile */
+.panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 15px 15px 0 0;
+  background: var(--white);
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact controls for mobile */
+select,
+input[type="datetime-local"] {
+  height: 36px;
+  margin: 0.3rem 0;
+  font-size: 14px;
+}
+
+label {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+button {
+  padding: 0.6rem;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+.info-box {
+  padding: 0.6rem;
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+}
+
+/* Desktop layout fixes (768px and above) */
+/* ===== Layout Desktop (≥768px) ===== */
+@media (min-width: 768px) {
+  body {
+    overflow: hidden;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: row; /* Pannello sinistra, mappa destra */
+    justify-content: center;
+    align-items: stretch;
+    height: calc(100vh - 60px);
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  /* === PANNELLO SINISTRO === */
+  .panel {
+    order: 1;
+    position: relative;
+    width: 340px;
+    min-width: 300px;
+    max-width: 380px;
+    height: 100%;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    padding: 1.2rem;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  /* === MAPPA DESTRA === */
+  .map-section {
+    order: 2;
+    flex: 1;
+    height: 100%;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+
+  /* === ELEMENTI INTERNI === */
+  select,
+  input[type="datetime-local"] {
+    height: 44px;
+    margin: 0.5rem 0;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+
+  label {
+    margin-top: 1rem;
+    font-size: 1rem;
+  }
+
+  .info-box {
+    padding: 0.9rem;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+}
+
+/* ===== Pannello sinistro ===== */
+/* === Panel adjustments === */
+.sidebar {
+  width: 300px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+}
+
+.panel {
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+select,
+input[type="datetime-local"] {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fafafa;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 44px;
+  /* Larger touch targets */
+  margin: 0.5rem 0;
+  font-size: 16px;
+  /* Prevents zoom on iOS */
+}
+
+select:focus,
+input[type="datetime-local"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
+  outline: none;
+}
+
+.info-box {
+  background: #eef5ff;
+  padding: 0.9rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  border: 1px solid #d4e3f8;
+}
+
+.controls {
+  margin: 20px 0;
+}
+
+.controls label {
+  display: block;
+  margin: 10px 0 5px 0;
+}
+
+.controls select {
+  width: 100%;
+  padding: 5px;
+}
+
+.select-group {
+  margin: 10px 0;
+}
+
+.select-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 8px;
+}
+
+.info {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 5px;
+}
+
+.info-panel {
+  background: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-item {
+  margin: 10px 0;
+}
+
+.info-item .label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+/* ===== Pulsanti ===== */
+/* === Button improvements === */
+button {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.8rem;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background: var(--primary-dark);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.secondary {
+  background: #e0e4e9;
+  color: #333;
+}
+
+button.secondary:hover {
+  background: #d0d5db;
+}
+
+/* ===== Mappa ===== */
+/* === Map container === */
+.map-section {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 0.7rem;
+  height: 100%;
+  /* Set a fixed viewport height for mobile */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  padding: 1.2rem;
+  font-size: 0.85rem;
+  color: #666;
+  background: #f0f2f5;
+  margin-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+/* ===== Animazioni leggere ===== */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
