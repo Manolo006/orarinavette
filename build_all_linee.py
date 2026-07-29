@@ -6,24 +6,30 @@ linee_data = {
     "colore": "#2563eb",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Sasso (Piazza del Fico)", "lat": 42.028710, "lng": 12.080510 },
-      { "id": "f3", "nome": "Stazione FS Marina di Cerveteri", "lat": 41.960693, "lng": 12.082584 },
-      { "id": "f4", "nome": "Poliambulatorio Via Aurelia", "lat": 41.970301, "lng": 12.081321 },
-      { "id": "f5", "nome": "Viale Manzoni (Ritorno)", "lat": 41.995641, "lng": 12.092690 }
+      { "id": "f2", "nome": "Via Mura Castellane", "lat": 41.994000, "lng": 12.091000 },
+      { "id": "f3", "nome": "Via della Necropoli", "lat": 41.990000, "lng": 12.088000 },
+      { "id": "f4", "nome": "Via del Sasso / Furbara", "lat": 42.010000, "lng": 12.085000 },
+      { "id": "f5", "nome": "Sasso (Piazza del Fico)", "lat": 42.028710, "lng": 12.080510 },
+      { "id": "f6", "nome": "Via Aurelia / Campo di Mare", "lat": 41.970000, "lng": 12.078000 },
+      { "id": "f7", "nome": "Stazione FS Marina di Cerveteri", "lat": 41.960693, "lng": 12.082584 },
+      { "id": "f8", "nome": "Via S. Angelucci / Caere Vetus", "lat": 41.965000, "lng": 12.083000 },
+      { "id": "f9", "nome": "Poliambulatorio Via Aurelia", "lat": 41.970301, "lng": 12.081321 },
+      { "id": "f10", "nome": "Via Settevene Palo / Ceretana", "lat": 41.992279, "lng": 12.090225 },
+      { "id": "f11", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "21-T1", "partenza": "06:00", "stopTimes": { "f1": "06:00", "f2": "06:20", "f5": "06:50" } },
-      { "id": "21-T2", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f2": "07:25", "f5": "08:05" } },
-      { "id": "21-T3", "partenza": "08:05", "stopTimes": { "f1": "08:05", "f2": "08:30", "f5": "09:10" } },
-      { "id": "21-T4", "partenza": "10:15", "stopTimes": { "f1": "10:15", "f2": "10:35", "f5": "11:05" } },
-      { "id": "21-T5", "partenza": "11:05", "stopTimes": { "f1": "11:05", "f2": "11:25", "f5": "11:55" } },
-      { "id": "21-T6", "partenza": "12:00", "stopTimes": { "f1": "12:00", "f2": "12:25", "f5": "12:55" } },
-      { "id": "21-T7", "partenza": "13:45", "stopTimes": { "f1": "13:45", "f2": "14:10", "f5": "14:50" } },
-      { "id": "21-T8", "partenza": "14:50", "stopTimes": { "f1": "14:50", "f2": "15:15", "f5": "15:45" } },
-      { "id": "21-T9", "partenza": "16:40", "stopTimes": { "f1": "16:40", "f2": "17:00", "f5": "17:30" } },
-      { "id": "21-T10", "partenza": "17:40", "stopTimes": { "f1": "17:40", "f2": "18:00", "f5": "18:30" } },
-      { "id": "21-T11", "partenza": "18:40", "stopTimes": { "f1": "18:40", "f2": "19:00", "f5": "19:30" } },
-      { "id": "21-T12", "partenza": "19:40", "stopTimes": { "f1": "19:40", "f2": "20:00", "f5": "20:30" } }
+      { "id": "21-T1", "partenza": "06:00", "stopTimes": { "f1": "06:00", "f5": "06:20", "f7": "06:35", "f9": "06:42", "f11": "06:50" } },
+      { "id": "21-T2", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f5": "07:25", "f7": "07:45", "f9": "07:55", "f11": "08:05" } },
+      { "id": "21-T3", "partenza": "08:05", "stopTimes": { "f1": "08:05", "f5": "08:30", "f7": "08:50", "f9": "09:00", "f11": "09:10" } },
+      { "id": "21-T4", "partenza": "10:15", "stopTimes": { "f1": "10:15", "f5": "10:35", "f7": "10:50", "f9": "10:58", "f11": "11:05" } },
+      { "id": "21-T5", "partenza": "11:05", "stopTimes": { "f1": "11:05", "f5": "11:25", "f7": "11:40", "f9": "11:48", "f11": "11:55" } },
+      { "id": "21-T6", "partenza": "12:00", "stopTimes": { "f1": "12:00", "f5": "12:25", "f7": "12:40", "f9": "12:48", "f11": "12:55" } },
+      { "id": "21-T7", "partenza": "13:45", "stopTimes": { "f1": "13:45", "f5": "14:10", "f7": "14:30", "f9": "14:40", "f11": "14:50" } },
+      { "id": "21-T8", "partenza": "14:50", "stopTimes": { "f1": "14:50", "f5": "15:15", "f7": "15:30", "f9": "15:38", "f11": "15:45" } },
+      { "id": "21-T9", "partenza": "16:40", "stopTimes": { "f1": "16:40", "f5": "17:00", "f7": "17:15", "f9": "17:22", "f11": "17:30" } },
+      { "id": "21-T10", "partenza": "17:40", "stopTimes": { "f1": "17:40", "f5": "18:00", "f7": "18:15", "f9": "18:22", "f11": "18:30" } },
+      { "id": "21-T11", "partenza": "18:40", "stopTimes": { "f1": "18:40", "f5": "19:00", "f7": "19:15", "f9": "19:22", "f11": "19:30" } },
+      { "id": "21-T12", "partenza": "19:40", "stopTimes": { "f1": "19:40", "f5": "20:00", "f7": "20:15", "f9": "20:22", "f11": "20:30" } }
     ]
   },
   "22": {
@@ -31,17 +37,19 @@ linee_data = {
     "colore": "#7c3aed",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Ceri - Borgo S. Martino", "lat": 41.995400, "lng": 12.148700 },
-      { "id": "f3", "nome": "I Terzi (Piazza Tisserant)", "lat": 41.998000, "lng": 12.165000 },
-      { "id": "f4", "nome": "Viale Manzoni (Ritorno)", "lat": 41.995641, "lng": 12.092690 }
+      { "id": "f2", "nome": "Via Settevene Palo / Via S. Paolo", "lat": 41.992279, "lng": 12.090225 },
+      { "id": "f3", "nome": "Via di Ceri / Doganale", "lat": 41.994000, "lng": 12.120000 },
+      { "id": "f4", "nome": "Ceri - Borgo S. Martino", "lat": 41.995400, "lng": 12.148700 },
+      { "id": "f5", "nome": "I Terzi (Piazza Cardinal Tisserant)", "lat": 41.998000, "lng": 12.165000 },
+      { "id": "f6", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "22-T1", "partenza": "06:55", "stopTimes": { "f1": "06:55", "f3": "07:25", "f4": "08:00" } },
-      { "id": "22-T2", "partenza": "09:05", "stopTimes": { "f1": "09:05", "f3": "09:35", "f4": "10:05" } },
-      { "id": "22-T3", "partenza": "11:10", "stopTimes": { "f1": "11:10", "f3": "11:40", "f4": "12:10" } },
-      { "id": "22-T4", "partenza": "14:30", "stopTimes": { "f1": "14:30", "f3": "15:10", "f4": "15:40" } },
-      { "id": "22-T5", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f3": "17:35", "f4": "18:10" } },
-      { "id": "22-T6", "partenza": "19:25", "stopTimes": { "f1": "19:25", "f3": "20:00", "f4": "20:35" } }
+      { "id": "22-T1", "partenza": "06:55", "stopTimes": { "f1": "06:55", "f4": "07:15", "f5": "07:25", "f6": "08:00" } },
+      { "id": "22-T2", "partenza": "09:05", "stopTimes": { "f1": "09:05", "f4": "09:25", "f5": "09:35", "f6": "10:05" } },
+      { "id": "22-T3", "partenza": "11:10", "stopTimes": { "f1": "11:10", "f4": "11:30", "f5": "11:40", "f6": "12:10" } },
+      { "id": "22-T4", "partenza": "14:30", "stopTimes": { "f1": "14:30", "f4": "14:55", "f5": "15:10", "f6": "15:40" } },
+      { "id": "22-T5", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f4": "17:25", "f5": "17:35", "f6": "18:10" } },
+      { "id": "22-T6", "partenza": "19:25", "stopTimes": { "f1": "19:25", "f4": "19:50", "f5": "20:00", "f6": "20:35" } }
     ]
   },
   "23": {
@@ -49,29 +57,32 @@ linee_data = {
     "colore": "#0077cc",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Via Settevene Palo", "lat": 41.992279, "lng": 12.090225 },
-      { "id": "f3", "nome": "Via Aurelia (Poliambulatorio)", "lat": 41.970301, "lng": 12.081321 },
-      { "id": "f4", "nome": "Via Settevene Palo Nord", "lat": 41.965732, "lng": 12.083648 },
-      { "id": "f5", "nome": "Via Taranto (Stazione FS)", "lat": 41.960693, "lng": 12.082584 },
-      { "id": "f6", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f7", "nome": "Valcanneto (Largo Monteverdi)", "lat": 41.935233, "lng": 12.153563 }
+      { "id": "f2", "nome": "Via Settevene Palo / Poliambulatorio", "lat": 41.970301, "lng": 12.081321 },
+      { "id": "f3", "nome": "Via Taranto / Via Flavia", "lat": 41.960693, "lng": 12.082584 },
+      { "id": "f4", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f5", "nome": "Via Amalfi / Via Trieste / Via Odescalchi", "lat": 41.948387, "lng": 12.080904 },
+      { "id": "f6", "nome": "Via Doganale / Via Aurelia", "lat": 41.942000, "lng": 12.110000 },
+      { "id": "f7", "nome": "Valcanneto (Largo Monteverdi)", "lat": 41.935233, "lng": 12.153563 },
+      { "id": "f8", "nome": "Via Pergolesi / Via Vivaldi / Via Boito", "lat": 41.936000, "lng": 12.152000 },
+      { "id": "f9", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f10", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "23-T1", "partenza": "05:25", "stopTimes": { "f1": "05:25", "f6": "05:40", "f7": "06:00" } },
-      { "id": "23-T2", "partenza": "06:15", "stopTimes": { "f1": "06:15", "f6": "06:30", "f7": "06:50" } },
-      { "id": "23-T3", "partenza": "06:40", "stopTimes": { "f1": "06:40", "f6": "06:55", "f7": "07:15" } },
-      { "id": "23-T4", "partenza": "07:45", "stopTimes": { "f1": "07:45", "f6": "08:00", "f7": "08:30" } },
-      { "id": "23-T5", "partenza": "08:25", "stopTimes": { "f1": "08:25", "f6": "08:40", "f7": "09:05" } },
-      { "id": "23-T6", "partenza": "09:35", "stopTimes": { "f1": "09:35", "f6": "09:50", "f7": "10:15" } },
-      { "id": "23-T7", "partenza": "10:10", "stopTimes": { "f1": "10:10", "f6": "10:25", "f7": "10:50" } },
-      { "id": "23-T8", "partenza": "11:15", "stopTimes": { "f1": "11:15", "f6": "11:30", "f7": "11:55" } },
-      { "id": "23-T9", "partenza": "11:45", "stopTimes": { "f1": "11:45", "f6": "12:00", "f7": "12:20" } },
-      { "id": "23-T10", "partenza": "13:00", "stopTimes": { "f1": "13:00", "f6": "13:15", "f7": "13:45" } },
-      { "id": "23-T11", "partenza": "14:40", "stopTimes": { "f1": "14:40", "f6": "14:55", "f7": "15:25" } },
-      { "id": "23-T12", "partenza": "15:25", "stopTimes": { "f1": "15:25", "f6": "15:40", "f7": "16:05" } },
-      { "id": "23-T13", "partenza": "17:05", "stopTimes": { "f1": "17:05", "f6": "17:20", "f7": "17:45" } },
-      { "id": "23-T14", "partenza": "18:10", "stopTimes": { "f1": "18:10", "f6": "18:25", "f7": "18:55" } },
-      { "id": "23-T15", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f6": "19:15", "f7": "19:55" } }
+      { "id": "23-T1", "partenza": "05:25", "stopTimes": { "f1": "05:25", "f4": "05:40", "f7": "06:00", "f9": "06:15", "f10": "06:40" } },
+      { "id": "23-T2", "partenza": "06:15", "stopTimes": { "f1": "06:15", "f4": "06:30", "f7": "06:50", "f9": "07:30", "f10": "07:45" } },
+      { "id": "23-T3", "partenza": "06:40", "stopTimes": { "f1": "06:40", "f4": "06:55", "f7": "07:15", "f9": "07:30", "f10": "08:05" } },
+      { "id": "23-T4", "partenza": "07:45", "stopTimes": { "f1": "07:45", "f4": "08:00", "f7": "08:30", "f9": "08:45", "f10": "09:15" } },
+      { "id": "23-T5", "partenza": "08:25", "stopTimes": { "f1": "08:25", "f4": "08:40", "f7": "09:05", "f9": "09:25", "f10": "09:55" } },
+      { "id": "23-T6", "partenza": "09:35", "stopTimes": { "f1": "09:35", "f4": "09:50", "f7": "10:15", "f9": "10:35", "f10": "11:05" } },
+      { "id": "23-T7", "partenza": "10:10", "stopTimes": { "f1": "10:10", "f4": "10:25", "f7": "10:50", "f9": "11:05", "f10": "11:35" } },
+      { "id": "23-T8", "partenza": "11:15", "stopTimes": { "f1": "11:15", "f4": "11:30", "f7": "11:55", "f9": "12:10", "f10": "12:40" } },
+      { "id": "23-T9", "partenza": "11:45", "stopTimes": { "f1": "11:45", "f4": "12:00", "f7": "12:20", "f9": "13:15", "f10": "13:45" } },
+      { "id": "23-T10", "partenza": "13:00", "stopTimes": { "f1": "13:00", "f4": "13:15", "f7": "13:45", "f9": "14:05", "f10": "14:40" } },
+      { "id": "23-T11", "partenza": "14:40", "stopTimes": { "f1": "14:40", "f4": "14:55", "f7": "15:25", "f9": "15:45", "f10": "16:15" } },
+      { "id": "23-T12", "partenza": "15:25", "stopTimes": { "f1": "15:25", "f4": "15:40", "f7": "16:05", "f9": "16:20", "f10": "16:50" } },
+      { "id": "23-T13", "partenza": "17:05", "stopTimes": { "f1": "17:05", "f4": "17:20", "f7": "17:45", "f9": "18:00", "f10": "18:30" } },
+      { "id": "23-T14", "partenza": "18:10", "stopTimes": { "f1": "18:10", "f4": "18:25", "f7": "18:55", "f9": "19:10", "f10": "19:40" } },
+      { "id": "23-T15", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f4": "19:15", "f7": "19:55", "f9": "20:10", "f10": "20:40" } }
     ]
   },
   "24": {
@@ -79,19 +90,21 @@ linee_data = {
     "colore": "#059669",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Tirsenia - Via Chirieletti", "lat": 41.980000, "lng": 12.088000 },
-      { "id": "f3", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
-      { "id": "f4", "nome": "Campo di Mare (Lungomare)", "lat": 41.950000, "lng": 12.070000 },
-      { "id": "f5", "nome": "Viale Manzoni (Ritorno)", "lat": 41.995641, "lng": 12.092690 }
+      { "id": "f2", "nome": "Via Chirieletti / Via F. Morella", "lat": 41.980000, "lng": 12.088000 },
+      { "id": "f3", "nome": "Tirsenia - Via Agilla", "lat": 41.975000, "lng": 12.085000 },
+      { "id": "f4", "nome": "Viale Campo di Mare / Via Marini", "lat": 41.965000, "lng": 12.082000 },
+      { "id": "f5", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
+      { "id": "f6", "nome": "Lungomare dei Navigatori Etruschi", "lat": 41.950000, "lng": 12.070000 },
+      { "id": "f7", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "24-T1", "partenza": "06:00", "stopTimes": { "f1": "06:00", "f3": "06:30", "f5": "06:55" } },
-      { "id": "24-T2", "partenza": "08:05", "stopTimes": { "f1": "08:05", "f3": "08:35", "f5": "09:00" } },
-      { "id": "24-T3", "partenza": "10:10", "stopTimes": { "f1": "10:10", "f3": "10:40", "f5": "11:05" } },
-      { "id": "24-T4", "partenza": "12:15", "stopTimes": { "f1": "12:15", "f3": "12:45", "f5": "13:10" } },
-      { "id": "24-T5", "partenza": "13:30", "stopTimes": { "f1": "13:30", "f3": "14:00", "f5": "14:25" } },
-      { "id": "24-T6", "partenza": "15:45", "stopTimes": { "f1": "15:45", "f3": "16:20", "f5": "16:50" } },
-      { "id": "24-T7", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f3": "18:50", "f5": "19:20" } }
+      { "id": "24-T1", "partenza": "06:00", "stopTimes": { "f1": "06:00", "f5": "06:30", "f7": "06:55" } },
+      { "id": "24-T2", "partenza": "08:05", "stopTimes": { "f1": "08:05", "f5": "08:35", "f7": "09:00" } },
+      { "id": "24-T3", "partenza": "10:10", "stopTimes": { "f1": "10:10", "f5": "10:40", "f7": "11:05" } },
+      { "id": "24-T4", "partenza": "12:15", "stopTimes": { "f1": "12:15", "f5": "12:45", "f7": "13:10" } },
+      { "id": "24-T5", "partenza": "13:30", "stopTimes": { "f1": "13:30", "f5": "14:00", "f7": "14:25" } },
+      { "id": "24-T6", "partenza": "15:45", "stopTimes": { "f1": "15:45", "f5": "16:20", "f7": "16:50" } },
+      { "id": "24-T7", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f5": "18:50", "f7": "19:20" } }
     ]
   },
   "25": {
@@ -99,26 +112,28 @@ linee_data = {
     "colore": "#d97706",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
-      { "id": "f3", "nome": "Viale Manzoni (Ritorno)", "lat": 41.995641, "lng": 12.092690 }
+      { "id": "f2", "nome": "Via Chirieletti / Via F. Morella", "lat": 41.980000, "lng": 12.088000 },
+      { "id": "f3", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
+      { "id": "f4", "nome": "Lungomare Navigatori Etruschi", "lat": 41.950000, "lng": 12.070000 },
+      { "id": "f5", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "25-T1", "partenza": "05:40", "stopTimes": { "f1": "05:40", "f2": "06:05", "f3": "06:20" } },
-      { "id": "25-T2", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f2": "06:45", "f3": "07:00" } },
-      { "id": "25-T3", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f2": "07:25", "f3": "07:50" } },
-      { "id": "25-T4", "partenza": "07:50", "stopTimes": { "f1": "07:50", "f2": "08:20", "f3": "08:35" } },
-      { "id": "25-T5", "partenza": "09:00", "stopTimes": { "f1": "09:00", "f2": "09:25", "f3": "09:50" } },
-      { "id": "25-T6", "partenza": "10:00", "stopTimes": { "f1": "10:00", "f2": "10:30", "f3": "10:55" } },
-      { "id": "25-T7", "partenza": "11:00", "stopTimes": { "f1": "11:00", "f2": "11:30", "f3": "11:45" } },
-      { "id": "25-T8", "partenza": "11:50", "stopTimes": { "f1": "11:50", "f2": "12:15", "f3": "12:30" } },
-      { "id": "25-T9", "partenza": "12:50", "stopTimes": { "f1": "12:50", "f2": "13:20", "f3": "13:35" } },
-      { "id": "25-T10", "partenza": "13:40", "stopTimes": { "f1": "13:40", "f2": "14:10", "f3": "14:25" } },
-      { "id": "25-T11", "partenza": "14:40", "stopTimes": { "f1": "14:40", "f2": "15:10", "f3": "15:35" } },
-      { "id": "25-T12", "partenza": "15:50", "stopTimes": { "f1": "15:50", "f2": "16:20", "f3": "16:45" } },
-      { "id": "25-T13", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f2": "17:30", "f3": "17:45" } },
-      { "id": "25-T14", "partenza": "18:00", "stopTimes": { "f1": "18:00", "f2": "18:25", "f3": "18:40" } },
-      { "id": "25-T15", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f2": "19:25", "f3": "19:40" } },
-      { "id": "25-T16", "partenza": "20:00", "stopTimes": { "f1": "20:00", "f2": "20:25", "f3": "20:40" } }
+      { "id": "25-T1", "partenza": "05:40", "stopTimes": { "f1": "05:40", "f3": "06:05", "f5": "06:20" } },
+      { "id": "25-T2", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f3": "06:45", "f5": "07:00" } },
+      { "id": "25-T3", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f3": "07:25", "f5": "07:50" } },
+      { "id": "25-T4", "partenza": "07:50", "stopTimes": { "f1": "07:50", "f3": "08:20", "f5": "08:35" } },
+      { "id": "25-T5", "partenza": "09:00", "stopTimes": { "f1": "09:00", "f3": "09:25", "f5": "09:50" } },
+      { "id": "25-T6", "partenza": "10:00", "stopTimes": { "f1": "10:00", "f3": "10:30", "f5": "10:55" } },
+      { "id": "25-T7", "partenza": "11:00", "stopTimes": { "f1": "11:00", "f3": "11:30", "f5": "11:45" } },
+      { "id": "25-T8", "partenza": "11:50", "stopTimes": { "f1": "11:50", "f3": "12:15", "f5": "12:30" } },
+      { "id": "25-T9", "partenza": "12:50", "stopTimes": { "f1": "12:50", "f3": "13:20", "f5": "13:35" } },
+      { "id": "25-T10", "partenza": "13:40", "stopTimes": { "f1": "13:40", "f3": "14:10", "f5": "14:25" } },
+      { "id": "25-T11", "partenza": "14:40", "stopTimes": { "f1": "14:40", "f3": "15:10", "f5": "15:35" } },
+      { "id": "25-T12", "partenza": "15:50", "stopTimes": { "f1": "15:50", "f3": "16:20", "f5": "16:45" } },
+      { "id": "25-T13", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f3": "17:30", "f5": "17:45" } },
+      { "id": "25-T14", "partenza": "18:00", "stopTimes": { "f1": "18:00", "f3": "18:25", "f5": "18:40" } },
+      { "id": "25-T15", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f3": "19:25", "f5": "19:40" } },
+      { "id": "25-T16", "partenza": "20:00", "stopTimes": { "f1": "20:00", "f3": "20:25", "f5": "20:40" } }
     ]
   },
   "26": {
@@ -126,158 +141,175 @@ linee_data = {
     "colore": "#6b7280",
     "stops": [
       { "id": "f1", "nome": "Viale Manzoni (Capolinea)", "lat": 41.995641, "lng": 12.092690 },
-      { "id": "f2", "nome": "Via dei Vignali (Cimitero)", "lat": 41.992279, "lng": 12.090225 },
-      { "id": "f3", "nome": "Viale Manzoni (Ritorno)", "lat": 41.995641, "lng": 12.092690 }
+      { "id": "f2", "nome": "Via Rosati / Via Merlini / Via Matteotti", "lat": 41.994000, "lng": 12.091500 },
+      { "id": "f3", "nome": "Piazza S. Pietro / Via Piave", "lat": 41.993000, "lng": 12.090500 },
+      { "id": "f4", "nome": "Via dei Vignali (Piazzale Cimitero)", "lat": 41.992279, "lng": 12.090225 },
+      { "id": "f5", "nome": "Viale Manzoni (Ritorno Capolinea)", "lat": 41.995641, "lng": 12.092690 }
     ],
     "tratte": [
-      { "id": "26-T1", "partenza": "09:25", "stopTimes": { "f1": "09:25", "f2": "09:35", "f3": "10:10" } },
-      { "id": "26-T2", "partenza": "15:50", "stopTimes": { "f1": "15:50", "f2": "16:00", "f3": "16:35" } }
+      { "id": "26-T1", "partenza": "09:25", "stopTimes": { "f1": "09:25", "f4": "09:35", "f5": "10:10" } },
+      { "id": "26-T2", "partenza": "15:50", "stopTimes": { "f1": "15:50", "f4": "16:00", "f5": "16:35" } }
     ]
   },
   "27": {
     "nome": "27 - Stazione FS Ladispoli - Centro - Poliambulatorio - Miami",
     "colore": "#ec4899",
     "stops": [
-      { "id": "f1", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f2", "nome": "Via Odescalchi / Centro", "lat": 41.948387, "lng": 12.080904 },
-      { "id": "f3", "nome": "Poliambulatorio Via A. Moro", "lat": 41.970301, "lng": 12.081321 },
-      { "id": "f4", "nome": "Quartiere Miami", "lat": 41.958000, "lng": 12.090000 },
-      { "id": "f5", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 }
+      { "id": "f1", "nome": "Stazione FS Ladispoli (Capolinea)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f2", "nome": "Via Amalfi / Via Trieste / Via Ancona", "lat": 41.950000, "lng": 12.082000 },
+      { "id": "f3", "nome": "Via Caltagirone (Poste / Ist. Alberghiero)", "lat": 41.960000, "lng": 12.084000 },
+      { "id": "f4", "nome": "Via A. Moro (Poliambulatorio)", "lat": 41.970301, "lng": 12.081321 },
+      { "id": "f5", "nome": "Zona Artigianale / Via Berlinguer", "lat": 41.965000, "lng": 12.085000 },
+      { "id": "f6", "nome": "Quartiere Miami (Viale Mediterraneo)", "lat": 41.958000, "lng": 12.090000 },
+      { "id": "f7", "nome": "Stazione FS Ladispoli (Ritorno Capolinea)", "lat": 41.953229, "lng": 12.081469 }
     ],
     "tratte": [
-      { "id": "27-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f3": "06:35", "f5": "07:10" } },
-      { "id": "27-T2", "partenza": "07:10", "stopTimes": { "f1": "07:10", "f3": "07:35", "f5": "08:20" } },
-      { "id": "27-T3", "partenza": "08:30", "stopTimes": { "f1": "08:30", "f3": "08:45", "f5": "09:30" } },
-      { "id": "27-T4", "partenza": "09:35", "stopTimes": { "f1": "09:35", "f3": "09:50", "f5": "10:35" } },
-      { "id": "27-T5", "partenza": "10:45", "stopTimes": { "f1": "10:45", "f3": "11:00", "f5": "11:45" } },
-      { "id": "27-T6", "partenza": "11:50", "stopTimes": { "f1": "11:50", "f3": "12:05", "f5": "12:50" } },
-      { "id": "27-T7", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f3": "13:35", "f5": "14:20" } },
-      { "id": "27-T8", "partenza": "14:20", "stopTimes": { "f1": "14:20", "f3": "14:35", "f5": "15:20" } },
-      { "id": "27-T9", "partenza": "15:20", "stopTimes": { "f1": "15:20", "f3": "15:35", "f5": "16:20" } },
-      { "id": "27-T10", "partenza": "16:30", "stopTimes": { "f1": "16:30", "f3": "16:45", "f5": "17:30" } },
-      { "id": "27-T11", "partenza": "17:35", "stopTimes": { "f1": "17:35", "f3": "17:50", "f5": "18:35" } },
-      { "id": "27-T12", "partenza": "18:45", "stopTimes": { "f1": "18:45", "f3": "19:00", "f5": "19:45" } }
+      { "id": "27-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f4": "06:35", "f7": "07:10" } },
+      { "id": "27-T2", "partenza": "07:10", "stopTimes": { "f1": "07:10", "f4": "07:35", "f7": "08:20" } },
+      { "id": "27-T3", "partenza": "08:30", "stopTimes": { "f1": "08:30", "f4": "08:45", "f7": "09:30" } },
+      { "id": "27-T4", "partenza": "09:35", "stopTimes": { "f1": "09:35", "f4": "09:50", "f7": "10:35" } },
+      { "id": "27-T5", "partenza": "10:45", "stopTimes": { "f1": "10:45", "f4": "11:00", "f7": "11:45" } },
+      { "id": "27-T6", "partenza": "11:50", "stopTimes": { "f1": "11:50", "f4": "12:05", "f7": "12:50" } },
+      { "id": "27-T7", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f4": "13:35", "f7": "14:20" } },
+      { "id": "27-T8", "partenza": "14:20", "stopTimes": { "f1": "14:20", "f4": "14:35", "f7": "15:20" } },
+      { "id": "27-T9", "partenza": "15:20", "stopTimes": { "f1": "15:20", "f4": "15:35", "f7": "16:20" } },
+      { "id": "27-T10", "partenza": "16:30", "stopTimes": { "f1": "16:30", "f4": "16:45", "f7": "17:30" } },
+      { "id": "27-T11", "partenza": "17:35", "stopTimes": { "f1": "17:35", "f4": "17:50", "f7": "18:35" } },
+      { "id": "27-T12", "partenza": "18:45", "stopTimes": { "f1": "18:45", "f4": "19:00", "f7": "19:45" } }
     ]
   },
   "28": {
     "nome": "28 - Stazione FS Ladispoli - Marina di S. Nicola",
     "colore": "#0284c7",
     "stops": [
-      { "id": "f1", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f2", "nome": "Piazza Domitilla", "lat": 41.945000, "lng": 12.085000 },
-      { "id": "f3", "nome": "Marina di San Nicola (Ingresso)", "lat": 41.934620, "lng": 12.117870 },
-      { "id": "f4", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 }
+      { "id": "f1", "nome": "Stazione FS Ladispoli (Capolinea)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f2", "nome": "Via Taranto / Via Flavia / Via Claudia", "lat": 41.955000, "lng": 12.083000 },
+      { "id": "f3", "nome": "Via Roma / Via Odescalchi / Via Palo Laziale", "lat": 41.948000, "lng": 12.080000 },
+      { "id": "f4", "nome": "Piazza Domitilla", "lat": 41.945000, "lng": 12.085000 },
+      { "id": "f5", "nome": "Marina di San Nicola (Ingresso)", "lat": 41.934620, "lng": 12.117870 },
+      { "id": "f6", "nome": "Piazza Orsa Maggiore / Via Saturno", "lat": 41.933000, "lng": 12.120000 },
+      { "id": "f7", "nome": "Stazione FS Ladispoli (Ritorno Capolinea)", "lat": 41.953229, "lng": 12.081469 }
     ],
     "tratte": [
-      { "id": "28-T1", "partenza": "05:35", "stopTimes": { "f1": "05:35", "f3": "05:50", "f4": "06:20" } },
-      { "id": "28-T2", "partenza": "06:15", "stopTimes": { "f1": "06:15", "f3": "06:30", "f4": "07:00" } },
-      { "id": "28-T3", "partenza": "07:10", "stopTimes": { "f1": "07:10", "f3": "07:25", "f4": "08:00" } },
-      { "id": "28-T4", "partenza": "08:15", "stopTimes": { "f1": "08:15", "f3": "08:30", "f4": "09:00" } },
-      { "id": "28-T5", "partenza": "09:15", "stopTimes": { "f1": "09:15", "f3": "09:30", "f4": "10:00" } },
-      { "id": "28-T6", "partenza": "10:15", "stopTimes": { "f1": "10:15", "f3": "10:30", "f4": "11:00" } },
-      { "id": "28-T7", "partenza": "11:15", "stopTimes": { "f1": "11:15", "f3": "11:30", "f4": "12:00" } },
-      { "id": "28-T8", "partenza": "12:15", "stopTimes": { "f1": "12:15", "f3": "12:30", "f4": "13:00" } },
-      { "id": "28-T9", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f3": "13:35", "f4": "14:10" } },
-      { "id": "28-T10", "partenza": "14:10", "stopTimes": { "f1": "14:10", "f3": "14:25", "f4": "15:00" } },
-      { "id": "28-T11", "partenza": "15:10", "stopTimes": { "f1": "15:10", "f3": "15:25", "f4": "16:00" } },
-      { "id": "28-T12", "partenza": "16:15", "stopTimes": { "f1": "16:15", "f3": "16:30", "f4": "17:00" } },
-      { "id": "28-T13", "partenza": "17:15", "stopTimes": { "f1": "17:15", "f3": "17:30", "f4": "18:00" } },
-      { "id": "28-T14", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f3": "18:30", "f4": "19:00" } },
-      { "id": "28-T15", "partenza": "19:15", "stopTimes": { "f1": "19:15", "f3": "19:30", "f4": "20:00" } },
-      { "id": "28-T16", "partenza": "19:50", "stopTimes": { "f1": "19:50", "f3": "20:05", "f4": "20:35" } }
+      { "id": "28-T1", "partenza": "05:35", "stopTimes": { "f1": "05:35", "f5": "05:50", "f7": "06:20" } },
+      { "id": "28-T2", "partenza": "06:15", "stopTimes": { "f1": "06:15", "f5": "06:30", "f7": "07:00" } },
+      { "id": "28-T3", "partenza": "07:10", "stopTimes": { "f1": "07:10", "f5": "07:25", "f7": "08:00" } },
+      { "id": "28-T4", "partenza": "08:15", "stopTimes": { "f1": "08:15", "f5": "08:30", "f7": "09:00" } },
+      { "id": "28-T5", "partenza": "09:15", "stopTimes": { "f1": "09:15", "f5": "09:30", "f7": "10:00" } },
+      { "id": "28-T6", "partenza": "10:15", "stopTimes": { "f1": "10:15", "f5": "10:30", "f7": "11:00" } },
+      { "id": "28-T7", "partenza": "11:15", "stopTimes": { "f1": "11:15", "f5": "11:30", "f7": "12:00" } },
+      { "id": "28-T8", "partenza": "12:15", "stopTimes": { "f1": "12:15", "f5": "12:30", "f7": "13:00" } },
+      { "id": "28-T9", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f5": "13:35", "f7": "14:10" } },
+      { "id": "28-T10", "partenza": "14:10", "stopTimes": { "f1": "14:10", "f5": "14:25", "f7": "15:00" } },
+      { "id": "28-T11", "partenza": "15:10", "stopTimes": { "f1": "15:10", "f5": "15:25", "f7": "16:00" } },
+      { "id": "28-T12", "partenza": "16:15", "stopTimes": { "f1": "16:15", "f5": "16:30", "f7": "17:00" } },
+      { "id": "28-T13", "partenza": "17:15", "stopTimes": { "f1": "17:15", "f5": "17:30", "f7": "18:00" } },
+      { "id": "28-T14", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f5": "18:30", "f7": "19:00" } },
+      { "id": "28-T15", "partenza": "19:15", "stopTimes": { "f1": "19:15", "f5": "19:30", "f7": "20:00" } },
+      { "id": "28-T16", "partenza": "19:50", "stopTimes": { "f1": "19:50", "f5": "20:05", "f7": "20:35" } }
     ]
   },
   "29": {
     "nome": "29 - Stazione FS Ladispoli - Marina di Palo - Cerenova",
     "colore": "#8b5cf6",
     "stops": [
-      { "id": "f1", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f2", "nome": "Marina di Palo", "lat": 41.942000, "lng": 12.075000 },
-      { "id": "f3", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
-      { "id": "f4", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 }
+      { "id": "f1", "nome": "Stazione FS Ladispoli (Capolinea)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f2", "nome": "Via Trieste / Via Odescalchi", "lat": 41.948000, "lng": 12.080000 },
+      { "id": "f3", "nome": "Marina di Palo (Lungomare)", "lat": 41.942000, "lng": 12.075000 },
+      { "id": "f4", "nome": "Via Caltagirone / Via Claudia", "lat": 41.960000, "lng": 12.083000 },
+      { "id": "f5", "nome": "Stazione FS Cerenova", "lat": 41.960693, "lng": 12.082584 },
+      { "id": "f6", "nome": "Poliambulatorio / Cimitero", "lat": 41.970301, "lng": 12.081321 },
+      { "id": "f7", "nome": "Stazione FS Ladispoli (Ritorno Capolinea)", "lat": 41.953229, "lng": 12.081469 }
     ],
     "tratte": [
-      { "id": "29-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f3": "06:45", "f4": "07:10" } },
-      { "id": "29-T2", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f3": "07:45", "f4": "08:15" } },
-      { "id": "29-T3", "partenza": "08:20", "stopTimes": { "f1": "08:20", "f3": "08:45", "f4": "09:10" } },
-      { "id": "29-T4", "partenza": "09:20", "stopTimes": { "f1": "09:20", "f3": "09:45", "f4": "10:10" } },
-      { "id": "29-T5", "partenza": "10:20", "stopTimes": { "f1": "10:20", "f3": "10:45", "f4": "11:10" } },
-      { "id": "29-T6", "partenza": "11:20", "stopTimes": { "f1": "11:20", "f3": "11:45", "f4": "12:10" } },
-      { "id": "29-T7", "partenza": "12:20", "stopTimes": { "f1": "12:20", "f3": "12:45", "f4": "13:10" } },
-      { "id": "29-T8", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f3": "13:45", "f4": "14:10" } },
-      { "id": "29-T9", "partenza": "14:20", "stopTimes": { "f1": "14:20", "f3": "14:45", "f4": "15:15" } },
-      { "id": "29-T10", "partenza": "15:15", "stopTimes": { "f1": "15:15", "f3": "15:40", "f4": "16:10" } },
-      { "id": "29-T11", "partenza": "16:20", "stopTimes": { "f1": "16:20", "f3": "16:45", "f4": "17:10" } },
-      { "id": "29-T12", "partenza": "17:20", "stopTimes": { "f1": "17:20", "f3": "17:45", "f4": "18:10" } },
-      { "id": "29-T13", "partenza": "18:20", "stopTimes": { "f1": "18:20", "f3": "18:45", "f4": "19:10" } },
-      { "id": "29-T14", "partenza": "19:20", "stopTimes": { "f1": "19:20", "f3": "19:45", "f4": "20:10" } }
+      { "id": "29-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f5": "06:45", "f7": "07:10" } },
+      { "id": "29-T2", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f5": "07:45", "f7": "08:15" } },
+      { "id": "29-T3", "partenza": "08:20", "stopTimes": { "f1": "08:20", "f5": "08:45", "f7": "09:10" } },
+      { "id": "29-T4", "partenza": "09:20", "stopTimes": { "f1": "09:20", "f5": "09:45", "f7": "10:10" } },
+      { "id": "29-T5", "partenza": "10:20", "stopTimes": { "f1": "10:20", "f5": "10:45", "f7": "11:10" } },
+      { "id": "29-T6", "partenza": "11:20", "stopTimes": { "f1": "11:20", "f5": "11:45", "f7": "12:10" } },
+      { "id": "29-T7", "partenza": "12:20", "stopTimes": { "f1": "12:20", "f5": "12:45", "f7": "13:10" } },
+      { "id": "29-T8", "partenza": "13:20", "stopTimes": { "f1": "13:20", "f5": "13:45", "f7": "14:10" } },
+      { "id": "29-T9", "partenza": "14:20", "stopTimes": { "f1": "14:20", "f5": "14:45", "f7": "15:15" } },
+      { "id": "29-T10", "partenza": "15:15", "stopTimes": { "f1": "15:15", "f5": "15:40", "f7": "16:10" } },
+      { "id": "29-T11", "partenza": "16:20", "stopTimes": { "f1": "16:20", "f5": "16:45", "f7": "17:10" } },
+      { "id": "29-T12", "partenza": "17:20", "stopTimes": { "f1": "17:20", "f5": "17:45", "f7": "18:10" } },
+      { "id": "29-T13", "partenza": "18:20", "stopTimes": { "f1": "18:20", "f5": "18:45", "f7": "19:10" } },
+      { "id": "29-T14", "partenza": "19:20", "stopTimes": { "f1": "19:20", "f5": "19:45", "f7": "20:10" } }
     ]
   },
   "30": {
     "nome": "30 - Stazione FS Ladispoli - Monteroni - Poste",
     "colore": "#14b8a6",
     "stops": [
-      { "id": "f1", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f2", "nome": "Bivio Monteroni", "lat": 41.975000, "lng": 12.110000 },
-      { "id": "f3", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 }
+      { "id": "f1", "nome": "Stazione FS Ladispoli (Capolinea)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f2", "nome": "Via Flavia / Via Milazzo / Via Cagliari", "lat": 41.955000, "lng": 12.083000 },
+      { "id": "f3", "nome": "Poliambulatorio / Via Aldo Moro", "lat": 41.970301, "lng": 12.081321 },
+      { "id": "f4", "nome": "Via dei Monteroni / Casal dei Venti", "lat": 41.975000, "lng": 12.110000 },
+      { "id": "f5", "nome": "Cimitero / Via Costantini", "lat": 41.965000, "lng": 12.085000 },
+      { "id": "f6", "nome": "Stazione FS Ladispoli (Ritorno Capolinea)", "lat": 41.953229, "lng": 12.081469 }
     ],
     "tratte": [
-      { "id": "30-T1", "partenza": "06:10", "stopTimes": { "f1": "06:10", "f2": "06:30", "f3": "07:00" } },
-      { "id": "30-T2", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f2": "07:20", "f3": "08:00" } },
-      { "id": "30-T3", "partenza": "08:10", "stopTimes": { "f1": "08:10", "f2": "08:30", "f3": "09:20" } },
-      { "id": "30-T4", "partenza": "09:40", "stopTimes": { "f1": "09:40", "f2": "10:00", "f3": "10:45" } },
-      { "id": "30-T5", "partenza": "11:00", "stopTimes": { "f1": "11:00", "f2": "11:20", "f3": "12:10" } },
-      { "id": "30-T6", "partenza": "12:20", "stopTimes": { "f1": "12:20", "f2": "12:40", "f3": "13:25" } },
-      { "id": "30-T7", "partenza": "13:30", "stopTimes": { "f1": "13:30", "f2": "13:50", "f3": "14:30" } },
-      { "id": "30-T8", "partenza": "14:30", "stopTimes": { "f1": "14:30", "f2": "14:50", "f3": "15:35" } },
-      { "id": "30-T9", "partenza": "15:40", "stopTimes": { "f1": "15:40", "f2": "16:00", "f3": "16:30" } },
-      { "id": "30-T10", "partenza": "16:40", "stopTimes": { "f1": "16:40", "f2": "17:00", "f3": "17:30" } },
-      { "id": "30-T11", "partenza": "17:40", "stopTimes": { "f1": "17:40", "f2": "18:00", "f3": "18:30" } },
-      { "id": "30-T12", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f2": "19:20", "f3": "19:50" } }
+      { "id": "30-T1", "partenza": "06:10", "stopTimes": { "f1": "06:10", "f4": "06:30", "f6": "07:00" } },
+      { "id": "30-T2", "partenza": "07:00", "stopTimes": { "f1": "07:00", "f4": "07:20", "f6": "08:00" } },
+      { "id": "30-T3", "partenza": "08:10", "stopTimes": { "f1": "08:10", "f4": "08:30", "f6": "09:20" } },
+      { "id": "30-T4", "partenza": "09:40", "stopTimes": { "f1": "09:40", "f4": "10:00", "f6": "10:45" } },
+      { "id": "30-T5", "partenza": "11:00", "stopTimes": { "f1": "11:00", "f4": "11:20", "f6": "12:10" } },
+      { "id": "30-T6", "partenza": "12:20", "stopTimes": { "f1": "12:20", "f4": "12:40", "f6": "13:25" } },
+      { "id": "30-T7", "partenza": "13:30", "stopTimes": { "f1": "13:30", "f4": "13:50", "f6": "14:30" } },
+      { "id": "30-T8", "partenza": "14:30", "stopTimes": { "f1": "14:30", "f4": "14:50", "f6": "15:35" } },
+      { "id": "30-T9", "partenza": "15:40", "stopTimes": { "f1": "15:40", "f4": "16:00", "f6": "16:30" } },
+      { "id": "30-T10", "partenza": "16:40", "stopTimes": { "f1": "16:40", "f4": "17:00", "f6": "17:30" } },
+      { "id": "30-T11", "partenza": "17:40", "stopTimes": { "f1": "17:40", "f4": "18:00", "f6": "18:30" } },
+      { "id": "30-T12", "partenza": "19:00", "stopTimes": { "f1": "19:00", "f4": "19:20", "f6": "19:50" } }
     ]
   },
   "32": {
     "nome": "32 - Stazione FS Ladispoli - Ospedale Bambin Gesù (Palidoro)",
     "colore": "#f43f5e",
     "stops": [
-      { "id": "f1", "nome": "Stazione FS Ladispoli", "lat": 41.953229, "lng": 12.081469 },
-      { "id": "f2", "nome": "Marina di San Nicola", "lat": 41.934620, "lng": 12.117870 },
-      { "id": "f3", "nome": "Ospedale Bambin Gesù (Palidoro)", "lat": 41.921500, "lng": 12.152000 },
-      { "id": "f4", "nome": "Stazione FS Ladispoli (Ritorno)", "lat": 41.953229, "lng": 12.081469 }
+      { "id": "f1", "nome": "Stazione FS Ladispoli (Capolinea)", "lat": 41.953229, "lng": 12.081469 },
+      { "id": "f2", "nome": "Via Flavia / Via Firenze / Via Claudia", "lat": 41.955000, "lng": 12.083000 },
+      { "id": "f3", "nome": "Marina di San Nicola (Via Aurelia)", "lat": 41.934620, "lng": 12.117870 },
+      { "id": "f4", "nome": "Via S. Carlo a Palidoro / Via Torre", "lat": 41.925000, "lng": 12.150000 },
+      { "id": "f5", "nome": "Ospedale Bambin Gesù (Palidoro)", "lat": 41.921500, "lng": 12.152000 },
+      { "id": "f6", "nome": "Stazione FS Ladispoli (Ritorno Capolinea)", "lat": 41.953229, "lng": 12.081469 }
     ],
     "tratte": [
-      { "id": "32-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f3": "06:50", "f4": "07:20" } },
-      { "id": "32-T2", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f3": "07:50", "f4": "08:20" } },
-      { "id": "32-T3", "partenza": "08:40", "stopTimes": { "f1": "08:40", "f3": "09:10", "f4": "09:40" } },
-      { "id": "32-T4", "partenza": "10:05", "stopTimes": { "f1": "10:05", "f3": "10:35", "f4": "11:05" } },
-      { "id": "32-T5", "partenza": "11:30", "stopTimes": { "f1": "11:30", "f3": "12:00", "f4": "12:30" } },
-      { "id": "32-T6", "partenza": "12:50", "stopTimes": { "f1": "12:50", "f3": "13:20", "f4": "13:50" } },
-      { "id": "32-T7", "partenza": "14:15", "stopTimes": { "f1": "14:15", "f3": "14:45", "f4": "15:15" } },
-      { "id": "32-T8", "partenza": "15:45", "stopTimes": { "f1": "15:45", "f3": "16:15", "f4": "16:45" } },
-      { "id": "32-T9", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f3": "17:30", "f4": "18:00" } },
-      { "id": "32-T10", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f3": "18:45", "f4": "19:15" } },
-      { "id": "32-T11", "partenza": "19:30", "stopTimes": { "f1": "19:30", "f3": "20:00", "f4": "20:30" } }
+      { "id": "32-T1", "partenza": "06:20", "stopTimes": { "f1": "06:20", "f5": "06:50", "f6": "07:20" } },
+      { "id": "32-T2", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f5": "07:50", "f6": "08:20" } },
+      { "id": "32-T3", "partenza": "08:40", "stopTimes": { "f1": "08:40", "f5": "09:10", "f6": "09:40" } },
+      { "id": "32-T4", "partenza": "10:05", "stopTimes": { "f1": "10:05", "f5": "10:35", "f6": "11:05" } },
+      { "id": "32-T5", "partenza": "11:30", "stopTimes": { "f1": "11:30", "f5": "12:00", "f6": "12:30" } },
+      { "id": "32-T6", "partenza": "12:50", "stopTimes": { "f1": "12:50", "f5": "13:20", "f6": "13:50" } },
+      { "id": "32-T7", "partenza": "14:15", "stopTimes": { "f1": "14:15", "f5": "14:45", "f6": "15:15" } },
+      { "id": "32-T8", "partenza": "15:45", "stopTimes": { "f1": "15:45", "f5": "16:15", "f6": "16:45" } },
+      { "id": "32-T9", "partenza": "17:00", "stopTimes": { "f1": "17:00", "f5": "17:30", "f6": "18:00" } },
+      { "id": "32-T10", "partenza": "18:15", "stopTimes": { "f1": "18:15", "f5": "18:45", "f6": "19:15" } },
+      { "id": "32-T11", "partenza": "19:30", "stopTimes": { "f1": "19:30", "f5": "20:00", "f6": "20:30" } }
     ]
   },
   "33": {
     "nome": "33 - Valcanneto - Stazione FS Palidoro",
     "colore": "#a855f7",
     "stops": [
-      { "id": "f1", "nome": "Largo Monteverdi (Valcanneto)", "lat": 41.935233, "lng": 12.153563 },
-      { "id": "f2", "nome": "Stazione FS Palidoro", "lat": 41.925000, "lng": 12.160000 },
-      { "id": "f3", "nome": "Largo Monteverdi (Ritorno)", "lat": 41.935233, "lng": 12.153563 }
+      { "id": "f1", "nome": "Largo Monteverdi (Valcanneto Capolinea)", "lat": 41.935233, "lng": 12.153563 },
+      { "id": "f2", "nome": "Via Pergolesi / Via Vivaldi / Via Scarlatti", "lat": 41.936000, "lng": 12.152000 },
+      { "id": "f3", "nome": "Via Doganale / Via Aurelia", "lat": 41.930000, "lng": 12.155000 },
+      { "id": "f4", "nome": "Stazione FS Palidoro", "lat": 41.925000, "lng": 12.160000 },
+      { "id": "f5", "nome": "Largo Monteverdi (Ritorno Capolinea)", "lat": 41.935233, "lng": 12.153563 }
     ],
     "tratte": [
-      { "id": "33-T1", "partenza": "06:40", "stopTimes": { "f1": "06:40", "f2": "07:00", "f3": "07:15" } },
-      { "id": "33-T2", "partenza": "06:50", "stopTimes": { "f1": "06:50", "f2": "07:05" } },
-      { "id": "33-T3", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f2": "07:40", "f3": "07:55" } },
-      { "id": "33-T4", "partenza": "07:55", "stopTimes": { "f1": "07:55", "f2": "08:15", "f3": "08:30" } },
-      { "id": "33-T5", "partenza": "08:30", "stopTimes": { "f1": "08:30", "f2": "08:50", "f3": "09:05" } },
-      { "id": "33-T6", "partenza": "13:00", "stopTimes": { "f1": "13:00", "f2": "13:50", "f3": "14:05" } },
-      { "id": "33-T7", "partenza": "14:10", "stopTimes": { "f1": "14:10", "f2": "14:40", "f3": "15:00" } },
-      { "id": "33-T8", "partenza": "15:00", "stopTimes": { "f1": "15:00", "f2": "15:35", "f3": "15:55" } },
-      { "id": "33-T9", "partenza": "18:40", "stopTimes": { "f2": "18:40", "f3": "18:55" } },
-      { "id": "33-T10", "partenza": "19:40", "stopTimes": { "f2": "19:40", "f3": "19:55" } }
+      { "id": "33-T1", "partenza": "06:40", "stopTimes": { "f1": "06:40", "f4": "07:00", "f5": "07:15" } },
+      { "id": "33-T2", "partenza": "06:50", "stopTimes": { "f1": "06:50", "f4": "07:05" } },
+      { "id": "33-T3", "partenza": "07:20", "stopTimes": { "f1": "07:20", "f4": "07:40", "f5": "07:55" } },
+      { "id": "33-T4", "partenza": "07:55", "stopTimes": { "f1": "07:55", "f4": "08:15", "f5": "08:30" } },
+      { "id": "33-T5", "partenza": "08:30", "stopTimes": { "f1": "08:30", "f4": "08:50", "f5": "09:05" } },
+      { "id": "33-T6", "partenza": "13:00", "stopTimes": { "f1": "13:00", "f4": "13:50", "f5": "14:05" } },
+      { "id": "33-T7", "partenza": "14:10", "stopTimes": { "f1": "14:10", "f4": "14:40", "f5": "15:00" } },
+      { "id": "33-T8", "partenza": "15:00", "stopTimes": { "f1": "15:00", "f4": "15:35", "f5": "15:55" } },
+      { "id": "33-T9", "partenza": "18:40", "stopTimes": { "f4": "18:40", "f5": "18:55" } },
+      { "id": "33-T10", "partenza": "19:40", "stopTimes": { "f4": "19:40", "f5": "19:55" } }
     ]
   }
 }
@@ -285,4 +317,4 @@ linee_data = {
 with open("linee.json", "w", encoding="utf-8") as f:
     json.dump(linee_data, f, ensure_ascii=False, indent=2)
 
-print("✅ Generato linee.json con successo! Totale linee:", len(linee_data))
+print("ALL STOPS GENERATED SUCCESSFULLY!")
