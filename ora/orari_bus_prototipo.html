@@ -1,64 +1,287 @@
-<!doctype html>
-<html lang="it">
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Orari Bus - Demo avanzato</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orari Navette & Bus - Transport Hub</title>
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
-  <header>
-    <h1>Orari Bus</h1>
-    <p class="subtitle">Seleziona linea → fermata → tratta; oppure simula un orario</p>
-  </header>
-  
-  <div class="container">
-    <div class="panel">
-      <label for="lineSelect">Linea:</label>
-      <select id="lineSelect"></select>
 
-      <label for="tripSelect">Corsa / Tratta (opzionale):</label>
-      <select id="tripSelect">
-        <option value="">(Usa ora attuale)</option>
-      </select>
-
-      <label for="stopSelect">Fermata:</label>
-      <select id="stopSelect"></select>
-
-      <div class="info-box">
-        <p><strong>Prossima corsa:</strong> <span id="nextRun">—</span></p>
-        <p><strong>Arrivo stimato:</strong> <span id="eta">—</span></p>
-        <p><strong>Stato corsa selezionata:</strong> <span id="statusSelected">—</span></p>
-      </div>
-
-      <div style="margin-top:12px">
-        <button id="zoomRoute" class="btn">Mostra percorso</button>
-      </div>
-
-    <button id="addStopMode">🟢 Modalità aggiunta fermate</button>
-<pre id="outputStops" style="background:#eee; padding:10px; max-height:200px; overflow:auto;"></pre>
-
-<button id="btnNearestStop">📍 Fermata più vicina</button>
-
-
-
-      <div style="margin-top:12px;font-size:0.9rem;color:#555">
-        Aggiornamento automatico ogni 1s.
-      </div>
-    </div>
+  <!-- APP CONTAINER -->
+  <div class="app-container">
     
-    <div class="map-section">
-      <div id="map"></div>
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bus-simple"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Orari Navette</h1>
+          <span class="status-pill"><span class="pulse-dot"></span> Live Tracking</span>
+        </div>
+      </div>
+
+      <!-- SEARCH BAR -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Cerca linea o fermata..." autocomplete="off">
+          <button id="clearSearch" class="btn-clear" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="searchResults" class="search-results-dropdown"></div>
+      </div>
+
+      <!-- HEADER ACTIONS -->
+      <div class="header-actions">
+        <button id="btnTimetable" class="icon-btn" title="Tabella Orari Completa">
+          <i class="fa-solid fa-table-cells"></i>
+          <span class="btn-label">Orari</span>
+        </button>
+        <button id="btnThemeToggle" class="icon-btn" title="Cambia Tema (Chiaro/Scuro)">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="btnAdminTools" class="icon-btn secondary-icon" title="Strumenti GPS / OSRM">
+          <i class="fa-solid fa-route"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+      <!-- SIDEBAR / MOBILE DRAWER -->
+      <aside class="sidebar-panel" id="sidebarPanel">
+        
+        <!-- Touch Handle for Mobile Drawer -->
+        <div class="drawer-handle" id="drawerHandle">
+          <div class="handle-bar"></div>
+        </div>
+
+        <div class="panel-content">
+
+          <!-- SELECTOR CARD -->
+          <div class="card controls-card">
+            <div class="control-group">
+              <label for="lineSelect"><i class="fa-solid fa-route"></i> Linea Navetta</label>
+              <div class="select-wrapper">
+                <select id="lineSelect"></select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="tripSelect"><i class="fa-solid fa-clock"></i> Corsa / Orario Partenza</label>
+              <div class="select-wrapper">
+                <select id="tripSelect">
+                  <option value="">(Usa corsa attuale)</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label for="stopSelect"><i class="fa-solid fa-location-dot"></i> Fermata di Riferimento</label>
+              <div class="select-wrapper">
+                <select id="stopSelect"></select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- HERO ETA & STATUS CARD -->
+          <div class="card status-card">
+            <div class="status-header">
+              <span class="line-badge" id="lineBadge">Linea --</span>
+              <button id="btnFavorite" class="fav-btn" title="Aggiungi ai preferiti">
+                <i class="fa-regular fa-star"></i>
+              </button>
+            </div>
+
+            <div class="eta-hero">
+              <div class="eta-main">
+                <span class="eta-label">PROSSIMO ARRIVO</span>
+                <div class="eta-value" id="etaBadge">--</div>
+              </div>
+              <div class="eta-details">
+                <div class="detail-item">
+                  <span class="d-label">Orario previsto</span>
+                  <span class="d-value" id="nextRunTime">—</span>
+                </div>
+                <div class="detail-item">
+                  <span class="d-label">Stato corsa</span>
+                  <span class="d-value" id="tripStatus">—</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <button id="btnNearestStop" class="btn btn-primary">
+                <i class="fa-solid fa-crosshairs"></i> Trova fermata più vicina
+              </button>
+              <button id="btnZoomRoute" class="btn btn-secondary">
+                <i class="fa-solid fa-expand"></i> Centra mappa
+              </button>
+            </div>
+          </div>
+
+          <!-- TABS FOR TIMELINE / UPCOMING / FAVORITES -->
+          <div class="tabs-container">
+            <div class="tab-header">
+              <button class="tab-btn active" data-tab="timeline">
+                <i class="fa-solid fa-list-check"></i> Percorso & Fermate
+              </button>
+              <button class="tab-btn" data-tab="upcoming">
+                <i class="fa-solid fa-clock-rotate-left"></i> Partenze Oggi
+              </button>
+              <button class="tab-btn" data-tab="favorites">
+                <i class="fa-solid fa-star"></i> Preferiti
+              </button>
+            </div>
+
+            <div class="tab-body">
+              
+              <!-- TAB 1: TIMELINE -->
+              <div class="tab-pane active" id="tab-timeline">
+                <div class="timeline-header">
+                  <span>Sequenza fermate corsa</span>
+                  <span class="timeline-count" id="timelineCount">0 fermate</span>
+                </div>
+                <div class="timeline-list" id="timelineList">
+                  <!-- Dynamic stops list rendered by JS -->
+                </div>
+              </div>
+
+              <!-- TAB 2: UPCOMING TRIPS -->
+              <div class="tab-pane" id="tab-upcoming">
+                <div class="upcoming-list" id="upcomingList">
+                  <!-- Dynamic upcoming trips rendered by JS -->
+                </div>
+              </div>
+
+              <!-- TAB 3: FAVORITES -->
+              <div class="tab-pane" id="tab-favorites">
+                <div class="favorites-list" id="favoritesList">
+                  <div class="empty-state">
+                    <i class="fa-regular fa-star"></i>
+                    <p>Nessun preferito salvato.<br>Clicca la stella per salvare linee e fermate!</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- MAP SECTION -->
+      <section class="map-section">
+        <div id="map"></div>
+
+        <!-- FLOATING MAP CONTROLS -->
+        <div class="map-overlay-controls">
+          <div class="map-layer-selector">
+            <button id="btnLayerPositron" class="layer-btn active" title="Mappa Chiara">Chiara</button>
+            <button id="btnLayerDark" class="layer-btn" title="Mappa Scura">Scura</button>
+            <button id="btnLayerSatellite" class="layer-btn" title="Satellite">Satellite</button>
+          </div>
+        </div>
+
+        <!-- MAP FLOATING LIVE BUS CARD -->
+        <div class="map-bus-card" id="mapBusCard" style="display: none;">
+          <div class="bus-card-header">
+            <i class="fa-solid fa-bus-simple"></i>
+            <span id="mapBusLine">Linea --</span>
+          </div>
+          <div class="bus-card-body">
+            <div id="mapBusNextStop">Prossima: --</div>
+            <div id="mapBusEta" class="bus-card-eta">In arrivo tra --</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: TIMETABLE MATRIX -->
+  <div class="modal-overlay" id="timetableModal">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-table-cells"></i>
+          <h2>Tabella Orari Completa - <span id="modalLineTitle">--</span></h2>
+        </div>
+        <button class="modal-close" id="closeTimetableModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="timetable-matrix" id="timetableMatrix">
+            <!-- Rendered by JS -->
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
-  <footer>
-    <p>Prototipo — salva i file in una stessa cartella e apri con server locale</p>
-  </footer>
+  <!-- MODAL: ADMIN & OSRM TOOLS -->
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <h2>Strumenti Percorso & GPS (OSRM Free Routing)</h2>
+        </div>
+        <button class="modal-close" id="closeAdminModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-section">
+          <h3><i class="fa-solid fa-route"></i> Generazione Rotta Stradale OSRM (Gratis)</h3>
+          <p class="admin-desc">Calcola automaticamente il percorso su strada reale tra le fermate usando il motore gratuito OSRM (Project OpenStreetMap).</p>
+          <button id="btnGenerateOSRM" class="btn btn-primary">
+            <i class="fa-solid fa-bolt"></i> Calcola percorso stradale per la linea selezionata
+          </button>
+        </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+        <hr class="divider">
+
+        <div class="admin-section">
+          <h3><i class="fa-solid fa-location-crosshairs"></i> Registratore GPS in Tempo Reale</h3>
+          <p class="admin-desc">Registra le tue coordinate mentre sei sul bus per creare il percorso esatto.</p>
+          <button id="btnRecordGPS" class="btn btn-secondary">
+            <i class="fa-solid fa-play"></i> Inizia registrazione GPS
+          </button>
+        </div>
+
+        <div class="admin-section margin-top-sm">
+          <label><strong>Output JSON Generato:</strong></label>
+          <textarea id="adminOutput" class="admin-textarea" readonly placeholder="Il JSON con i punti 'path' comparirà qui..."></textarea>
+          <button id="btnCopyAdminOutput" class="btn btn-outline margin-top-xs">
+            <i class="fa-regular fa-copy"></i> Copia JSON negli appunti
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Application JS -->
   <script src="script.js"></script>
+
 </body>
 </html>
