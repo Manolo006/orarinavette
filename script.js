@@ -23,8 +23,7 @@
   // === CARTO BASEMAPS API KEY CONFIGURATION ===
   // Da agosto 2026 CARTO richiede una API key gratuita (https://carto.com/basemaps/apikey) per i suoi tile.
   // Senza chiave, viene mostrata la filigrana "API KEY REQUIRED".
-  // Se non c'è una chiave, il sistema usa OpenStreetMap come fallback 100% gratuito e senza watermark.
-  let cartoApiKey = localStorage.getItem("carto_api_key") || "";
+  let cartoApiKey = localStorage.getItem("carto_api_key") || "cb1_2vji_1_325c3790be83c78e3c85fe40";
 
   // Active Map Tiles State
   let currentTileLayer = null;
