@@ -14,6 +14,24 @@
   let userMarker = null;
   let autoUpdateInterval = null;
   let osrmCache = {};
+  let stopMarkersMap = {}; // Maps stopId -> L.Marker for fast, flicker-free active pin updates
+
+  // Dynamic contrast calculation (WCAG AA compliant)
+  // Relative luminance: L = 0.2126*R + 0.7152*G + 0.0722*B. If L > 0.18 use dark (#0f172a), else white (#ffffff)
+  function getContrastTextColor(hexColor) {
+    if (!hexColor) return "#ffffff";
+    let hex = hexColor.replace("#", "").trim();
+    if (hex.length === 3) {
+      hex = hex.split("").map(c => c + c).join("");
+    }
+    if (hex.length !== 6) return "#ffffff";
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+    const toLinear = (c) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+    const L = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+    return L > 0.18 ? "#0f172a" : "#ffffff";
+  }
 
   // GPS State
   let isRecordingGPS = false;
@@ -48,8 +66,15 @@
       : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   }
 
-  // Favorites
-  let favorites = JSON.parse(localStorage.getItem("bus_favorites") || "[]");
+  // Favorites with error-resilient storage
+  function getStoredFavorites() {
+    try {
+      return JSON.parse(localStorage.getItem("bus_favorites") || "[]");
+    } catch {
+      return [];
+    }
+  }
+  let favorites = getStoredFavorites();
 
   // === DOM ELEMENTS ===
   const lineSelect = document.getElementById("lineSelect");
@@ -146,8 +171,8 @@
   function updateThemeIcon(theme) {
     if (btnThemeToggle) {
       btnThemeToggle.innerHTML = theme === "dark" 
-        ? '<i class="fa-solid fa-sun"></i>' 
-        : '<i class="fa-solid fa-moon"></i>';
+        ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>' 
+        : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
     }
   }
 
@@ -262,8 +287,15 @@
     const linea = getCurrentLine();
     if (!linea) return;
 
-    heroLineBadge.innerHTML = `<i class="fa-solid fa-bus"></i> ${linea.nome || 'Linea ' + lineSelect.value}`;
-    if (linea.colore) heroLineBadge.style.backgroundColor = linea.colore;
+    const badgeTextColor = getContrastTextColor(linea.colore);
+    heroLineBadge.innerHTML = `<i class="fa-solid fa-bus" aria-hidden="true"></i> ${linea.nome || 'Linea ' + lineSelect.value}`;
+    if (linea.colore) {
+      heroLineBadge.style.backgroundColor = linea.colore;
+      heroLineBadge.style.color = badgeTextColor;
+    } else {
+      heroLineBadge.style.backgroundColor = "";
+      heroLineBadge.style.color = "";
+    }
 
     tripSelect.innerHTML = '<option value="">(Corsa in tempo reale)</option>';
     (linea.tratte || []).forEach((t) => {
@@ -292,35 +324,12 @@
     staticLayer.clearLayers();
     if (dynamicLayer) dynamicLayer.clearLayers();
     busMarker = null;
+    stopMarkersMap = {};
 
     const linea = getCurrentLine();
     if (!linea) return;
 
-    const selectedTripId = tripSelect.value;
-    let tratta = selectedTripId 
-      ? (linea.tratte || []).find((t) => t.id === selectedTripId) 
-      : (linea.tratte || [])[0];
-
-    let pathCoords = null;
-
-    if (tratta && Array.isArray(tratta.path) && tratta.path.length > 1) {
-      pathCoords = tratta.path;
-    } else if (linea.stops && linea.stops.length > 1) {
-      pathCoords = await fetchOSRMRoute(linea.stops);
-    }
-
-    if (!pathCoords) {
-      pathCoords = (linea.stops || []).map(s => [s.lat, s.lng]);
-    }
-
-    if (pathCoords && pathCoords.length > 1) {
-      L.polyline(pathCoords, {
-        color: linea.colore || "#2563eb",
-        weight: 5,
-        opacity: 0.85
-      }).addTo(staticLayer);
-    }
-
+    // 1. Draw stop markers synchronously so stopMarkersMap is populated immediately
     (linea.stops || []).forEach((s, idx) => {
       const isSelected = s.id === stopSelect.value;
       const markerHtml = `<div class="stop-marker-pin ${isSelected ? 'active' : ''}">${idx + 1}</div>`;
@@ -336,13 +345,121 @@
       m.bindPopup(`<b>${s.nome}</b><br>Fermata #${idx + 1}`);
 
       m.on("click", () => {
-        stopSelect.value = s.id;
-        updateAllDisplays();
-        zoomToSelectedStop();
+        selectStop(s.id, true);
       });
+
+      stopMarkersMap[s.id] = m;
     });
 
     fitMapToCurrentRouteOrStops();
+
+    // 2. Determine and render route polyline
+    const selectedTripId = tripSelect.value;
+    let tratta = selectedTripId 
+      ? (linea.tratte || []).find((t) => t.id === selectedTripId) 
+      : (linea.tratte || [])[0];
+
+    let pathCoords = null;
+
+    if (tratta && Array.isArray(tratta.path) && tratta.path.length > 1) {
+      pathCoords = tratta.path;
+    } else if (linea.stops && linea.stops.length > 1) {
+      // Draw straight-line fallback while fetching OSRM road geometry
+      const fallbackPolyline = L.polyline((linea.stops || []).map(s => [s.lat, s.lng]), {
+        color: linea.colore || "#2563eb",
+        weight: 5,
+        opacity: 0.85
+      }).addTo(staticLayer);
+
+      pathCoords = await fetchOSRMRoute(linea.stops);
+      if (pathCoords && pathCoords.length > 1) {
+        staticLayer.removeLayer(fallbackPolyline);
+        L.polyline(pathCoords, {
+          color: linea.colore || "#2563eb",
+          weight: 5,
+          opacity: 0.85
+        }).addTo(staticLayer);
+      }
+      return;
+    }
+
+    if (!pathCoords) {
+      pathCoords = (linea.stops || []).map(s => [s.lat, s.lng]);
+    }
+
+    if (pathCoords && pathCoords.length > 1) {
+      L.polyline(pathCoords, {
+        color: linea.colore || "#2563eb",
+        weight: 5,
+        opacity: 0.85
+      }).addTo(staticLayer);
+    }
+  }
+
+  // Fast, flicker-free active pin updating without redrawing the layer
+  function updateActiveStopMarkerPin(selectedStopId) {
+    if (!stopMarkersMap) return;
+    Object.keys(stopMarkersMap).forEach((stopId) => {
+      const marker = stopMarkersMap[stopId];
+      if (!marker) return;
+      const el = marker.getElement ? marker.getElement() : marker._icon;
+      if (el) {
+        const pin = el.querySelector(".stop-marker-pin");
+        if (pin) {
+          if (stopId === selectedStopId) {
+            pin.classList.add("active");
+            el.style.zIndex = "1000";
+          } else {
+            pin.classList.remove("active");
+            el.style.zIndex = "";
+          }
+        }
+      }
+    });
+  }
+
+  // Helpers for intermediate on-demand stops without fixed times
+  function isIntermediateOnDemandStop(linea, stopId) {
+    if (!linea || !linea.tratte || !linea.tratte.length) return false;
+    return !linea.tratte.some((t) => t.stopTimes && t.stopTimes[stopId]);
+  }
+
+  function findActiveOrNextTrattaForLine(linea, nowDate, tripIdSpecific = "") {
+    if (!linea || !linea.tratte || !linea.tratte.length) return null;
+    const sorted = [...linea.tratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
+    if (tripIdSpecific) {
+      const specific = sorted.find((t) => t.id === tripIdSpecific);
+      if (specific) return specific;
+    }
+
+    const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
+
+    // 1. Detect if a trip is currently in progress (between departure and last stop arrival)
+    for (const t of sorted) {
+      const depMin = t.partenza ? hhmmToMinutes(t.partenza) : null;
+      if (depMin !== null) {
+        let maxStopMin = depMin;
+        if (t.stopTimes) {
+          Object.values(t.stopTimes).forEach((st) => {
+            const sm = hhmmToMinutes(st);
+            if (sm > maxStopMin) maxStopMin = sm;
+          });
+        }
+        if (nowMin >= depMin && nowMin <= maxStopMin) {
+          return t;
+        }
+      }
+    }
+
+    // 2. Detect next scheduled departure today
+    for (const t of sorted) {
+      if (t.partenza && hhmmToMinutes(t.partenza) >= nowMin) {
+        return t;
+      }
+    }
+
+    // 3. Fallback to first departure tomorrow
+    return sorted[0];
   }
 
   function fitMapToCurrentRouteOrStops() {
@@ -372,11 +489,19 @@
       const st = t.stopTimes?.[stopId];
       if (!st) return null;
 
-      const dateStop = hhmmToDateOnOrAfter(st, nowDate);
+      const [h, m] = String(st).split(":").map(Number);
+      const dateStop = new Date(nowDate);
+      dateStop.setHours(h, m, 0, 0);
+      let isTomorrow = false;
+      if (dateStop < nowDate) {
+        dateStop.setDate(dateStop.getDate() + 1);
+        isTomorrow = true;
+      }
       const diffMin = Math.round((dateStop - nowDate) / 60000);
-      return { tratta: t, stopTime: st, dateStop, diffMin, forced: true };
+      return { tratta: t, stopTime: st, dateStop, diffMin, forced: true, tomorrow: isTomorrow };
     }
 
+    // Find next upcoming stop time today
     for (const t of sorted) {
       const st = t.stopTimes?.[stopId];
       if (!st) continue;
@@ -391,19 +516,22 @@
       }
     }
 
+    // Fallback: first scheduled trip tomorrow
     const first = sorted.find((t) => t.stopTimes?.[stopId]);
     if (!first) return null;
 
     const st = first.stopTimes[stopId];
-    const dateStop = hhmmToDateOnOrAfter(st, nowDate);
-    if (dateStop < nowDate) dateStop.setDate(dateStop.getDate() + 1);
+    const [h, m] = String(st).split(":").map(Number);
+    const dateStop = new Date(nowDate);
+    dateStop.setDate(dateStop.getDate() + 1);
+    dateStop.setHours(h, m, 0, 0);
 
     const diffMin = Math.round((dateStop - nowDate) / 60000);
     return { tratta: first, stopTime: st, dateStop, diffMin, forced: false, tomorrow: true };
   }
 
   // === BUS POSITION & ANIMATION ===
-  function updateBusMarkerForTratta(tratta, dateStop, diffMin, now) {
+  function updateBusMarkerForTratta(tratta, now, isTomorrow = false) {
     if (!dynamicLayer) return;
 
     if (busMarker) {
@@ -412,87 +540,143 @@
     }
 
     const linea = getCurrentLine();
-    if (!linea) return;
+    if (!linea || !tratta) return;
+
+    const tripBaseDate = new Date(now);
+    if (isTomorrow) {
+      tripBaseDate.setDate(tripBaseDate.getDate() + 1);
+    }
 
     const points = (linea.stops || [])
       .map((s) => {
         const t = tratta.stopTimes?.[s.id];
         if (!t) return null;
+        const [h, m] = String(t).split(":").map(Number);
+        const d = new Date(tripBaseDate);
+        d.setHours(h, m, 0, 0);
+        if (tratta.partenza && hhmmToMinutes(t) < hhmmToMinutes(tratta.partenza)) {
+          d.setDate(d.getDate() + 1);
+        }
         return {
           id: s.id,
           nome: s.nome,
           lat: s.lat,
           lng: s.lng,
-          date: hhmmToDateOnOrAfter(t, now)
+          date: d
         };
       })
       .filter(Boolean);
 
-    if (points.length < 2) return;
+    if (points.length === 0) return;
 
-    let prev = points[0];
-    let next = points[points.length - 1];
+    if (points.length === 1) {
+      const busIcon = L.divIcon({
+        className: 'bus-marker-wrapper',
+        html: `<div class="bus-marker-icon"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+      busMarker = L.marker([points[0].lat, points[0].lng], { icon: busIcon }).addTo(dynamicLayer);
+      busMarker.bindPopup(`<b>Corsa ${tratta.id}</b><br>Fermata: ${points[0].nome}`);
+      return;
+    }
 
-    for (let i = 0; i < points.length; i += 1) {
-      if (points[i].date >= now) {
-        next = points[i];
-        prev = i > 0 ? points[i - 1] : points[i];
-        break;
+    let lat, lng, nextStopName;
+    if (now < points[0].date) {
+      lat = points[0].lat;
+      lng = points[0].lng;
+      nextStopName = `Partenza ore ${points[0].date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}: ${points[0].nome}`;
+    } else if (now > points[points.length - 1].date) {
+      // Keep marker at destination for up to 5 min after arrival
+      if (now - points[points.length - 1].date > 5 * 60 * 1000) {
+        return;
       }
-    }
+      lat = points[points.length - 1].lat;
+      lng = points[points.length - 1].lng;
+      nextStopName = `Arrivato al capolinea: ${points[points.length - 1].nome}`;
+    } else {
+      let prev = points[0];
+      let next = points[1];
+      for (let i = 0; i < points.length - 1; i += 1) {
+        if (points[i].date <= now && now <= points[i + 1].date) {
+          prev = points[i];
+          next = points[i + 1];
+          break;
+        }
+      }
 
-    let percent = 0;
-    if (next.date > prev.date) {
-      percent = (now - prev.date) / (next.date - prev.date);
-      percent = Math.max(0, Math.min(1, percent));
-    }
+      let percent = 0;
+      const span = next.date.getTime() - prev.date.getTime();
+      if (span > 0) {
+        percent = (now.getTime() - prev.date.getTime()) / span;
+        percent = Math.max(0, Math.min(1, percent));
+      }
 
-    const lat = prev.lat + (next.lat - prev.lat) * percent;
-    const lng = prev.lng + (next.lng - prev.lng) * percent;
+      lat = prev.lat + (next.lat - prev.lat) * percent;
+      lng = prev.lng + (next.lng - prev.lng) * percent;
+      nextStopName = `In viaggio verso: ${next.nome}`;
+    }
 
     const busIcon = L.divIcon({
       className: 'bus-marker-wrapper',
-      html: `<div class="bus-marker-icon"><i class="fa-solid fa-bus"></i></div>`,
+      html: `<div class="bus-marker-icon"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>`,
       iconSize: [36, 36],
       iconAnchor: [18, 18]
     });
 
     busMarker = L.marker([lat, lng], { icon: busIcon }).addTo(dynamicLayer);
-    busMarker.bindPopup(`<b>Corsa ${tratta.id}</b><br>Prossima: ${next.nome}`);
+    busMarker.bindPopup(`<b>Corsa ${tratta.id}</b><br>${nextStopName}`);
   }
 
   // === RENDER TIMELINE ===
-  function renderTimeline(linea, currentTratta, now) {
+  function renderTimeline(linea, currentTratta, now, isTomorrow = false) {
     if (!timelineList || !linea || !linea.stops) return;
     timelineList.innerHTML = "";
 
     const stopTimes = currentTratta ? (currentTratta.stopTimes || {}) : {};
 
+    const tripBaseDate = new Date(now);
+    if (isTomorrow) {
+      tripBaseDate.setDate(tripBaseDate.getDate() + 1);
+    }
+
     linea.stops.forEach((stop, index) => {
-      const timeStr = stopTimes[stop.id] || "--:--";
+      const explicitTime = stopTimes[stop.id];
+      let timeDisplayHtml = "";
+      if (explicitTime) {
+        timeDisplayHtml = `<i class="fa-regular fa-clock" aria-hidden="true"></i> ${explicitTime}`;
+      } else if (currentTratta) {
+        timeDisplayHtml = `<span class="badge-on-demand"><i class="fa-solid fa-hand" aria-hidden="true"></i> A richiesta</span>`;
+      } else {
+        timeDisplayHtml = `<i class="fa-regular fa-clock" aria-hidden="true"></i> --:--`;
+      }
+
       const isSelected = stop.id === stopSelect.value;
       
       let isPassed = false;
-      if (currentTratta && stopTimes[stop.id]) {
-        const stopDate = hhmmToDateOnOrAfter(stopTimes[stop.id], now);
+      if (currentTratta && explicitTime) {
+        const [h, m] = String(explicitTime).split(":").map(Number);
+        const stopDate = new Date(tripBaseDate);
+        stopDate.setHours(h, m, 0, 0);
+        if (currentTratta.partenza && hhmmToMinutes(explicitTime) < hhmmToMinutes(currentTratta.partenza)) {
+          stopDate.setDate(stopDate.getDate() + 1);
+        }
         if (stopDate < now) isPassed = true;
       }
 
       const row = document.createElement("div");
       row.className = `timeline-row ${isSelected ? 'active' : ''} ${isPassed ? 'passed' : ''}`;
       row.innerHTML = `
-        <div class="stop-badge-num">${isPassed ? '<i class="fa-solid fa-check"></i>' : index + 1}</div>
+        <div class="stop-badge-num">${isPassed ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : index + 1}</div>
         <div class="stop-row-info">
           <div class="stop-row-name">${stop.nome}</div>
-          <div class="stop-row-time"><i class="fa-regular fa-clock"></i> ${timeStr}</div>
+          <div class="stop-row-time">${timeDisplayHtml}</div>
         </div>
-        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;" aria-hidden="true"></i>
       `;
 
       row.addEventListener("click", () => {
-        stopSelect.value = stop.id;
-        updateAllDisplays();
-        zoomToSelectedStop();
+        selectStop(stop.id, true);
       });
 
       timelineList.appendChild(row);
@@ -505,12 +689,66 @@
     upcomingList.innerHTML = "";
 
     const sorted = [...linea.tratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
+    const isOnDemand = isIntermediateOnDemandStop(linea, stopId);
+
+    if (isOnDemand) {
+      const infoCard = document.createElement("div");
+      infoCard.className = "on-demand-card";
+      infoCard.innerHTML = `
+        <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
+          <i class="fa-solid fa-circle-info" style="color: var(--warning);" aria-hidden="true"></i>
+          Fermata a richiesta
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+          Questa fermata viene servita al passaggio della navetta lungo il percorso. Fai un chiaro cenno all'autista con congruo anticipo.
+        </div>
+      `;
+      upcomingList.appendChild(infoCard);
+
+      const headerDiv = document.createElement("div");
+      headerDiv.style.cssText = "font-weight: 700; font-size: 0.8rem; color: var(--text-muted); margin: 0.75rem 0 0.5rem 0; text-transform: uppercase;";
+      headerDiv.textContent = "Partenze della linea da capolinea";
+      upcomingList.appendChild(headerDiv);
+
+      sorted.forEach((tratta) => {
+        const depTime = tratta.partenza;
+        if (!depTime) return;
+        const [h, m] = String(depTime).split(":").map(Number);
+        const dateDep = new Date(now);
+        dateDep.setHours(h, m, 0, 0);
+        const diffMin = Math.round((dateDep - now) / 60000);
+        const isPassed = diffMin < 0;
+
+        const row = document.createElement("div");
+        row.className = "timeline-row";
+        row.style.opacity = isPassed ? "0.6" : "1";
+        row.innerHTML = `
+          <div class="stop-badge-num" style="background: var(--primary-hover);"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>
+          <div class="stop-row-info">
+            <div class="stop-row-name">Corsa ${tratta.id}</div>
+            <div class="stop-row-time">Partenza capolinea: ore ${depTime}</div>
+          </div>
+          <span class="hero-line-tag" style="font-size: 0.75rem;">${formatDiffText(diffMin)}</span>
+        `;
+
+        row.addEventListener("click", () => {
+          tripSelect.value = tratta.id;
+          drawRouteForSelectedTripOrDefault();
+          updateAllDisplays();
+        });
+
+        upcomingList.appendChild(row);
+      });
+      return;
+    }
 
     sorted.forEach((tratta) => {
       const st = tratta.stopTimes?.[stopId];
       if (!st) return;
 
-      const dateStop = hhmmToDateOnOrAfter(st, now);
+      const [h, m] = String(st).split(":").map(Number);
+      const dateStop = new Date(now);
+      dateStop.setHours(h, m, 0, 0);
       const diffMin = Math.round((dateStop - now) / 60000);
       const isPassed = diffMin < 0;
 
@@ -518,7 +756,7 @@
       row.className = "timeline-row";
       row.style.opacity = isPassed ? "0.6" : "1";
       row.innerHTML = `
-        <div class="stop-badge-num" style="background: var(--primary-hover);"><i class="fa-solid fa-bus"></i></div>
+        <div class="stop-badge-num" style="background: var(--primary-hover);"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>
         <div class="stop-row-info">
           <div class="stop-row-name">Corsa ${tratta.id} (Partenza ${tratta.partenza})</div>
           <div class="stop-row-time">Arrivo alla fermata: ${st}</div>
@@ -545,8 +783,8 @@
 
     const isFav = favorites.some(f => f.key === favKey);
     btnFavorite.innerHTML = isFav 
-      ? '<i class="fa-solid fa-star" style="color: var(--warning);"></i> Preferito' 
-      : '<i class="fa-regular fa-star"></i> Preferito';
+      ? '<i class="fa-solid fa-star" style="color: var(--warning);" aria-hidden="true"></i> Preferito' 
+      : '<i class="fa-regular fa-star" aria-hidden="true"></i> Preferito';
   }
 
   function toggleFavorite() {
@@ -589,20 +827,18 @@
       const row = document.createElement("div");
       row.className = "timeline-row";
       row.innerHTML = `
-        <div class="stop-badge-num" style="background: var(--warning);"><i class="fa-solid fa-star"></i></div>
+        <div class="stop-badge-num" style="background: var(--warning);"><i class="fa-solid fa-star" aria-hidden="true"></i></div>
         <div class="stop-row-info">
           <div class="stop-row-name">${fav.lineName}</div>
           <div class="stop-row-time">${fav.stopName}</div>
         </div>
-        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+        <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;" aria-hidden="true"></i>
       `;
 
       row.addEventListener("click", () => {
         lineSelect.value = fav.lineId;
         aggiornaTratteEStops();
-        stopSelect.value = fav.stopId;
-        updateAllDisplays();
-        zoomToSelectedStop();
+        selectStop(fav.stopId, true);
       });
 
       favoritesList.appendChild(row);
@@ -648,7 +884,7 @@
         item.className = "timeline-row";
         item.style.marginBottom = "0.5rem";
         item.innerHTML = `
-          <div class="stop-badge-num" style="background: var(--primary);"><i class="${res.type === 'line' ? 'fa-solid fa-route' : 'fa-solid fa-location-dot'}"></i></div>
+          <div class="stop-badge-num" style="background: var(--primary);"><i class="${res.type === 'line' ? 'fa-solid fa-route' : 'fa-solid fa-location-dot'}" aria-hidden="true"></i></div>
           <div class="stop-row-info">
             <div class="stop-row-name">${res.title}</div>
             <div class="stop-row-time">${res.subtitle}</div>
@@ -659,9 +895,7 @@
           lineSelect.value = res.lineId;
           aggiornaTratteEStops();
           if (res.type === "stop") {
-            stopSelect.value = res.stopId;
-            updateAllDisplays();
-            zoomToSelectedStop();
+            selectStop(res.stopId, true);
           }
           searchModal.classList.remove("active");
         });
@@ -690,8 +924,12 @@
     stops.forEach(s => {
       html += `<tr><td class="stop-name-cell">${s.nome}</td>`;
       tratte.forEach(t => {
-        const time = t.stopTimes?.[s.id] || "—";
-        html += `<td>${time}</td>`;
+        const time = t.stopTimes?.[s.id];
+        if (time) {
+          html += `<td>${time}</td>`;
+        } else {
+          html += `<td><span style="color: var(--text-muted); font-size: 0.72rem;" title="Fermata a richiesta">a rich.</span></td>`;
+        }
       });
       html += `</tr>`;
     });
@@ -710,10 +948,10 @@
       return;
     }
 
-    btnGenerateOSRM.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Calcolo OSRM...';
+    btnGenerateOSRM.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Calcolo OSRM...';
 
     const pathCoords = await fetchOSRMRoute(linea.stops);
-    btnGenerateOSRM.innerHTML = '<i class="fa-solid fa-bolt"></i> Genera rotta stradale OSRM';
+    btnGenerateOSRM.innerHTML = '<i class="fa-solid fa-bolt" aria-hidden="true"></i> Genera rotta stradale OSRM';
 
     if (!pathCoords) {
       alert("Impossibile calcolare il percorso OSRM.");
@@ -732,7 +970,7 @@
     if (!isRecordingGPS) {
       isRecordingGPS = true;
       recordedGPSPath = [];
-      btnRecordGPS.innerHTML = '<i class="fa-solid fa-stop"></i> Stop registrazione GPS';
+      btnRecordGPS.innerHTML = '<i class="fa-solid fa-stop" aria-hidden="true"></i> Stop registrazione GPS';
       
       if (navigator.geolocation) {
         gpsWatchId = navigator.geolocation.watchPosition(
@@ -748,7 +986,7 @@
       isRecordingGPS = false;
       if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
       gpsWatchId = null;
-      btnRecordGPS.innerHTML = '<i class="fa-solid fa-play"></i> Registra traccia GPS';
+      btnRecordGPS.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i> Registra traccia GPS';
 
       const formattedJson = `"path": [\n${recordedGPSPath.map(p => `  [${p[0]}, ${p[1]}]`).join(",\n")}\n]`;
       adminOutput.value = formattedJson;
@@ -771,19 +1009,60 @@
     const info = findNextTrattaForStop(lineKey, stopId, now, tripIdSpecific);
 
     if (!info) {
-      heroEtaBadge.textContent = "—";
-      heroNextTime.textContent = "Nessuna corsa";
-      renderTimeline(linea, null, now);
+      if (isIntermediateOnDemandStop(linea, stopId)) {
+        heroEtaBadge.textContent = "A richiesta";
+        heroEtaBadge.style.fontSize = "0.85rem";
+        heroNextTime.textContent = "Fermata a richiesta (passaggio lungo la tratta)";
+        const activeTratta = findActiveOrNextTrattaForLine(linea, now, tripIdSpecific);
+        let isTomorrow = false;
+        if (activeTratta && activeTratta.partenza) {
+          const depMin = hhmmToMinutes(activeTratta.partenza);
+          const nowMin = now.getHours() * 60 + now.getMinutes();
+          if (nowMin > depMin) {
+            let maxStopMin = depMin;
+            if (activeTratta.stopTimes) {
+              Object.values(activeTratta.stopTimes).forEach(st => {
+                const sm = hhmmToMinutes(st);
+                if (sm > maxStopMin) maxStopMin = sm;
+              });
+            }
+            if (nowMin > maxStopMin) {
+              isTomorrow = true;
+            }
+          }
+        }
+        if (activeTratta) {
+          updateBusMarkerForTratta(activeTratta, now, isTomorrow);
+        } else if (busMarker && dynamicLayer) {
+          dynamicLayer.removeLayer(busMarker);
+          busMarker = null;
+        }
+        renderTimeline(linea, activeTratta, now, isTomorrow);
+        renderUpcomingTrips(linea, stopId, now);
+      } else {
+        if (busMarker && dynamicLayer) {
+          dynamicLayer.removeLayer(busMarker);
+          busMarker = null;
+        }
+        heroEtaBadge.textContent = "—";
+        heroEtaBadge.style.fontSize = "";
+        heroNextTime.textContent = "Nessuna corsa";
+        renderTimeline(linea, null, now, false);
+        renderUpcomingTrips(linea, stopId, now);
+      }
+      updateActiveStopMarkerPin(stopId);
       return;
     }
 
+    heroEtaBadge.style.fontSize = "";
     const orarioTesto = info.dateStop.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     heroNextTime.textContent = info.tomorrow ? `Domani ore ${orarioTesto}` : `Previsto ore ${orarioTesto}`;
     heroEtaBadge.textContent = formatDiffText(info.diffMin);
 
-    updateBusMarkerForTratta(info.tratta, info.dateStop, info.diffMin, now);
-    renderTimeline(linea, info.tratta, now);
+    updateBusMarkerForTratta(info.tratta, now, Boolean(info.tomorrow));
+    renderTimeline(linea, info.tratta, now, Boolean(info.tomorrow));
     renderUpcomingTrips(linea, stopId, now);
+    updateActiveStopMarkerPin(stopId);
   }
 
   function startAutoUpdate() {
@@ -799,41 +1078,150 @@
     if (stop && map) map.setView([stop.lat, stop.lng], 16);
   }
 
-  // === BOTTOM NAV SYSTEM ===
+  // Unified helper to select a stop across all interactions
+  function selectStop(stopId, shouldZoom = true) {
+    if (!stopId) return;
+    stopSelect.value = stopId;
+    updateAllDisplays();
+    updateFavoriteButtonState();
+    if (shouldZoom) zoomToSelectedStop();
+  }
+
+  // === TAB NAVIGATION SYSTEM (MOBILE & DESKTOP) ===
+  function setActiveTab(tab) {
+    const isDesktop = window.innerWidth >= 768;
+
+    // On desktop, the floating sidebar stays open; fallback 'map' to 'timeline'
+    if (isDesktop && tab === "map") {
+      tab = "timeline";
+    }
+
+    // Update bottom nav items
+    navItems.forEach(i => {
+      const match = i.getAttribute("data-tab") === tab;
+      i.classList.toggle("active", match);
+    });
+
+    // Update sidebar tab buttons
+    const sidebarTabBtns = document.querySelectorAll(".sidebar-tab-btn");
+    sidebarTabBtns.forEach(btn => {
+      const match = btn.getAttribute("data-tab") === tab;
+      btn.classList.toggle("active", match);
+      btn.setAttribute("aria-selected", match ? "true" : "false");
+    });
+
+    if (tab === "map") {
+      bottomSheet.classList.remove("expanded");
+    } else {
+      bottomSheet.classList.add("expanded");
+
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+      if (tab === "timeline") document.getElementById("paneTimeline")?.classList.add("active");
+      if (tab === "upcoming") document.getElementById("paneUpcoming")?.classList.add("active");
+      if (tab === "favorites") document.getElementById("paneFavorites")?.classList.add("active");
+    }
+  }
+
   function wireNavSystem() {
     navItems.forEach(item => {
       item.addEventListener("click", () => {
         const tab = item.getAttribute("data-tab");
+        setActiveTab(tab);
+      });
+    });
 
-        navItems.forEach(i => i.classList.remove("active"));
-        item.classList.add("active");
-
-        if (tab === "map") {
-          bottomSheet.classList.remove("expanded");
-        } else {
-          bottomSheet.classList.add("expanded");
-
-          document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-          if (tab === "timeline") document.getElementById("paneTimeline")?.classList.add("active");
-          if (tab === "upcoming") document.getElementById("paneUpcoming")?.classList.add("active");
-          if (tab === "favorites") document.getElementById("paneFavorites")?.classList.add("active");
-        }
+    const sidebarTabBtns = document.querySelectorAll(".sidebar-tab-btn");
+    sidebarTabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        setActiveTab(tab);
       });
     });
   }
 
-  // === BOTTOM SHEET TOUCH EVENTS ===
+  // === BOTTOM SHEET TOUCH & SWIPE EVENTS ===
   function wireBottomSheetEvents() {
     let startY = 0;
-    let currentY = 0;
+    let deltaY = 0;
+    let isTouching = false;
+    let isSwiped = false;
 
-    sheetHandle?.addEventListener("click", () => {
-      bottomSheet.classList.toggle("expanded");
-    });
+    const onTouchStart = (e) => {
+      if (e.touches.length !== 1) return;
+      startY = e.touches[0].clientY;
+      deltaY = 0;
+      isTouching = true;
+      isSwiped = false;
+    };
 
-    sheetHero?.addEventListener("click", () => {
-      bottomSheet.classList.toggle("expanded");
-    });
+    const onTouchMove = (e) => {
+      if (!isTouching) return;
+      const currentY = e.touches[0].clientY;
+      deltaY = currentY - startY;
+      if (Math.abs(deltaY) > 8) {
+        isSwiped = true;
+      }
+    };
+
+    const onTouchEnd = () => {
+      if (!isTouching) return;
+      isTouching = false;
+
+      if (deltaY < -35) {
+        // Swiped UP -> expand bottom sheet
+        bottomSheet.classList.add("expanded");
+        const activeNav = document.querySelector(".nav-item.active");
+        if (activeNav && activeNav.getAttribute("data-tab") === "map") {
+          setActiveTab("timeline");
+        }
+      } else if (deltaY > 35) {
+        // Swiped DOWN -> collapse bottom sheet
+        bottomSheet.classList.remove("expanded");
+        setActiveTab("map");
+      }
+    };
+
+    const setupTouchHandle = (el) => {
+      if (!el) return;
+      el.addEventListener("touchstart", (e) => {
+        if (window.innerWidth >= 768) return;
+        onTouchStart(e);
+      }, { passive: true });
+
+      el.addEventListener("touchmove", (e) => {
+        if (window.innerWidth >= 768) return;
+        onTouchMove(e);
+      }, { passive: true });
+
+      el.addEventListener("touchend", () => {
+        if (window.innerWidth >= 768) return;
+        onTouchEnd();
+      });
+
+      el.addEventListener("touchcancel", () => { isTouching = false; });
+
+      el.addEventListener("click", (e) => {
+        if (window.innerWidth >= 768) return;
+        if (isSwiped) {
+          isSwiped = false;
+          return;
+        }
+        if (e.target.closest("button") || e.target.closest("a") || e.target.closest("select")) return;
+
+        bottomSheet.classList.toggle("expanded");
+        if (!bottomSheet.classList.contains("expanded")) {
+          setActiveTab("map");
+        } else {
+          const activeNav = document.querySelector(".nav-item.active");
+          if (activeNav && activeNav.getAttribute("data-tab") === "map") {
+            setActiveTab("timeline");
+          }
+        }
+      });
+    };
+
+    setupTouchHandle(sheetHandle);
+    setupTouchHandle(sheetHero);
   }
 
   // === EVENT BINDINGS ===
@@ -844,9 +1232,7 @@
       updateAllDisplays();
     });
     stopSelect.addEventListener("change", () => {
-      updateAllDisplays();
-      updateFavoriteButtonState();
-      zoomToSelectedStop();
+      selectStop(stopSelect.value, true);
     });
 
     if (btnZoomRoute) btnZoomRoute.addEventListener("click", fitMapToCurrentRouteOrStops);
@@ -868,6 +1254,35 @@
     btnTimetable?.addEventListener("click", openTimetableMatrix);
     closeTimetableModal?.addEventListener("click", () => timetableModal.classList.remove("active"));
     closeAdminModal?.addEventListener("click", () => adminModal.classList.remove("active"));
+
+    // Modal backdrop click handlers
+    timetableModal?.addEventListener("click", (e) => {
+      if (e.target === timetableModal) timetableModal.classList.remove("active");
+    });
+    adminModal?.addEventListener("click", (e) => {
+      if (e.target === adminModal) adminModal.classList.remove("active");
+    });
+    searchModal?.addEventListener("click", (e) => {
+      if (e.target === searchModal || e.target === searchResults) searchModal.classList.remove("active");
+    });
+
+    // Escape key closes modals
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchModal?.classList.remove("active");
+        timetableModal?.classList.remove("active");
+        adminModal?.classList.remove("active");
+      }
+    });
+
+    // Keyboard accessibility for bottom sheet handle
+    sheetHandle?.addEventListener("keydown", (e) => {
+      if (window.innerWidth >= 768) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        bottomSheet.classList.toggle("expanded");
+      }
+    });
 
     btnGenerateOSRM?.addEventListener("click", generateOSRMRouteForCurrentLine);
     btnRecordGPS?.addEventListener("click", toggleGPSRecording);
@@ -926,9 +1341,7 @@
 
           if (!nearestStop) return;
 
-          stopSelect.value = nearestStop.id;
-          updateAllDisplays();
-          zoomToSelectedStop();
+          selectStop(nearestStop.id, true);
 
           if (userMarker) dynamicLayer.removeLayer(userMarker);
           userMarker = L.marker([latitude, longitude])
