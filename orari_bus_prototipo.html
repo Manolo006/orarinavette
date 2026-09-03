@@ -253,6 +253,21 @@
             <i class="fa-regular fa-copy"></i> Copia JSON
           </button>
         </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
+
+        <div>
+          <h4 style="margin-bottom: 0.35rem;">🗺️ CARTO Basemaps API Key</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Inserisci la chiave gratuita ottenibile su <a href="https://carto.com/basemaps/apikey" target="_blank" rel="noopener" style="color: var(--primary); text-decoration: underline;">carto.com/basemaps/apikey</a> per rimuovere il watermark, oppure lascia vuoto per usare OpenStreetMap gratuito.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="cartoApiKeyInput" placeholder="Incolla API Key CARTO..." style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.82rem; background: var(--bg-surface); color: var(--text-main);">
+            <button id="btnSaveCartoKey" class="btn-mobile btn-mobile-primary" style="white-space: nowrap;">
+              Salva
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

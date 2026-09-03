@@ -20,14 +20,34 @@
   let recordedGPSPath = [];
   let gpsWatchId = null;
 
+  // === CARTO BASEMAPS API KEY CONFIGURATION ===
+  // Da agosto 2026 CARTO richiede una API key gratuita (https://carto.com/basemaps/apikey) per i suoi tile.
+  // Senza chiave, viene mostrata la filigrana "API KEY REQUIRED".
+  // Se non c'è una chiave, il sistema usa OpenStreetMap come fallback 100% gratuito e senza watermark.
+  let cartoApiKey = localStorage.getItem("carto_api_key") || "";
+
   // Active Map Tiles State
   let currentTileLayer = null;
   let currentTileType = "positron";
-  const MAP_TILES = {
-    positron: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-    dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-  };
+
+  function getMapTileUrl(type) {
+    const keyParam = cartoApiKey ? `?key=${encodeURIComponent(cartoApiKey)}` : "";
+    if (type === "dark") {
+      return cartoApiKey
+        ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${keyParam}`
+        : `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png`;
+    }
+    if (type === "satellite") {
+      return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+    }
+    if (type === "osm") {
+      return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+    }
+    // "positron" di default: se c'è la chiave usa Carto Positron, altrimenti OpenStreetMap pulito senza filigrana
+    return cartoApiKey
+      ? `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png${keyParam}`
+      : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  }
 
   // Favorites
   let favorites = JSON.parse(localStorage.getItem("bus_favorites") || "[]");
@@ -156,12 +176,12 @@
     if (currentTileLayer) map.removeLayer(currentTileLayer);
 
     currentTileType = type;
-    const url = MAP_TILES[type] || MAP_TILES.positron;
+    const url = getMapTileUrl(type);
     currentTileLayer = L.tileLayer(url, { maxZoom: 19 }).addTo(map);
   }
 
   function cycleMapTile() {
-    if (currentTileType === "positron") switchMapTile("dark");
+    if (currentTileType === "positron" || currentTileType === "osm") switchMapTile("dark");
     else if (currentTileType === "dark") switchMapTile("satellite");
     else switchMapTile("positron");
   }
@@ -856,6 +876,27 @@
       navigator.clipboard.writeText(adminOutput.value).then(() => {
         alert("✅ JSON copiato negli appunti!");
       });
+    });
+
+    // CARTO Basemaps API Key Settings
+    const cartoApiKeyInput = document.getElementById("cartoApiKeyInput");
+    const btnSaveCartoKey = document.getElementById("btnSaveCartoKey");
+
+    if (cartoApiKeyInput) {
+      cartoApiKeyInput.value = cartoApiKey;
+    }
+
+    btnSaveCartoKey?.addEventListener("click", () => {
+      const newKey = cartoApiKeyInput ? cartoApiKeyInput.value.trim() : "";
+      cartoApiKey = newKey;
+      if (newKey) {
+        localStorage.setItem("carto_api_key", newKey);
+        alert("✅ Chiave CARTO salvata! I tile Positron/Dark verranno caricati con la chiave.");
+      } else {
+        localStorage.removeItem("carto_api_key");
+        alert("ℹ️ Chiave rimossa: la mappa userà OpenStreetMap gratuito senza filigrane.");
+      }
+      switchMapTile(currentTileType);
     });
 
     // Locate Me FAB
