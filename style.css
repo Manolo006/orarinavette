@@ -861,7 +861,343 @@ html, body {
   gap: 0.35rem;
 }
 
-/* --- DESKTOP ADAPTATION (MIN-WIDTH: 768PX) --- */
+/* --- DAY FILTER SEGMENTED CONTROL --- */
+.day-filter-container {
+  display: flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 3px;
+  gap: 3px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.25rem;
+}
+
+.day-pill-btn {
+  flex: 1;
+  height: 38px;
+  border-radius: var(--radius-lg);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.day-pill-btn:hover {
+  color: var(--text-main);
+}
+
+.day-pill-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-alpha);
+}
+
+/* --- SERVICE STATUS ALERT BANNER --- */
+.service-alert-banner {
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.35;
+  margin-bottom: 0.25rem;
+}
+
+.service-alert-banner.alert-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
+.service-alert-banner.alert-warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #b45309;
+}
+
+[data-theme="dark"] .service-alert-banner.alert-warning {
+  color: #fbbf24;
+}
+
+.service-alert-banner.alert-info {
+  background: var(--primary-light);
+  border: 1px solid var(--primary-alpha);
+  color: var(--primary);
+}
+
+/* --- ROUTE ITINERARY & OFFICIAL NOTES CARD --- */
+.route-details-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.route-details-header {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.route-details-header:active {
+  background: var(--bg-subtle);
+}
+
+.route-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.route-chevron {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  transition: transform 0.25s ease;
+}
+
+.route-details-body {
+  padding: 0 0.85rem 0.85rem 0.85rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+
+.route-path-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0.65rem 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.route-full-path {
+  line-height: 1.45;
+  background: var(--bg-subtle);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  word-break: break-word;
+}
+
+.route-notes-wrapper {
+  margin-top: 0.65rem;
+}
+
+.route-notes-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--warning);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.route-notes-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.route-notes-list li {
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  padding-left: 0.75rem;
+  position: relative;
+}
+
+.route-notes-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* --- TIMETABLE MODAL DAY TABS & NOTES --- */
+.modal-tab-bar {
+  display: flex;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.4rem 0.75rem;
+  gap: 0.4rem;
+}
+
+.modal-tab-btn {
+  flex: 1;
+  height: 38px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: var(--transition-fast);
+}
+
+.modal-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.modal-tab-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.timetable-empty-msg {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.timetable-notes-container {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+.timetable-notes-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.timetable-notes-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.timetable-notes-list li {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.timing-cell {
+  background: var(--bg-subtle) !important;
+  font-weight: 700 !important;
+  color: var(--primary) !important;
+}
+
+.badge-estimated {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+}
+
+.trip-note-badge {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.stop-marker-pin.timing-point {
+  border-width: 3px;
+  box-shadow: 0 0 0 2px var(--primary-alpha), 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Animated OSRM Road Direction Flow */
+.animated-route-flow {
+  animation: route-dash-flow 25s linear infinite;
+}
+
+@keyframes route-dash-flow {
+  from {
+    stroke-dashoffset: 500;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-route-flow {
+    animation: none;
+  }
+  .stop-marker-pin.active {
+    animation: none;
+  }
+  .bus-marker-icon {
+    animation: none;
+  }
+}
+
+/* --- SMALL MOBILE DEVICES (< 380PX) --- */
+@media (max-width: 380px) {
+  .day-pill-btn {
+    font-size: 0.72rem;
+    padding: 0 0.25rem;
+  }
+  .brand-pill span {
+    display: none;
+  }
+  .search-trigger-btn {
+    max-width: 130px;
+  }
+  .modal-tab-btn {
+    font-size: 0.74rem;
+  }
+}
+
+/* --- DESKTOP & TABLET ADAPTATION (MIN-WIDTH: 768PX) --- */
 @media (min-width: 768px) {
   .mobile-app {
     flex-direction: row;
@@ -871,7 +1207,7 @@ html, body {
     position: absolute;
     top: 16px;
     left: 16px;
-    width: 360px;
+    width: 380px;
     height: var(--header-height);
     padding: 0 0.85rem;
     border-radius: var(--radius-xl);
@@ -887,7 +1223,7 @@ html, body {
     top: 80px;
     left: 16px;
     bottom: 16px;
-    width: 360px;
+    width: 380px;
     height: auto;
     border-radius: var(--radius-xl);
     transform: none !important;
@@ -913,7 +1249,8 @@ html, body {
   }
 
   .modal-sheet {
-    max-width: 600px;
+    max-width: 750px;
     border-radius: var(--radius-xl);
   }
 }
+

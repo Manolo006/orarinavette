@@ -1,7 +1,7 @@
 /**
- * ORARI NAVETTE & BUS - MOBILE-FIRST JAVASCRIPT ENGINE
- * Handles touch gestures, bottom sheet drawer, bottom navigation bar,
- * OSRM road routing, live bus tracking, and mobile UI modals.
+ * ORARI NAVETTE & BUS - MOBILE-FIRST JAVASCRIPT ENGINE (V2.0)
+ * Gestione completa linee, fermate sequenziali, orari feriali/sabato/festivi,
+ * calendario festività, rotte OSRM con senso di marcia e ricerca avanzata.
  */
 
 (() => {
@@ -14,10 +14,13 @@
   let userMarker = null;
   let autoUpdateInterval = null;
   let osrmCache = {};
-  let stopMarkersMap = {}; // Maps stopId -> L.Marker for fast, flicker-free active pin updates
+  let stopMarkersMap = {}; // Maps stopId -> L.Marker
+
+  // Day filter: 'oggi' | 'lun_ven' | 'sabato' | 'domenica'
+  let selectedDayFilter = "oggi";
+  let currentModalDayTab = "lun_ven";
 
   // Dynamic contrast calculation (WCAG AA compliant)
-  // Relative luminance: L = 0.2126*R + 0.7152*G + 0.0722*B. If L > 0.18 use dark (#0f172a), else white (#ffffff)
   function getContrastTextColor(hexColor) {
     if (!hexColor) return "#ffffff";
     let hex = hexColor.replace("#", "").trim();
@@ -38,12 +41,8 @@
   let recordedGPSPath = [];
   let gpsWatchId = null;
 
-  // === CARTO BASEMAPS API KEY CONFIGURATION ===
-  // Da agosto 2026 CARTO richiede una API key gratuita (https://carto.com/basemaps/apikey) per i suoi tile.
-  // Senza chiave, viene mostrata la filigrana "API KEY REQUIRED".
+  // CARTO Basemaps API Key Configuration
   let cartoApiKey = localStorage.getItem("carto_api_key") || "cb1_2vji_1_325c3790be83c78e3c85fe40";
-
-  // Active Map Tiles State
   let currentTileLayer = null;
   let currentTileType = "positron";
 
@@ -60,13 +59,12 @@
     if (type === "osm") {
       return "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
     }
-    // "positron" di default: se c'è la chiave usa Carto Positron, altrimenti OpenStreetMap pulito senza filigrana
     return cartoApiKey
       ? `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png${keyParam}`
       : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   }
 
-  // Favorites with error-resilient storage
+  // Storage for Favorites
   function getStoredFavorites() {
     try {
       return JSON.parse(localStorage.getItem("bus_favorites") || "[]");
@@ -75,6 +73,24 @@
     }
   }
   let favorites = getStoredFavorites();
+
+  // Storage for OSRM Cache across reloads
+  function initOsrmCache() {
+    try {
+      const stored = localStorage.getItem("bus_osrm_cache");
+      if (stored) osrmCache = JSON.parse(stored);
+    } catch {
+      osrmCache = {};
+    }
+  }
+  function saveOsrmCache() {
+    try {
+      localStorage.setItem("bus_osrm_cache", JSON.stringify(osrmCache));
+    } catch (e) {
+      console.warn("Storage quota per OSRM superata:", e);
+    }
+  }
+  initOsrmCache();
 
   // === DOM ELEMENTS ===
   const lineSelect = document.getElementById("lineSelect");
@@ -93,6 +109,19 @@
   const btnFavorite = document.getElementById("btnFavorite");
   const btnZoomRoute = document.getElementById("btnZoomRoute");
   const btnThemeToggle = document.getElementById("btnThemeToggle");
+
+  // Day buttons
+  const dayPillBtns = document.querySelectorAll(".day-pill-btn");
+  const serviceAlertBanner = document.getElementById("serviceAlertBanner");
+  const serviceAlertText = document.getElementById("serviceAlertText");
+
+  // Route Details Card
+  const btnToggleRouteDetails = document.getElementById("btnToggleRouteDetails");
+  const routeDetailsBody = document.getElementById("routeDetailsBody");
+  const routeDetailsChevron = document.getElementById("routeDetailsChevron");
+  const routeFullPathText = document.getElementById("routeFullPathText");
+  const routeNotesWrapper = document.getElementById("routeNotesWrapper");
+  const routeNotesList = document.getElementById("routeNotesList");
 
   // FABs & Map Controls
   const fabLocate = document.getElementById("fabLocate");
@@ -114,19 +143,100 @@
   const searchInput = document.getElementById("searchInput");
   const searchResults = document.getElementById("searchResults");
 
-  // Modals
+  // Timetable Modal
   const timetableModal = document.getElementById("timetableModal");
   const btnTimetable = document.getElementById("btnTimetable");
   const closeTimetableModal = document.getElementById("closeTimetableModal");
   const timetableMatrix = document.getElementById("timetableMatrix");
   const modalLineTitle = document.getElementById("modalLineTitle");
+  const modalTimetableTabs = document.querySelectorAll("#modalTimetableTabs .modal-tab-btn");
+  const timetableEmptyMsg = document.getElementById("timetableEmptyMsg");
+  const timetableNotesContainer = document.getElementById("timetableNotesContainer");
+  const timetableNotesList = document.getElementById("timetableNotesList");
 
+  // Admin Modal
   const adminModal = document.getElementById("adminModal");
   const closeAdminModal = document.getElementById("closeAdminModal");
   const btnGenerateOSRM = document.getElementById("btnGenerateOSRM");
   const btnRecordGPS = document.getElementById("btnRecordGPS");
   const adminOutput = document.getElementById("adminOutput");
   const btnCopyAdminOutput = document.getElementById("btnCopyAdminOutput");
+
+  // === EASTER / PASQUETTA COMPUTUS ===
+  function getEasterAndPasquetta(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3 = March, 4 = April
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+    const easter = new Date(year, month - 1, day);
+    const pasquetta = new Date(year, month - 1, day + 1);
+    return { easter, pasquetta };
+  }
+
+  // === HOLIDAY & SUSPENSION CHECKER (da no corse.jpg) ===
+  function checkHolidayStatus(date) {
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mmdd = `${mm}-${dd}`;
+    const year = date.getFullYear();
+
+    const sospensioniFisse = [
+      "01-01", // Capodanno
+      "01-06", // Epifania
+      "04-25", // Liberazione
+      "05-01", // Festa Lavoro
+      "06-02", // Festa Repubblica
+      "08-15", // Ferragosto
+      "11-01", // Ognissanti
+      "12-08", // Immacolata
+      "12-25", // Natale
+      "12-26"  // Santo Stefano
+    ];
+
+    if (sospensioniFisse.includes(mmdd)) {
+      return { suspended: true, reason: "Giorno festivo: nessun servizio navette (come da orario ufficiale)" };
+    }
+
+    // Controllo Pasqua e Pasquetta
+    const { easter, pasquetta } = getEasterAndPasquetta(year);
+    if (
+      (date.getMonth() === easter.getMonth() && date.getDate() === easter.getDate()) ||
+      (date.getMonth() === pasquetta.getMonth() && date.getDate() === pasquetta.getDate())
+    ) {
+      return { suspended: true, reason: "Pasqua / Lunedì dell'Angelo: nessun servizio navette" };
+    }
+
+    // Chiusura anticipata 24 e 31 dicembre
+    if (mmdd === "12-24" || mmdd === "12-31") {
+      return { suspended: false, earlyClose: true, reason: "Vigilia: il servizio termina anticipatamente alle ore 19:00" };
+    }
+
+    return { suspended: false, earlyClose: false, reason: "" };
+  }
+
+  // Resolves the effective schedule key: 'lun_ven' | 'sabato' | 'domenica'
+  function resolveEffectiveDayKey(nowDate = new Date()) {
+    if (selectedDayFilter === "lun_ven") return "lun_ven";
+    if (selectedDayFilter === "sabato") return "sabato";
+    if (selectedDayFilter === "domenica") return "domenica";
+
+    // 'oggi' in tempo reale:
+    const dayOfWeek = nowDate.getDay();
+    if (dayOfWeek === 0) return "domenica";
+    if (dayOfWeek === 6) return "sabato";
+    return "lun_ven";
+  }
 
   // === INIT ===
   async function init() {
@@ -135,12 +245,15 @@
     wireMobileEvents();
     wireNavSystem();
     wireBottomSheetEvents();
+    wireDayFilterEvents();
+    wireRouteDetailsToggle();
 
     try {
       const res = await fetch("linee.json", { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      SCHEDULES = await res.json();
+      const json = await res.json();
+      SCHEDULES = json.linee || json;
       populateLinee();
       renderFavorites();
       startAutoUpdate();
@@ -164,7 +277,6 @@
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("bus_theme", newTheme);
     updateThemeIcon(newTheme);
-
     switchMapTile(newTheme === "dark" ? "dark" : "positron");
   }
 
@@ -210,28 +322,51 @@
     else switchMapTile("positron");
   }
 
-  // === OSRM FREE ROAD ROUTING ENGINE ===
+  // === OSRM FREE ROAD ROUTING ENGINE WITH DIRECTION PRESERVATION ===
   async function fetchOSRMRoute(stops) {
     if (!stops || stops.length < 2) return null;
 
-    const cacheKey = stops.map(s => `${s.lat.toFixed(5)},${s.lng.toFixed(5)}`).join(";");
+    // Create a stable cache key based on the ordered stops sequence
+    const cacheKey = stops.map(s => `${s.lat.toFixed(4)},${s.lng.toFixed(4)}`).join(";");
     if (osrmCache[cacheKey]) return osrmCache[cacheKey];
 
     try {
-      const coordinatesParam = stops.map(s => `${s.lng},${s.lat}`).join(";");
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
+
+      // Limita il campionamento a massimo 25 waypoints per rispettare l'URL OSRM garantendo precisione
+      let sampledStops = stops;
+      if (stops.length > 25) {
+        sampledStops = [];
+        const step = (stops.length - 1) / 24;
+        for (let i = 0; i < 25; i++) {
+          const idx = Math.min(stops.length - 1, Math.round(i * step));
+          if (!sampledStops.includes(stops[idx])) {
+            sampledStops.push(stops[idx]);
+          }
+        }
+        if (sampledStops[sampledStops.length - 1] !== stops[stops.length - 1]) {
+          sampledStops.push(stops[stops.length - 1]);
+        }
+      }
+
+      const coordinatesParam = sampledStops.map(s => `${s.lng.toFixed(6)},${s.lat.toFixed(6)}`).join(";");
       const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
 
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
       if (!response.ok) throw new Error("OSRM Routing failed");
 
       const data = await response.json();
       if (data.routes && data.routes.length > 0) {
         const latLngs = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
         osrmCache[cacheKey] = latLngs;
+        saveOsrmCache();
         return latLngs;
       }
     } catch (err) {
-      console.warn("OSRM routing fallito, fallback:", err);
+      console.warn("OSRM routing fallito o timeout, uso tracciato sequenziale nativo:", err);
     }
     return null;
   }
@@ -241,17 +376,18 @@
     return new Date();
   }
 
-  function hhmmToDateOnOrAfter(hhmm, nowDate) {
-    const [h, m] = String(hhmm).split(":").map(Number);
-    const d = new Date(nowDate);
-    d.setHours(h, m, 0, 0);
-    if (d < nowDate) d.setDate(d.getDate() + 1);
-    return d;
+  function hhmmToMinutes(hhmm) {
+    if (!hhmm) return 0;
+    const clean = String(hhmm).replace(/[^0-9:]/g, "");
+    const [h, m] = clean.split(":").map(Number);
+    return (h || 0) * 60 + (m || 0);
   }
 
-  function hhmmToMinutes(hhmm) {
-    const [h, m] = String(hhmm).split(":").map(Number);
-    return h * 60 + m;
+  function minutesToHHMM(totalMinutes) {
+    const normalized = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
+    const h = String(Math.floor(normalized / 60)).padStart(2, "0");
+    const m = String(normalized % 60).padStart(2, "0");
+    return `${h}:${m}`;
   }
 
   function formatDiffText(diffMin) {
@@ -266,11 +402,73 @@
     return SCHEDULES[lineSelect.value] || null;
   }
 
-  // === POPULATE SELECTORS ===
+  // Returns trips array for current line and current active day key
+  function getActiveTratteForCurrentLine() {
+    const linea = getCurrentLine();
+    if (!linea) return [];
+    const dayKey = resolveEffectiveDayKey();
+    if (linea.orari && Array.isArray(linea.orari[dayKey])) {
+      return linea.orari[dayKey];
+    }
+    return linea.tratte || [];
+  }
+
+  // Estimates intermediate stop arrival time proportionally between timing points
+  function getEstimatedStopTime(tratta, stopId, linea) {
+    if (!tratta || !tratta.stopTimes || !linea || !linea.stops) return null;
+
+    // 1. Explicit time
+    if (tratta.stopTimes[stopId]) {
+      return { time: tratta.stopTimes[stopId], estimated: false };
+    }
+
+    // 2. Linear proportional interpolation between timing points
+    const stops = linea.stops;
+    const targetIdx = stops.findIndex(s => s.id === stopId);
+    if (targetIdx === -1) return null;
+
+    // Find previous timing stop with known time
+    let prevIdx = -1;
+    let prevTimeMin = null;
+    for (let i = targetIdx - 1; i >= 0; i--) {
+      if (tratta.stopTimes[stops[i].id]) {
+        prevIdx = i;
+        prevTimeMin = hhmmToMinutes(tratta.stopTimes[stops[i].id]);
+        break;
+      }
+    }
+
+    // Find next timing stop with known time
+    let nextIdx = -1;
+    let nextTimeMin = null;
+    for (let i = targetIdx + 1; i < stops.length; i++) {
+      if (tratta.stopTimes[stops[i].id]) {
+        nextIdx = i;
+        nextTimeMin = hhmmToMinutes(tratta.stopTimes[stops[i].id]);
+        break;
+      }
+    }
+
+    if (prevIdx !== -1 && nextIdx !== -1 && nextTimeMin !== null && prevTimeMin !== null) {
+      if (nextTimeMin < prevTimeMin) nextTimeMin += 1440; // Midnight rollover
+      const fraction = (targetIdx - prevIdx) / (nextIdx - prevIdx);
+      const estMin = prevTimeMin + fraction * (nextTimeMin - prevTimeMin);
+      return { time: minutesToHHMM(estMin), estimated: true };
+    }
+
+    if (prevIdx !== -1 && prevTimeMin !== null) {
+      return { time: minutesToHHMM(prevTimeMin + (targetIdx - prevIdx) * 2), estimated: true };
+    }
+
+    return null;
+  }
+
+  // === POPULATE SELECTORS & UI ===
   function populateLinee() {
     lineSelect.innerHTML = "";
 
-    Object.keys(SCHEDULES).forEach((key) => {
+    const keys = Object.keys(SCHEDULES).filter(k => k !== "calendario_servizio");
+    keys.forEach((key) => {
       const opt = document.createElement("option");
       opt.value = key;
       opt.textContent = SCHEDULES[key].nome || `Linea ${key}`;
@@ -287,6 +485,7 @@
     const linea = getCurrentLine();
     if (!linea) return;
 
+    // Update Line Badge Color
     const badgeTextColor = getContrastTextColor(linea.colore);
     heroLineBadge.innerHTML = `<i class="fa-solid fa-bus" aria-hidden="true"></i> ${linea.nome || 'Linea ' + lineSelect.value}`;
     if (linea.colore) {
@@ -297,14 +496,32 @@
       heroLineBadge.style.color = "";
     }
 
+    // Update Route Details Card
+    if (routeFullPathText) {
+      routeFullPathText.textContent = linea.percorso_ufficiale || "Percorso circolare ordinario.";
+    }
+    if (routeNotesList && routeNotesWrapper) {
+      if (Array.isArray(linea.note) && linea.note.length > 0) {
+        routeNotesWrapper.style.display = "block";
+        routeNotesList.innerHTML = linea.note.map(n => `<li>${n}</li>`).join("");
+      } else {
+        routeNotesWrapper.style.display = "none";
+        routeNotesList.innerHTML = "";
+      }
+    }
+
+    // Populate Trips for Active Day
+    const activeTratte = getActiveTratteForCurrentLine();
     tripSelect.innerHTML = '<option value="">(Corsa in tempo reale)</option>';
-    (linea.tratte || []).forEach((t) => {
+    activeTratte.forEach((t) => {
       const opt = document.createElement("option");
       opt.value = t.id;
-      opt.textContent = `${t.id} - Partenza ore ${t.partenza || "--:--"}`;
+      const noteBadge = t.note ? ` ${t.note}` : "";
+      opt.textContent = `${t.id} - Partenza ore ${t.partenza || "--:--"}${noteBadge}`;
       tripSelect.appendChild(opt);
     });
 
+    // Populate Stops in strict chronological order
     stopSelect.innerHTML = "";
     (linea.stops || []).forEach((s) => {
       const opt = document.createElement("option");
@@ -313,12 +530,49 @@
       stopSelect.appendChild(opt);
     });
 
+    updateServiceAlertBanner();
     updateFavoriteButtonState();
     drawRouteForSelectedTripOrDefault();
     updateAllDisplays();
   }
 
-  // === DRAW MAP ROUTE & STOPS ===
+  // Updates Service Status Banner (Holidays, Sunday closures, Early termination)
+  function updateServiceAlertBanner() {
+    if (!serviceAlertBanner || !serviceAlertText) return;
+
+    const now = getNow();
+    const holidayInfo = checkHolidayStatus(now);
+    const dayKey = resolveEffectiveDayKey(now);
+    const linea = getCurrentLine();
+    const tratte = getActiveTratteForCurrentLine();
+
+    if (selectedDayFilter === "oggi" && holidayInfo.suspended) {
+      serviceAlertBanner.style.display = "flex";
+      serviceAlertBanner.className = "service-alert-banner alert-danger";
+      serviceAlertText.textContent = holidayInfo.reason;
+      return;
+    }
+
+    if (tratte.length === 0) {
+      serviceAlertBanner.style.display = "flex";
+      serviceAlertBanner.className = "service-alert-banner alert-warning";
+      const dayLabel = dayKey === "domenica" ? "la domenica e nei giorni festivi" : (dayKey === "sabato" ? "il sabato" : "nei giorni selezionati");
+      serviceAlertText.textContent = `Nessun servizio programmato per la ${linea?.nome || 'linea'} ${dayLabel}.`;
+      return;
+    }
+
+    if (selectedDayFilter === "oggi" && holidayInfo.earlyClose) {
+      serviceAlertBanner.style.display = "flex";
+      serviceAlertBanner.className = "service-alert-banner alert-info";
+      serviceAlertText.textContent = holidayInfo.reason;
+      return;
+    }
+
+    serviceAlertBanner.style.display = "none";
+    serviceAlertText.textContent = "";
+  }
+
+  // === DRAW MAP ROUTE & STOPS IN DIRECTION OF TRAVEL ===
   async function drawRouteForSelectedTripOrDefault() {
     if (!staticLayer) return;
     staticLayer.clearLayers();
@@ -329,20 +583,23 @@
     const linea = getCurrentLine();
     if (!linea) return;
 
-    // 1. Draw stop markers synchronously so stopMarkersMap is populated immediately
+    // 1. Draw stop markers sequentially
     (linea.stops || []).forEach((s, idx) => {
       const isSelected = s.id === stopSelect.value;
-      const markerHtml = `<div class="stop-marker-pin ${isSelected ? 'active' : ''}">${idx + 1}</div>`;
+      const isTimingPoint = Boolean(s.timing);
+      const pinClass = `stop-marker-pin ${isSelected ? 'active' : ''} ${isTimingPoint ? 'timing-point' : ''}`;
+      const markerHtml = `<div class="${pinClass}">${idx + 1}</div>`;
       
       const customIcon = L.divIcon({
         className: 'custom-stop-icon',
         html: markerHtml,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13]
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
       });
 
       const m = L.marker([s.lat, s.lng], { icon: customIcon }).addTo(staticLayer);
-      m.bindPopup(`<b>${s.nome}</b><br>Fermata #${idx + 1}`);
+      const timingLabel = isTimingPoint ? ' <span style="color:var(--primary); font-weight:700;">(Fermata Oraria)</span>' : '';
+      m.bindPopup(`<b>${s.nome}</b>${timingLabel}<br><small style="color:var(--text-muted);">Fermata #${idx + 1} • ${s.via || ''}</small>`);
 
       m.on("click", () => {
         selectStop(s.id, true);
@@ -353,31 +610,48 @@
 
     fitMapToCurrentRouteOrStops();
 
-    // 2. Determine and render route polyline
+    // 2. Trace route polyline with direction flow
+    const activeTratte = getActiveTratteForCurrentLine();
     const selectedTripId = tripSelect.value;
     let tratta = selectedTripId 
-      ? (linea.tratte || []).find((t) => t.id === selectedTripId) 
-      : (linea.tratte || [])[0];
+      ? activeTratte.find((t) => t.id === selectedTripId) 
+      : activeTratte[0];
 
     let pathCoords = null;
 
     if (tratta && Array.isArray(tratta.path) && tratta.path.length > 1) {
       pathCoords = tratta.path;
     } else if (linea.stops && linea.stops.length > 1) {
-      // Draw straight-line fallback while fetching OSRM road geometry
+      // Draw fallback straight lines along sequential stops
       const fallbackPolyline = L.polyline((linea.stops || []).map(s => [s.lat, s.lng]), {
         color: linea.colore || "#2563eb",
         weight: 5,
-        opacity: 0.85
+        opacity: 0.85,
+        lineCap: "round",
+        lineJoin: "round"
       }).addTo(staticLayer);
 
+      // Asynchronously fetch road-following geometry
       pathCoords = await fetchOSRMRoute(linea.stops);
       if (pathCoords && pathCoords.length > 1) {
         staticLayer.removeLayer(fallbackPolyline);
+        
+        // Base road line
         L.polyline(pathCoords, {
           color: linea.colore || "#2563eb",
           weight: 5,
-          opacity: 0.85
+          opacity: 0.88,
+          lineCap: "round",
+          lineJoin: "round"
+        }).addTo(staticLayer);
+
+        // Direction flow dashes
+        L.polyline(pathCoords, {
+          color: "#ffffff",
+          weight: 2,
+          opacity: 0.7,
+          dashArray: "6, 12",
+          className: "animated-route-flow"
         }).addTo(staticLayer);
       }
       return;
@@ -391,12 +665,14 @@
       L.polyline(pathCoords, {
         color: linea.colore || "#2563eb",
         weight: 5,
-        opacity: 0.85
+        opacity: 0.88,
+        lineCap: "round",
+        lineJoin: "round"
       }).addTo(staticLayer);
     }
   }
 
-  // Fast, flicker-free active pin updating without redrawing the layer
+  // Fast, flicker-free active pin updating
   function updateActiveStopMarkerPin(selectedStopId) {
     if (!stopMarkersMap) return;
     Object.keys(stopMarkersMap).forEach((stopId) => {
@@ -418,15 +694,12 @@
     });
   }
 
-  // Helpers for intermediate on-demand stops without fixed times
-  function isIntermediateOnDemandStop(linea, stopId) {
-    if (!linea || !linea.tratte || !linea.tratte.length) return false;
-    return !linea.tratte.some((t) => t.stopTimes && t.stopTimes[stopId]);
-  }
-
+  // === NEXT TRATTA CALCULATOR ===
   function findActiveOrNextTrattaForLine(linea, nowDate, tripIdSpecific = "") {
-    if (!linea || !linea.tratte || !linea.tratte.length) return null;
-    const sorted = [...linea.tratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
+    const activeTratte = getActiveTratteForCurrentLine();
+    if (!activeTratte.length) return null;
+
+    const sorted = [...activeTratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
     if (tripIdSpecific) {
       const specific = sorted.find((t) => t.id === tripIdSpecific);
       if (specific) return specific;
@@ -434,7 +707,7 @@
 
     const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
 
-    // 1. Detect if a trip is currently in progress (between departure and last stop arrival)
+    // 1. Detect if a trip is currently in progress
     for (const t of sorted) {
       const depMin = t.partenza ? hhmmToMinutes(t.partenza) : null;
       if (depMin !== null) {
@@ -451,15 +724,71 @@
       }
     }
 
-    // 2. Detect next scheduled departure today
+    // 2. Next departure today
     for (const t of sorted) {
       if (t.partenza && hhmmToMinutes(t.partenza) >= nowMin) {
         return t;
       }
     }
 
-    // 3. Fallback to first departure tomorrow
+    // 3. Fallback to first trip
     return sorted[0];
+  }
+
+  function findNextTrattaForStop(lineKey, stopId, nowDate, tripIdSpecific = "") {
+    const linea = SCHEDULES[lineKey];
+    if (!linea) return null;
+    const activeTratte = getActiveTratteForCurrentLine();
+    if (!activeTratte.length) return null;
+
+    const sorted = [...activeTratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
+    const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
+
+    if (tripIdSpecific) {
+      const t = sorted.find((x) => x.id === tripIdSpecific);
+      if (!t) return null;
+
+      const timeInfo = getEstimatedStopTime(t, stopId, linea);
+      if (!timeInfo) return null;
+
+      const [h, m] = String(timeInfo.time).split(":").map(Number);
+      const dateStop = new Date(nowDate);
+      dateStop.setHours(h, m, 0, 0);
+      let isTomorrow = false;
+      if (dateStop < nowDate) {
+        dateStop.setDate(dateStop.getDate() + 1);
+        isTomorrow = true;
+      }
+      const diffMin = Math.round((dateStop - nowDate) / 60000);
+      return { tratta: t, stopTime: timeInfo.time, estimated: timeInfo.estimated, dateStop, diffMin, forced: true, tomorrow: isTomorrow };
+    }
+
+    // Find next upcoming trip today for this stop
+    for (const t of sorted) {
+      const timeInfo = getEstimatedStopTime(t, stopId, linea);
+      if (!timeInfo) continue;
+
+      const stopMin = hhmmToMinutes(timeInfo.time);
+      if (stopMin >= nowMin) {
+        const dateStop = new Date(nowDate);
+        dateStop.setHours(Math.floor(stopMin / 60), stopMin % 60, 0, 0);
+        const diffMin = stopMin - nowMin;
+        return { tratta: t, stopTime: timeInfo.time, estimated: timeInfo.estimated, dateStop, diffMin, forced: false, tomorrow: false };
+      }
+    }
+
+    // Fallback: first trip tomorrow
+    const first = sorted[0];
+    const timeInfo = getEstimatedStopTime(first, stopId, linea);
+    if (!timeInfo) return null;
+
+    const stopMin = hhmmToMinutes(timeInfo.time);
+    const dateStop = new Date(nowDate);
+    dateStop.setDate(dateStop.getDate() + 1);
+    dateStop.setHours(Math.floor(stopMin / 60), stopMin % 60, 0, 0);
+
+    const diffMin = Math.round((dateStop - nowDate) / 60000);
+    return { tratta: first, stopTime: timeInfo.time, estimated: timeInfo.estimated, dateStop, diffMin, forced: false, tomorrow: true };
   }
 
   function fitMapToCurrentRouteOrStops() {
@@ -472,62 +801,6 @@
     } catch (err) {
       console.warn("fitBounds fallito:", err);
     }
-  }
-
-  // === NEXT TRATTA CALCULATOR ===
-  function findNextTrattaForStop(lineKey, stopId, nowDate, tripIdSpecific = "") {
-    const linea = SCHEDULES[lineKey];
-    if (!linea || !linea.tratte || !linea.tratte.length) return null;
-
-    const sorted = [...linea.tratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
-    const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes();
-
-    if (tripIdSpecific) {
-      const t = sorted.find((x) => x.id === tripIdSpecific);
-      if (!t) return null;
-
-      const st = t.stopTimes?.[stopId];
-      if (!st) return null;
-
-      const [h, m] = String(st).split(":").map(Number);
-      const dateStop = new Date(nowDate);
-      dateStop.setHours(h, m, 0, 0);
-      let isTomorrow = false;
-      if (dateStop < nowDate) {
-        dateStop.setDate(dateStop.getDate() + 1);
-        isTomorrow = true;
-      }
-      const diffMin = Math.round((dateStop - nowDate) / 60000);
-      return { tratta: t, stopTime: st, dateStop, diffMin, forced: true, tomorrow: isTomorrow };
-    }
-
-    // Find next upcoming stop time today
-    for (const t of sorted) {
-      const st = t.stopTimes?.[stopId];
-      if (!st) continue;
-
-      const stopMin = hhmmToMinutes(st);
-      if (stopMin >= nowMin) {
-        const dateStop = new Date(nowDate);
-        const [h, m] = String(st).split(":").map(Number);
-        dateStop.setHours(h, m, 0, 0);
-        const diffMin = stopMin - nowMin;
-        return { tratta: t, stopTime: st, dateStop, diffMin, forced: false, tomorrow: false };
-      }
-    }
-
-    // Fallback: first scheduled trip tomorrow
-    const first = sorted.find((t) => t.stopTimes?.[stopId]);
-    if (!first) return null;
-
-    const st = first.stopTimes[stopId];
-    const [h, m] = String(st).split(":").map(Number);
-    const dateStop = new Date(nowDate);
-    dateStop.setDate(dateStop.getDate() + 1);
-    dateStop.setHours(h, m, 0, 0);
-
-    const diffMin = Math.round((dateStop - nowDate) / 60000);
-    return { tratta: first, stopTime: st, dateStop, diffMin, forced: false, tomorrow: true };
   }
 
   // === BUS POSITION & ANIMATION ===
@@ -547,14 +820,15 @@
       tripBaseDate.setDate(tripBaseDate.getDate() + 1);
     }
 
+    // Interpolate bus along all sequential stops that have resolved times
     const points = (linea.stops || [])
       .map((s) => {
-        const t = tratta.stopTimes?.[s.id];
-        if (!t) return null;
-        const [h, m] = String(t).split(":").map(Number);
+        const timeInfo = getEstimatedStopTime(tratta, s.id, linea);
+        if (!timeInfo) return null;
+        const [h, m] = String(timeInfo.time).split(":").map(Number);
         const d = new Date(tripBaseDate);
         d.setHours(h, m, 0, 0);
-        if (tratta.partenza && hhmmToMinutes(t) < hhmmToMinutes(tratta.partenza)) {
+        if (tratta.partenza && hhmmToMinutes(timeInfo.time) < hhmmToMinutes(tratta.partenza)) {
           d.setDate(d.getDate() + 1);
         }
         return {
@@ -587,7 +861,6 @@
       lng = points[0].lng;
       nextStopName = `Partenza ore ${points[0].date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}: ${points[0].nome}`;
     } else if (now > points[points.length - 1].date) {
-      // Keep marker at destination for up to 5 min after arrival
       if (now - points[points.length - 1].date > 5 * 60 * 1000) {
         return;
       }
@@ -633,7 +906,14 @@
     if (!timelineList || !linea || !linea.stops) return;
     timelineList.innerHTML = "";
 
-    const stopTimes = currentTratta ? (currentTratta.stopTimes || {}) : {};
+    const activeTratte = getActiveTratteForCurrentLine();
+    if (activeTratte.length === 0) {
+      timelineList.innerHTML = `<div style="text-align:center; padding:2rem 1rem; color:var(--text-muted); font-size:0.9rem;">
+        <i class="fa-solid fa-ban" style="font-size:1.6rem; color:var(--warning); display:block; margin-bottom:0.5rem;" aria-hidden="true"></i>
+        Nessuna corsa programmata per questo giorno.
+      </div>`;
+      return;
+    }
 
     const tripBaseDate = new Date(now);
     if (isTomorrow) {
@@ -641,24 +921,25 @@
     }
 
     linea.stops.forEach((stop, index) => {
-      const explicitTime = stopTimes[stop.id];
+      const timeInfo = currentTratta ? getEstimatedStopTime(currentTratta, stop.id, linea) : null;
       let timeDisplayHtml = "";
-      if (explicitTime) {
-        timeDisplayHtml = `<i class="fa-regular fa-clock" aria-hidden="true"></i> ${explicitTime}`;
-      } else if (currentTratta) {
-        timeDisplayHtml = `<span class="badge-on-demand"><i class="fa-solid fa-hand" aria-hidden="true"></i> A richiesta</span>`;
+
+      if (timeInfo && !timeInfo.estimated) {
+        timeDisplayHtml = `<i class="fa-regular fa-clock" aria-hidden="true"></i> <b>${timeInfo.time}</b>`;
+      } else if (timeInfo && timeInfo.estimated) {
+        timeDisplayHtml = `<span class="badge-estimated" title="Orario stimato di passaggio"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> ~${timeInfo.time}</span>`;
       } else {
-        timeDisplayHtml = `<i class="fa-regular fa-clock" aria-hidden="true"></i> --:--`;
+        timeDisplayHtml = `<span class="badge-on-demand"><i class="fa-solid fa-hand" aria-hidden="true"></i> A richiesta</span>`;
       }
 
       const isSelected = stop.id === stopSelect.value;
       
       let isPassed = false;
-      if (currentTratta && explicitTime) {
-        const [h, m] = String(explicitTime).split(":").map(Number);
+      if (currentTratta && timeInfo) {
+        const [h, m] = String(timeInfo.time).split(":").map(Number);
         const stopDate = new Date(tripBaseDate);
         stopDate.setHours(h, m, 0, 0);
-        if (currentTratta.partenza && hhmmToMinutes(explicitTime) < hhmmToMinutes(currentTratta.partenza)) {
+        if (currentTratta.partenza && hhmmToMinutes(timeInfo.time) < hhmmToMinutes(currentTratta.partenza)) {
           stopDate.setDate(stopDate.getDate() + 1);
         }
         if (stopDate < now) isPassed = true;
@@ -670,7 +951,7 @@
         <div class="stop-badge-num">${isPassed ? '<i class="fa-solid fa-check" aria-hidden="true"></i>' : index + 1}</div>
         <div class="stop-row-info">
           <div class="stop-row-name">${stop.nome}</div>
-          <div class="stop-row-time">${timeDisplayHtml}</div>
+          <div class="stop-row-time">${timeDisplayHtml} • <span style="font-size:0.75rem; color:var(--text-muted);">${stop.via || ''}</span></div>
         </div>
         <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;" aria-hidden="true"></i>
       `;
@@ -685,72 +966,31 @@
 
   // === RENDER UPCOMING TRIPS ===
   function renderUpcomingTrips(linea, stopId, now) {
-    if (!upcomingList || !linea || !linea.tratte) return;
+    if (!upcomingList || !linea) return;
     upcomingList.innerHTML = "";
 
-    const sorted = [...linea.tratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
-    const isOnDemand = isIntermediateOnDemandStop(linea, stopId);
-
-    if (isOnDemand) {
-      const infoCard = document.createElement("div");
-      infoCard.className = "on-demand-card";
-      infoCard.innerHTML = `
-        <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-circle-info" style="color: var(--warning);" aria-hidden="true"></i>
-          Fermata a richiesta
-        </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-          Questa fermata viene servita al passaggio della navetta lungo il percorso. Fai un chiaro cenno all'autista con congruo anticipo.
-        </div>
-      `;
-      upcomingList.appendChild(infoCard);
-
-      const headerDiv = document.createElement("div");
-      headerDiv.style.cssText = "font-weight: 700; font-size: 0.8rem; color: var(--text-muted); margin: 0.75rem 0 0.5rem 0; text-transform: uppercase;";
-      headerDiv.textContent = "Partenze della linea da capolinea";
-      upcomingList.appendChild(headerDiv);
-
-      sorted.forEach((tratta) => {
-        const depTime = tratta.partenza;
-        if (!depTime) return;
-        const [h, m] = String(depTime).split(":").map(Number);
-        const dateDep = new Date(now);
-        dateDep.setHours(h, m, 0, 0);
-        const diffMin = Math.round((dateDep - now) / 60000);
-        const isPassed = diffMin < 0;
-
-        const row = document.createElement("div");
-        row.className = "timeline-row";
-        row.style.opacity = isPassed ? "0.6" : "1";
-        row.innerHTML = `
-          <div class="stop-badge-num" style="background: var(--primary-hover);"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>
-          <div class="stop-row-info">
-            <div class="stop-row-name">Corsa ${tratta.id}</div>
-            <div class="stop-row-time">Partenza capolinea: ore ${depTime}</div>
-          </div>
-          <span class="hero-line-tag" style="font-size: 0.75rem;">${formatDiffText(diffMin)}</span>
-        `;
-
-        row.addEventListener("click", () => {
-          tripSelect.value = tratta.id;
-          drawRouteForSelectedTripOrDefault();
-          updateAllDisplays();
-        });
-
-        upcomingList.appendChild(row);
-      });
+    const activeTratte = getActiveTratteForCurrentLine();
+    if (activeTratte.length === 0) {
+      upcomingList.innerHTML = `<div style="text-align:center; padding:2rem 1rem; color:var(--text-muted); font-size:0.9rem;">
+        <i class="fa-solid fa-ban" style="font-size:1.6rem; color:var(--warning); display:block; margin-bottom:0.5rem;" aria-hidden="true"></i>
+        Nessuna partenza per il giorno selezionato.
+      </div>`;
       return;
     }
 
-    sorted.forEach((tratta) => {
-      const st = tratta.stopTimes?.[stopId];
-      if (!st) return;
+    const sorted = [...activeTratte].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
 
-      const [h, m] = String(st).split(":").map(Number);
+    sorted.forEach((tratta) => {
+      const timeInfo = getEstimatedStopTime(tratta, stopId, linea);
+      if (!timeInfo) return;
+
+      const [h, m] = String(timeInfo.time).split(":").map(Number);
       const dateStop = new Date(now);
       dateStop.setHours(h, m, 0, 0);
       const diffMin = Math.round((dateStop - now) / 60000);
       const isPassed = diffMin < 0;
+
+      const noteText = tratta.note ? ` <span class="trip-note-badge">${tratta.note}</span>` : "";
 
       const row = document.createElement("div");
       row.className = "timeline-row";
@@ -758,8 +998,8 @@
       row.innerHTML = `
         <div class="stop-badge-num" style="background: var(--primary-hover);"><i class="fa-solid fa-bus" aria-hidden="true"></i></div>
         <div class="stop-row-info">
-          <div class="stop-row-name">Corsa ${tratta.id} (Partenza ${tratta.partenza})</div>
-          <div class="stop-row-time">Arrivo alla fermata: ${st}</div>
+          <div class="stop-row-name">Corsa ${tratta.id}${noteText} (Partenza ${tratta.partenza || '--:--'})</div>
+          <div class="stop-row-time">Passaggio fermata: <b>${timeInfo.time}</b> ${timeInfo.estimated ? '<small>(stimato)</small>' : ''}</div>
         </div>
         <span class="hero-line-tag" style="font-size: 0.75rem;">${formatDiffText(diffMin)}</span>
       `;
@@ -857,29 +1097,34 @@
     const results = [];
 
     Object.keys(SCHEDULES).forEach(key => {
+      if (key === "calendario_servizio") return;
       const linea = SCHEDULES[key];
       const name = linea.nome || key;
-      if (name.toLowerCase().includes(query)) {
-        results.push({ type: "line", lineId: key, title: name, subtitle: "Linea Navetta" });
+      const routeText = linea.percorso_ufficiale || "";
+
+      if (name.toLowerCase().includes(query) || routeText.toLowerCase().includes(query)) {
+        results.push({ type: "line", lineId: key, title: name, subtitle: "Linea Navetta Circolare" });
       }
 
       (linea.stops || []).forEach(stop => {
-        if (stop.nome.toLowerCase().includes(query)) {
+        const stopName = (stop.nome || "").toLowerCase();
+        const stopVia = (stop.via || "").toLowerCase();
+        if (stopName.includes(query) || stopVia.includes(query)) {
           results.push({ 
             type: "stop", 
             lineId: key, 
             stopId: stop.id, 
             title: stop.nome, 
-            subtitle: `Fermata • ${name}` 
+            subtitle: `Fermata #${(linea.stops.indexOf(stop) + 1)} • ${name} (${stop.via || ''})` 
           });
         }
       });
     });
 
     if (results.length === 0) {
-      searchResults.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">Nessun risultato</div>`;
+      searchResults.innerHTML = `<div style="padding: 1rem; color: var(--text-muted); text-align: center;">Nessun risultato trovato</div>`;
     } else {
-      results.slice(0, 10).forEach(res => {
+      results.slice(0, 15).forEach(res => {
         const item = document.createElement("div");
         item.className = "timeline-row";
         item.style.marginBottom = "0.5rem";
@@ -905,39 +1150,85 @@
     }
   }
 
-  // === TIMETABLE MATRIX MODAL ===
+  // === TIMETABLE MATRIX MODAL WITH MULTI-DAY TABS ===
   function openTimetableMatrix() {
     const linea = getCurrentLine();
     if (!linea || !timetableMatrix) return;
 
     modalLineTitle.textContent = linea.nome || `Linea ${lineSelect.value}`;
 
-    const tratte = [...(linea.tratte || [])].sort((a, b) => (a.partenza || "").localeCompare(b.partenza || ""));
-    const stops = linea.stops || [];
+    // Select tab matching current day filter
+    const effectiveDay = resolveEffectiveDayKey();
+    currentModalDayTab = (selectedDayFilter === "oggi") ? effectiveDay : selectedDayFilter;
 
-    let html = `<thead><tr><th>Fermata</th>`;
-    tratte.forEach(t => {
-      html += `<th>${t.id}<br><small style="font-weight: normal;">ore ${t.partenza || ''}</small></th>`;
-    });
-    html += `</tr></thead><tbody>`;
-
-    stops.forEach(s => {
-      html += `<tr><td class="stop-name-cell">${s.nome}</td>`;
-      tratte.forEach(t => {
-        const time = t.stopTimes?.[s.id];
-        if (time) {
-          html += `<td>${time}</td>`;
-        } else {
-          html += `<td><span style="color: var(--text-muted); font-size: 0.72rem;" title="Fermata a richiesta">a rich.</span></td>`;
-        }
-      });
-      html += `</tr>`;
-    });
-
-    html += `</tbody>`;
-    timetableMatrix.innerHTML = html;
+    updateModalDayTabs();
+    renderTimetableMatrixForTab(currentModalDayTab);
 
     timetableModal.classList.add("active");
+  }
+
+  function updateModalDayTabs() {
+    modalTimetableTabs.forEach(btn => {
+      const match = btn.getAttribute("data-modaltab") === currentModalDayTab;
+      btn.classList.toggle("active", match);
+      btn.setAttribute("aria-selected", match ? "true" : "false");
+    });
+  }
+
+  function renderTimetableMatrixForTab(dayTab) {
+    const linea = getCurrentLine();
+    if (!linea) return;
+
+    const tratte = (linea.orari && linea.orari[dayTab]) ? linea.orari[dayTab] : [];
+    const stops = linea.stops || [];
+
+    if (tratte.length === 0) {
+      timetableMatrix.style.display = "none";
+      timetableEmptyMsg.style.display = "block";
+      const dayName = dayTab === "domenica" ? "la domenica e nei giorni festivi" : (dayTab === "sabato" ? "il sabato" : "nei giorni feriali");
+      timetableEmptyMsg.innerHTML = `<i class="fa-solid fa-ban" style="font-size:1.8rem; color:var(--warning); display:block; margin-bottom:0.5rem;" aria-hidden="true"></i>
+        Nessuna corsa effettuata ${dayName} per la ${linea.nome || 'linea'}.`;
+    } else {
+      timetableEmptyMsg.style.display = "none";
+      timetableMatrix.style.display = "table";
+
+      let html = `<thead><tr><th>Fermata</th>`;
+      tratte.forEach(t => {
+        const noteBadge = t.note ? ` <small style="color:var(--primary); font-weight:bold;">${t.note}</small>` : '';
+        html += `<th>${t.id}${noteBadge}<br><small style="font-weight: normal;">ore ${t.partenza || ''}</small></th>`;
+      });
+      html += `</tr></thead><tbody>`;
+
+      stops.forEach(s => {
+        const timingClass = s.timing ? 'timing-cell' : '';
+        html += `<tr><td class="stop-name-cell ${timingClass}">${s.nome}</td>`;
+        tratte.forEach(t => {
+          const timeInfo = getEstimatedStopTime(t, s.id, linea);
+          if (timeInfo && !timeInfo.estimated) {
+            html += `<td><b>${timeInfo.time}</b></td>`;
+          } else if (timeInfo && timeInfo.estimated) {
+            html += `<td><span style="color: var(--text-muted); font-size: 0.75rem;" title="Orario stimato di passaggio">~${timeInfo.time}</span></td>`;
+          } else {
+            html += `<td><span style="color: var(--text-muted); font-size: 0.72rem;" title="Fermata a richiesta">a rich.</span></td>`;
+          }
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody>`;
+      timetableMatrix.innerHTML = html;
+    }
+
+    // Populate notes
+    if (timetableNotesContainer && timetableNotesList) {
+      if (Array.isArray(linea.note) && linea.note.length > 0) {
+        timetableNotesContainer.style.display = "block";
+        timetableNotesList.innerHTML = linea.note.map(n => `<li>${n}</li>`).join("");
+      } else {
+        timetableNotesContainer.style.display = "none";
+        timetableNotesList.innerHTML = "";
+      }
+    }
   }
 
   // === ADMIN & OSRM GENERATOR ===
@@ -1006,57 +1297,42 @@
     const stop = (linea?.stops || []).find(s => s.id === stopId);
     if (stop) heroStopName.textContent = stop.nome;
 
+    const activeTratte = getActiveTratteForCurrentLine();
+
+    if (activeTratte.length === 0) {
+      if (busMarker && dynamicLayer) {
+        dynamicLayer.removeLayer(busMarker);
+        busMarker = null;
+      }
+      heroEtaBadge.textContent = "—";
+      heroEtaBadge.style.fontSize = "";
+      heroNextTime.textContent = "Nessun servizio oggi";
+      renderTimeline(linea, null, now, false);
+      renderUpcomingTrips(linea, stopId, now);
+      updateActiveStopMarkerPin(stopId);
+      return;
+    }
+
     const info = findNextTrattaForStop(lineKey, stopId, now, tripIdSpecific);
 
     if (!info) {
-      if (isIntermediateOnDemandStop(linea, stopId)) {
-        heroEtaBadge.textContent = "A richiesta";
-        heroEtaBadge.style.fontSize = "0.85rem";
-        heroNextTime.textContent = "Fermata a richiesta (passaggio lungo la tratta)";
-        const activeTratta = findActiveOrNextTrattaForLine(linea, now, tripIdSpecific);
-        let isTomorrow = false;
-        if (activeTratta && activeTratta.partenza) {
-          const depMin = hhmmToMinutes(activeTratta.partenza);
-          const nowMin = now.getHours() * 60 + now.getMinutes();
-          if (nowMin > depMin) {
-            let maxStopMin = depMin;
-            if (activeTratta.stopTimes) {
-              Object.values(activeTratta.stopTimes).forEach(st => {
-                const sm = hhmmToMinutes(st);
-                if (sm > maxStopMin) maxStopMin = sm;
-              });
-            }
-            if (nowMin > maxStopMin) {
-              isTomorrow = true;
-            }
-          }
-        }
-        if (activeTratta) {
-          updateBusMarkerForTratta(activeTratta, now, isTomorrow);
-        } else if (busMarker && dynamicLayer) {
-          dynamicLayer.removeLayer(busMarker);
-          busMarker = null;
-        }
-        renderTimeline(linea, activeTratta, now, isTomorrow);
-        renderUpcomingTrips(linea, stopId, now);
-      } else {
-        if (busMarker && dynamicLayer) {
-          dynamicLayer.removeLayer(busMarker);
-          busMarker = null;
-        }
-        heroEtaBadge.textContent = "—";
-        heroEtaBadge.style.fontSize = "";
-        heroNextTime.textContent = "Nessuna corsa";
-        renderTimeline(linea, null, now, false);
-        renderUpcomingTrips(linea, stopId, now);
+      if (busMarker && dynamicLayer) {
+        dynamicLayer.removeLayer(busMarker);
+        busMarker = null;
       }
+      heroEtaBadge.textContent = "—";
+      heroEtaBadge.style.fontSize = "";
+      heroNextTime.textContent = "Nessuna corsa imminente";
+      renderTimeline(linea, null, now, false);
+      renderUpcomingTrips(linea, stopId, now);
       updateActiveStopMarkerPin(stopId);
       return;
     }
 
     heroEtaBadge.style.fontSize = "";
     const orarioTesto = info.dateStop.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    heroNextTime.textContent = info.tomorrow ? `Domani ore ${orarioTesto}` : `Previsto ore ${orarioTesto}`;
+    const estLabel = info.estimated ? " (stimato)" : "";
+    heroNextTime.textContent = info.tomorrow ? `Domani ore ${orarioTesto}${estLabel}` : `Previsto ore ${orarioTesto}${estLabel}`;
     heroEtaBadge.textContent = formatDiffText(info.diffMin);
 
     updateBusMarkerForTratta(info.tratta, now, Boolean(info.tomorrow));
@@ -1087,22 +1363,52 @@
     if (shouldZoom) zoomToSelectedStop();
   }
 
+  // === DAY FILTER SYSTEM ===
+  function wireDayFilterEvents() {
+    dayPillBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const dayMode = btn.getAttribute("data-day");
+        selectedDayFilter = dayMode;
+
+        dayPillBtns.forEach(b => {
+          const match = b === btn;
+          b.classList.toggle("active", match);
+          b.setAttribute("aria-pressed", match ? "true" : "false");
+        });
+
+        aggiornaTratteEStops();
+      });
+    });
+  }
+
+  // === ROUTE DETAILS TOGGLE ===
+  function wireRouteDetailsToggle() {
+    if (!btnToggleRouteDetails || !routeDetailsBody) return;
+
+    btnToggleRouteDetails.addEventListener("click", () => {
+      const isExpanded = btnToggleRouteDetails.getAttribute("aria-expanded") === "true";
+      const nextState = !isExpanded;
+      btnToggleRouteDetails.setAttribute("aria-expanded", String(nextState));
+      routeDetailsBody.style.display = nextState ? "block" : "none";
+      if (routeDetailsChevron) {
+        routeDetailsChevron.style.transform = nextState ? "rotate(180deg)" : "none";
+      }
+    });
+  }
+
   // === TAB NAVIGATION SYSTEM (MOBILE & DESKTOP) ===
   function setActiveTab(tab) {
     const isDesktop = window.innerWidth >= 768;
 
-    // On desktop, the floating sidebar stays open; fallback 'map' to 'timeline'
     if (isDesktop && tab === "map") {
       tab = "timeline";
     }
 
-    // Update bottom nav items
     navItems.forEach(i => {
       const match = i.getAttribute("data-tab") === tab;
       i.classList.toggle("active", match);
     });
 
-    // Update sidebar tab buttons
     const sidebarTabBtns = document.querySelectorAll(".sidebar-tab-btn");
     sidebarTabBtns.forEach(btn => {
       const match = btn.getAttribute("data-tab") === tab;
@@ -1168,14 +1474,12 @@
       isTouching = false;
 
       if (deltaY < -35) {
-        // Swiped UP -> expand bottom sheet
         bottomSheet.classList.add("expanded");
         const activeNav = document.querySelector(".nav-item.active");
         if (activeNav && activeNav.getAttribute("data-tab") === "map") {
           setActiveTab("timeline");
         }
       } else if (deltaY > 35) {
-        // Swiped DOWN -> collapse bottom sheet
         bottomSheet.classList.remove("expanded");
         setActiveTab("map");
       }
@@ -1250,10 +1554,19 @@
     btnCloseSearch?.addEventListener("click", () => searchModal.classList.remove("active"));
     searchInput?.addEventListener("input", handleSearch);
 
-    // Modals
+    // Timetable Modal
     btnTimetable?.addEventListener("click", openTimetableMatrix);
     closeTimetableModal?.addEventListener("click", () => timetableModal.classList.remove("active"));
     closeAdminModal?.addEventListener("click", () => adminModal.classList.remove("active"));
+
+    // Modal Timetable Day Tabs
+    modalTimetableTabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentModalDayTab = btn.getAttribute("data-modaltab");
+        updateModalDayTabs();
+        renderTimetableMatrixForTab(currentModalDayTab);
+      });
+    });
 
     // Modal backdrop click handlers
     timetableModal?.addEventListener("click", (e) => {

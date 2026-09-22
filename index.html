@@ -91,6 +91,29 @@
       <!-- EXPANDED CONTENT SCROLL AREA -->
       <div class="sheet-expanded-content" id="expandedContent">
 
+        <!-- DAY FILTER SEGMENTED CONTROL -->
+        <div class="day-filter-container" role="group" aria-label="Giorno di consultazione orari">
+          <button class="day-pill-btn active" data-day="oggi" id="dayBtnOggi" aria-pressed="true">
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+            <span>Oggi</span>
+          </button>
+          <button class="day-pill-btn" data-day="lun_ven" id="dayBtnLV" aria-pressed="false">
+            <span>Lun - Ven</span>
+          </button>
+          <button class="day-pill-btn" data-day="sabato" id="dayBtnSA" aria-pressed="false">
+            <span>Sabato</span>
+          </button>
+          <button class="day-pill-btn" data-day="domenica" id="dayBtnDO" aria-pressed="false">
+            <span>Domenica</span>
+          </button>
+        </div>
+
+        <!-- SERVICE STATUS ALERT BANNER -->
+        <div class="service-alert-banner" id="serviceAlertBanner" style="display: none;" role="alert">
+          <i class="fa-solid fa-circle-exclamation" id="serviceAlertIcon" aria-hidden="true"></i>
+          <div class="service-alert-content" id="serviceAlertText"></div>
+        </div>
+
         <!-- SELECTORS CARD -->
         <div class="mobile-select-card">
           <div class="select-group-mobile">
@@ -120,12 +143,31 @@
           </div>
 
           <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
-            <button id="btnFavorite" class="btn-mobile btn-mobile-secondary" style="flex: 1;">
+            <button id="btnFavorite" class="btn-mobile btn-mobile-secondary" style="flex: 1;" aria-label="Aggiungi o rimuovi dai preferiti">
               <i class="fa-regular fa-star" aria-hidden="true"></i> Preferito
             </button>
-            <button id="btnZoomRoute" class="btn-mobile btn-mobile-secondary" style="flex: 1;">
+            <button id="btnZoomRoute" class="btn-mobile btn-mobile-secondary" style="flex: 1;" aria-label="Centra linea sulla mappa">
               <i class="fa-solid fa-expand" aria-hidden="true"></i> Centra
             </button>
+          </div>
+        </div>
+
+        <!-- ROUTE ITINERARY & OFFICIAL NOTES CARD -->
+        <div class="route-details-card" id="routeDetailsCard">
+          <button class="route-details-header" id="btnToggleRouteDetails" aria-expanded="false" aria-controls="routeDetailsBody" aria-label="Mostra o nascondi itinerario e note ufficiali">
+            <div class="route-header-left">
+              <i class="fa-solid fa-signs-post" style="color: var(--primary);" aria-hidden="true"></i>
+              <span>Itinerario e Note Linea</span>
+            </div>
+            <i class="fa-solid fa-chevron-down route-chevron" id="routeDetailsChevron" aria-hidden="true"></i>
+          </button>
+          <div class="route-details-body" id="routeDetailsBody" style="display: none;">
+            <div class="route-path-label"><i class="fa-solid fa-route" aria-hidden="true"></i> Percorso stradale completo:</div>
+            <div class="route-full-path" id="routeFullPathText">--</div>
+            <div class="route-notes-wrapper" id="routeNotesWrapper" style="display: none;">
+              <div class="route-notes-label"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Note ufficiali & deviazioni:</div>
+              <ul class="route-notes-list" id="routeNotesList"></ul>
+            </div>
           </div>
         </div>
 
@@ -225,9 +267,28 @@
         </div>
         <button class="icon-btn-touch" id="closeTimetableModal" aria-label="Chiudi tabella orari"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
+
+      <!-- TABS PER TIPOLOGIA GIORNO NELLA MATRICE -->
+      <div class="modal-tab-bar" id="modalTimetableTabs" role="tablist" aria-label="Seleziona giorno per la tabella orari">
+        <button class="modal-tab-btn active" data-modaltab="lun_ven" role="tab" aria-selected="true">
+          <i class="fa-solid fa-briefcase" aria-hidden="true"></i> Lun - Ven
+        </button>
+        <button class="modal-tab-btn" data-modaltab="sabato" role="tab" aria-selected="false">
+          <i class="fa-solid fa-calendar-day" aria-hidden="true"></i> Sabato
+        </button>
+        <button class="modal-tab-btn" data-modaltab="domenica" role="tab" aria-selected="false">
+          <i class="fa-solid fa-sun" aria-hidden="true"></i> Domenica / Festivi
+        </button>
+      </div>
+
       <div class="modal-sheet-body">
         <div class="table-responsive">
           <table class="timetable-matrix" id="timetableMatrix"></table>
+        </div>
+        <div class="timetable-empty-msg" id="timetableEmptyMsg" style="display: none;"></div>
+        <div class="timetable-notes-container" id="timetableNotesContainer" style="display: none;">
+          <div class="timetable-notes-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Note e Deviazioni:</div>
+          <ul class="timetable-notes-list" id="timetableNotesList"></ul>
         </div>
       </div>
     </div>
