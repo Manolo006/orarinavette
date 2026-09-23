@@ -7,6 +7,7 @@
 (() => {
   // === APPLICATION STATE ===
   let SCHEDULES = {};
+  let CALENDARIO_SERVIZIO = null;
   let map = null;
   let staticLayer = null;
   let dynamicLayer = null;
@@ -356,12 +357,33 @@
     wireDayFilterEvents();
     wireRouteDetailsToggle();
 
+    // Instant cache-first loading with background validation
+    let hasLoadedFromCache = false;
     try {
-      const res = await fetch("linee.json", { cache: "no-store" });
+      const cached = sessionStorage.getItem("cached_linee_v2");
+      if (cached) {
+        const json = JSON.parse(cached);
+        SCHEDULES = json.linee || json;
+        if (json.calendario_servizio) CALENDARIO_SERVIZIO = json.calendario_servizio;
+        hasLoadedFromCache = true;
+        populateLinee();
+        renderFavorites();
+        startAutoUpdate();
+        startUserTracking(true);
+      }
+    } catch {}
+
+    try {
+      const res = await fetch("linee.json");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const json = await res.json();
       SCHEDULES = json.linee || json;
+      if (json.calendario_servizio) CALENDARIO_SERVIZIO = json.calendario_servizio;
+
+      try {
+        sessionStorage.setItem("cached_linee_v2", JSON.stringify(json));
+      } catch {}
 
       // Clear obsolete custom test route for line 33 if previously saved with < 500 points
       try {
@@ -381,14 +403,21 @@
         }
       } catch {}
 
-      populateLinee();
-      renderFavorites();
-      startAutoUpdate();
-      startUserTracking(true);
+      if (!hasLoadedFromCache) {
+        populateLinee();
+        renderFavorites();
+        startAutoUpdate();
+        startUserTracking(true);
+      } else {
+        // Silently refresh UI if data changed
+        updateAllDisplays();
+      }
     } catch (err) {
-      console.error("Errore caricamento linee.json:", err);
-      heroEtaBadge.textContent = "Err";
-      heroStopName.textContent = "Errore dati linee.json";
+      if (!hasLoadedFromCache) {
+        console.error("Errore caricamento linee.json:", err);
+        heroEtaBadge.textContent = "Err";
+        heroStopName.textContent = "Errore dati linee.json";
+      }
     }
   }
 

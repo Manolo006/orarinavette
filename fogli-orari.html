@@ -15,6 +15,17 @@
   
   <!-- App Stylesheet -->
   <link rel="stylesheet" href="style.css">
+  <style>
+    html, body.doc-page {
+      height: auto !important;
+      min-height: 100% !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      touch-action: pan-y !important;
+      user-select: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+  </style>
 </head>
 <body class="doc-page">
 
@@ -41,26 +52,6 @@
       </button>
     </div>
   </header>
-
-  <!-- QUICK JUMP PILL NAVIGATION (HORIZONTAL SCROLLER) -->
-  <nav class="doc-pill-bar-wrapper" aria-label="Indice rapido linee">
-    <a href="#sheet-21" class="doc-pill-btn">Linea 21</a>
-    <a href="#sheet-22" class="doc-pill-btn">Linea 22</a>
-    <a href="#sheet-23-feriale" class="doc-pill-btn">Linea 23 (Feriale)</a>
-    <a href="#sheet-23-festivo" class="doc-pill-btn">Linea 23 (Sab/Festivi)</a>
-    <a href="#sheet-24" class="doc-pill-btn">Linea 24</a>
-    <a href="#sheet-25-feriale" class="doc-pill-btn">Linea 25 (Feriale)</a>
-    <a href="#sheet-25-festivo" class="doc-pill-btn">Linea 25 (Sab/Festivi)</a>
-    <a href="#sheet-26" class="doc-pill-btn">Linea 26</a>
-    <a href="#sheet-27" class="doc-pill-btn">Linea 27</a>
-    <a href="#sheet-28-feriale" class="doc-pill-btn">Linea 28 (Feriale)</a>
-    <a href="#sheet-28-festivo" class="doc-pill-btn">Linea 28 (Sab/Festivi)</a>
-    <a href="#sheet-29" class="doc-pill-btn">Linea 29</a>
-    <a href="#sheet-30" class="doc-pill-btn">Linea 30</a>
-    <a href="#sheet-32" class="doc-pill-btn">Linea 32</a>
-    <a href="#sheet-33" class="doc-pill-btn">Linea 33</a>
-    <a href="#sheet-festivita" class="doc-pill-btn">Festività & Sospensioni</a>
-  </nav>
 
   <!-- MAIN DOCUMENT FEED -->
   <main class="doc-feed-container">
@@ -99,7 +90,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="21.jpg" alt="Orari ufficiali Linea 21" loading="lazy">
+        <img class="doc-sheet-img" src="21.jpg" alt="Orari ufficiali Linea 21" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -126,7 +117,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="22.jpg" alt="Orari ufficiali Linea 22" loading="lazy">
+        <img class="doc-sheet-img" src="22.jpg" alt="Orari ufficiali Linea 22" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -153,7 +144,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="23 lun ven.jpg" alt="Orari ufficiali Linea 23 Lunedì-Venerdì" loading="lazy">
+        <img class="doc-sheet-img" src="23 lun ven.jpg" alt="Orari ufficiali Linea 23 Lunedì-Venerdì" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -180,7 +171,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="23 sab dom.jpg" alt="Orari ufficiali Linea 23 Sabato e Domenica" loading="lazy">
+        <img class="doc-sheet-img" src="23 sab dom.jpg" alt="Orari ufficiali Linea 23 Sabato e Domenica" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -207,7 +198,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="24.jpg" alt="Orari ufficiali Linea 24" loading="lazy">
+        <img class="doc-sheet-img" src="24.jpg" alt="Orari ufficiali Linea 24" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -234,7 +225,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="25 lun ven.jpg" alt="Orari ufficiali Linea 25 Lunedì-Venerdì" loading="lazy">
+        <img class="doc-sheet-img" src="25 lun ven.jpg" alt="Orari ufficiali Linea 25 Lunedì-Venerdì" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -261,7 +252,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="25 sab dom.jpg" alt="Orari ufficiali Linea 25 Sabato e Domenica" loading="lazy">
+        <img class="doc-sheet-img" src="25 sab dom.jpg" alt="Orari ufficiali Linea 25 Sabato e Domenica" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -288,7 +279,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="26.jpg" alt="Orari ufficiali Linea 26" loading="lazy">
+        <img class="doc-sheet-img" src="26.jpg" alt="Orari ufficiali Linea 26" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -315,7 +306,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="27.jpg" alt="Orari ufficiali Linea 27" loading="lazy">
+        <img class="doc-sheet-img" src="27.jpg" alt="Orari ufficiali Linea 27" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -342,7 +333,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="28 lun ven.jpg" alt="Orari ufficiali Linea 28 Lunedì-Venerdì" loading="lazy">
+        <img class="doc-sheet-img" src="28 lun ven.jpg" alt="Orari ufficiali Linea 28 Lunedì-Venerdì" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -369,7 +360,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="28 sab dom.jpg" alt="Orari ufficiali Linea 28 Sabato e Domenica" loading="lazy">
+        <img class="doc-sheet-img" src="28 sab dom.jpg" alt="Orari ufficiali Linea 28 Sabato e Domenica" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -396,7 +387,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="29.jpg" alt="Orari ufficiali Linea 29" loading="lazy">
+        <img class="doc-sheet-img" src="29.jpg" alt="Orari ufficiali Linea 29" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -423,7 +414,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="30.jpg" alt="Orari ufficiali Linea 30" loading="lazy">
+        <img class="doc-sheet-img" src="30.jpg" alt="Orari ufficiali Linea 30" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -450,7 +441,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="32.jpg" alt="Orari ufficiali Linea 32" loading="lazy">
+        <img class="doc-sheet-img" src="32.jpg" alt="Orari ufficiali Linea 32" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -477,7 +468,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="33.jpg" alt="Orari ufficiali Linea 33" loading="lazy">
+        <img class="doc-sheet-img" src="33.jpg" alt="Orari ufficiali Linea 33" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -501,7 +492,7 @@
         </div>
       </div>
       <div class="doc-sheet-image-wrap">
-        <img class="doc-sheet-img" src="no corse.jpg" alt="Calendario Festività e Sospensioni del Servizio" loading="lazy">
+        <img class="doc-sheet-img" src="no corse.jpg" alt="Calendario Festività e Sospensioni del Servizio" loading="lazy" decoding="async">
         <div class="doc-zoom-overlay-hint">
           <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
         </div>
@@ -883,37 +874,6 @@
           updateTransform();
         }
       });
-
-      // --- PILL NAVIGATION SCROLLSPY ---
-      const pillButtons = Array.from(document.querySelectorAll(".doc-pill-btn"));
-      const pillMap = new Map();
-      pillButtons.forEach(btn => {
-        const href = btn.getAttribute("href");
-        if (href && href.startsWith("#")) {
-          pillMap.set(href.slice(1), btn);
-        }
-      });
-
-      if ("IntersectionObserver" in window) {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const id = entry.target.id;
-              const targetPill = pillMap.get(id);
-              if (targetPill) {
-                pillButtons.forEach(p => p.classList.remove("active"));
-                targetPill.classList.add("active");
-                targetPill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-              }
-            }
-          });
-        }, {
-          rootMargin: "-15% 0px -65% 0px",
-          threshold: 0
-        });
-
-        cards.forEach(c => observer.observe(c));
-      }
 
       // Deep link to specific sheet via hash or URL param (e.g. ?linea=27 or #sheet-27)
       window.addEventListener("DOMContentLoaded", () => {

@@ -898,18 +898,14 @@ linee_data = {
 for line_id, line_obj in linee_data.items():
     line_obj["tratte"] = line_obj["orari"]["lun_ven"]
 
-# Salviamo in linee.json con indentazione pulita e utf-8
+# Salviamo in linee.json ottimizzato (senza duplicazioni e minificato)
 output_data = {
     "calendario_servizio": CALENDARIO_SERVIZIO,
     "linee": linee_data
 }
 
-# Manteniamo anche la struttura al livello radice per compatibilità diretta se SCHEDULES[lineKey] legge direttamente da root:
-for line_id, line_obj in linee_data.items():
-    output_data[line_id] = line_obj
-
 with open("linee.json", "w", encoding="utf-8") as f:
-    json.dump(output_data, f, ensure_ascii=False, indent=2)
+    json.dump(output_data, f, ensure_ascii=False, separators=(',', ':'))
 
 print(f"SUCCESS: Generato linee.json con {len(linee_data)} linee complete e dettagliate!")
 for line_id, line_obj in linee_data.items():
