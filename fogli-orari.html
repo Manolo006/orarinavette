@@ -658,7 +658,7 @@
         lightboxTitle.textContent = title;
         lightboxCounter.textContent = `Foglio ${currentIndex + 1} di ${cards.length}`;
         lightboxImg.src = src;
-        btnDownload.href = src;
+        btnDownload.href = encodeURI(src);
 
         // Reset transform
         zoomLevel = 1.0;
@@ -788,6 +788,8 @@
         if (tapLength < 320 && tapLength > 0 && e.touches.length === 1) {
           // Double-tap triggered!
           e.preventDefault();
+          isDragging = false;
+          stage.classList.remove("dragging");
           if (zoomLevel > 1.2) {
             zoomLevel = 1.0;
             posX = 0;
@@ -881,6 +883,37 @@
           updateTransform();
         }
       });
+
+      // --- PILL NAVIGATION SCROLLSPY ---
+      const pillButtons = Array.from(document.querySelectorAll(".doc-pill-btn"));
+      const pillMap = new Map();
+      pillButtons.forEach(btn => {
+        const href = btn.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          pillMap.set(href.slice(1), btn);
+        }
+      });
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = entry.target.id;
+              const targetPill = pillMap.get(id);
+              if (targetPill) {
+                pillButtons.forEach(p => p.classList.remove("active"));
+                targetPill.classList.add("active");
+                targetPill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+              }
+            }
+          });
+        }, {
+          rootMargin: "-15% 0px -65% 0px",
+          threshold: 0
+        });
+
+        cards.forEach(c => observer.observe(c));
+      }
 
       // Deep link to specific sheet via hash or URL param (e.g. ?linea=27 or #sheet-27)
       window.addEventListener("DOMContentLoaded", () => {

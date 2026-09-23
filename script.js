@@ -1493,7 +1493,7 @@
       mapContainer?.classList.add("editor-mode");
       if (routeEditorToolbar) routeEditorToolbar.style.display = "flex";
       if (editorLineName) editorLineName.textContent = linea.nome || `Linea ${lineSelect.value}`;
-      if (bottomSheet) bottomSheet.classList.remove("expanded");
+      if (bottomSheet) setSheetState("peek");
 
       if (!editorLayerGroup) {
         editorLayerGroup = L.featureGroup().addTo(map);
@@ -2469,6 +2469,118 @@
     });
   }
 
+  // === BOTTOM SHEET & TAB NAVIGATION ENGINE (GOOGLE MAPS STYLE) ===
+  let currentSheetState = "peek"; // 'peek' | 'mid' | 'full'
+  let currentTab = "map";
+  let sheetTransitionTimeout = null;
+
+  function getSheetSnapPoints() {
+    if (!bottomSheet) return { yFull: 0, yMid: 300, yPeek: 600, totalH: 600, peekH: 120 };
+    const totalH = bottomSheet.offsetHeight || (window.innerHeight - 120);
+    const peekH = (sheetHero && sheetHandle)
+      ? (sheetHandle.offsetHeight + sheetHero.offsetHeight)
+      : 120;
+    const yPeek = Math.max(0, totalH - peekH);
+    const yMid = Math.round(totalH * 0.48);
+    const yFull = 0;
+    return { yFull, yMid, yPeek, totalH, peekH };
+  }
+
+  function getCurrentTranslateY() {
+    if (!bottomSheet) return 0;
+    const styleTransform = bottomSheet.style.transform;
+    if (styleTransform) {
+      const match = styleTransform.match(/translateY\((-?\d+(?:\.\d+)?)px\)/);
+      if (match) return parseFloat(match[1]);
+    }
+    const { yFull, yMid, yPeek } = getSheetSnapPoints();
+    if (bottomSheet.classList.contains("expanded")) return yFull;
+    if (bottomSheet.classList.contains("half-expanded")) return yMid;
+    return yPeek;
+  }
+
+  function setSheetState(state, animated = true) {
+    if (window.innerWidth >= 768) {
+      // Desktop: sheet is pinned to sidebar card
+      currentSheetState = state;
+      if (bottomSheet) {
+        bottomSheet.style.transform = "";
+        bottomSheet.style.transition = "";
+        bottomSheet.classList.add("expanded");
+        bottomSheet.classList.remove("half-expanded");
+        bottomSheet.classList.remove("is-dragging");
+      }
+      return;
+    }
+
+    if (!bottomSheet) return;
+    currentSheetState = state;
+
+    const { yFull, yMid, yPeek } = getSheetSnapPoints();
+    let targetY = yPeek;
+    if (state === "full") targetY = yFull;
+    else if (state === "mid") targetY = yMid;
+
+    if (sheetTransitionTimeout) {
+      clearTimeout(sheetTransitionTimeout);
+      sheetTransitionTimeout = null;
+    }
+
+    bottomSheet.classList.remove("is-dragging");
+
+    if (animated) {
+      bottomSheet.style.transition = "transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)";
+      bottomSheet.style.transform = `translateY(${targetY}px)`;
+      bottomSheet.classList.toggle("expanded", state === "full");
+      bottomSheet.classList.toggle("half-expanded", state === "mid");
+
+      sheetTransitionTimeout = setTimeout(() => {
+        if (bottomSheet) {
+          bottomSheet.style.transition = "";
+          bottomSheet.style.transform = "";
+        }
+        sheetTransitionTimeout = null;
+      }, 360);
+    } else {
+      bottomSheet.style.transition = "none";
+      bottomSheet.style.transform = `translateY(${targetY}px)`;
+      bottomSheet.classList.toggle("expanded", state === "full");
+      bottomSheet.classList.toggle("half-expanded", state === "mid");
+    }
+
+    // Sync bottom navigation tabs according to sheet state
+    if (state === "peek") {
+      syncNavActive("map");
+    } else {
+      const activeNav = document.querySelector(".nav-item.active");
+      if (!activeNav || activeNav.getAttribute("data-tab") === "map") {
+        syncNavActive("timeline");
+        showTabPane("timeline");
+      }
+    }
+  }
+
+  function syncNavActive(tab) {
+    currentTab = tab;
+    navItems.forEach(i => {
+      const match = i.getAttribute("data-tab") === tab;
+      i.classList.toggle("active", match);
+    });
+    const sidebarTabBtns = document.querySelectorAll(".sidebar-tab-btn");
+    sidebarTabBtns.forEach(btn => {
+      const match = btn.getAttribute("data-tab") === tab;
+      btn.classList.toggle("active", match);
+      btn.setAttribute("aria-selected", match ? "true" : "false");
+    });
+  }
+
+  function showTabPane(tab) {
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    if (tab === "timeline") document.getElementById("paneTimeline")?.classList.add("active");
+    if (tab === "upcoming") document.getElementById("paneUpcoming")?.classList.add("active");
+    if (tab === "favorites") document.getElementById("paneFavorites")?.classList.add("active");
+  }
+
   // === TAB NAVIGATION SYSTEM (MOBILE & DESKTOP) ===
   function setActiveTab(tab) {
     const isDesktop = window.innerWidth >= 768;
@@ -2477,27 +2589,13 @@
       tab = "timeline";
     }
 
-    navItems.forEach(i => {
-      const match = i.getAttribute("data-tab") === tab;
-      i.classList.toggle("active", match);
-    });
-
-    const sidebarTabBtns = document.querySelectorAll(".sidebar-tab-btn");
-    sidebarTabBtns.forEach(btn => {
-      const match = btn.getAttribute("data-tab") === tab;
-      btn.classList.toggle("active", match);
-      btn.setAttribute("aria-selected", match ? "true" : "false");
-    });
+    syncNavActive(tab);
 
     if (tab === "map") {
-      bottomSheet.classList.remove("expanded");
+      setSheetState("peek");
     } else {
-      bottomSheet.classList.add("expanded");
-
-      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-      if (tab === "timeline") document.getElementById("paneTimeline")?.classList.add("active");
-      if (tab === "upcoming") document.getElementById("paneUpcoming")?.classList.add("active");
-      if (tab === "favorites") document.getElementById("paneFavorites")?.classList.add("active");
+      showTabPane(tab);
+      setSheetState("full");
     }
   }
 
@@ -2518,87 +2616,207 @@
     });
   }
 
-  // === BOTTOM SHEET TOUCH & SWIPE EVENTS ===
+  // === BOTTOM SHEET TOUCH & GESTURE ENGINE (GOOGLE MAPS STYLE) ===
   function wireBottomSheetEvents() {
-    let startY = 0;
-    let deltaY = 0;
-    let isTouching = false;
-    let isSwiped = false;
+    if (!bottomSheet) return;
+
+    let isTouchActive = false;
+    let isDraggingSheet = false;
+    let isInnerScroll = false;
+    let hasMoved = false;
+    let dragStartY = 0;
+    let initialSheetY = 0;
+    let currentSheetY = 0;
+    let startScrollTop = 0;
+    let touchVelocityPoints = [];
+    let rafId = null;
 
     const onTouchStart = (e) => {
+      if (window.innerWidth >= 768) return;
       if (e.touches.length !== 1) return;
-      startY = e.touches[0].clientY;
-      deltaY = 0;
-      isTouching = true;
-      isSwiped = false;
+
+      if (sheetTransitionTimeout) {
+        clearTimeout(sheetTransitionTimeout);
+        sheetTransitionTimeout = null;
+      }
+
+      isTouchActive = true;
+      isDraggingSheet = false;
+      isInnerScroll = false;
+      hasMoved = false;
+      dragStartY = e.touches[0].clientY;
+      startScrollTop = expandedContent ? expandedContent.scrollTop : 0;
+      touchVelocityPoints = [{ y: dragStartY, t: performance.now() }];
+      initialSheetY = getCurrentTranslateY();
+      currentSheetY = initialSheetY;
     };
 
     const onTouchMove = (e) => {
-      if (!isTouching) return;
-      const currentY = e.touches[0].clientY;
-      deltaY = currentY - startY;
-      if (Math.abs(deltaY) > 8) {
-        isSwiped = true;
+      if (!isTouchActive || e.touches.length !== 1) return;
+      if (window.innerWidth >= 768) return;
+
+      const clientY = e.touches[0].clientY;
+      const deltaY = clientY - dragStartY;
+      const now = performance.now();
+
+      touchVelocityPoints.push({ y: clientY, t: now });
+      while (touchVelocityPoints.length > 2 && (now - touchVelocityPoints[0].t > 120)) {
+        touchVelocityPoints.shift();
       }
-    };
 
-    const onTouchEnd = () => {
-      if (!isTouching) return;
-      isTouching = false;
+      const targetEl = e.target;
+      const inHandleOrHero = targetEl.closest("#sheetHandle") || targetEl.closest("#sheetHero");
 
-      if (deltaY < -35) {
-        bottomSheet.classList.add("expanded");
-        const activeNav = document.querySelector(".nav-item.active");
-        if (activeNav && activeNav.getAttribute("data-tab") === "map") {
-          setActiveTab("timeline");
-        }
-      } else if (deltaY > 35) {
-        bottomSheet.classList.remove("expanded");
-        setActiveTab("map");
-      }
-    };
-
-    const setupTouchHandle = (el) => {
-      if (!el) return;
-      el.addEventListener("touchstart", (e) => {
-        if (window.innerWidth >= 768) return;
-        onTouchStart(e);
-      }, { passive: true });
-
-      el.addEventListener("touchmove", (e) => {
-        if (window.innerWidth >= 768) return;
-        onTouchMove(e);
-      }, { passive: true });
-
-      el.addEventListener("touchend", () => {
-        if (window.innerWidth >= 768) return;
-        onTouchEnd();
-      });
-
-      el.addEventListener("touchcancel", () => { isTouching = false; });
-
-      el.addEventListener("click", (e) => {
-        if (window.innerWidth >= 768) return;
-        if (isSwiped) {
-          isSwiped = false;
-          return;
-        }
-        if (e.target.closest("button") || e.target.closest("a") || e.target.closest("select")) return;
-
-        bottomSheet.classList.toggle("expanded");
-        if (!bottomSheet.classList.contains("expanded")) {
-          setActiveTab("map");
-        } else {
-          const activeNav = document.querySelector(".nav-item.active");
-          if (activeNav && activeNav.getAttribute("data-tab") === "map") {
-            setActiveTab("timeline");
+      if (!isDraggingSheet && !isInnerScroll) {
+        if (Math.abs(deltaY) > 6) {
+          hasMoved = true;
+          if (inHandleOrHero) {
+            isDraggingSheet = true;
+          } else if (currentSheetState === "full") {
+            if (deltaY > 0 && startScrollTop <= 0) {
+              // Pulling down from top of scroll area -> drag sheet down
+              isDraggingSheet = true;
+            } else {
+              isInnerScroll = true;
+            }
+          } else {
+            // Sheet is at peek or mid -> dragging moves the sheet
+            isDraggingSheet = true;
           }
         }
-      });
+      }
+
+      if (isDraggingSheet) {
+        if (e.cancelable) e.preventDefault();
+        if (!bottomSheet.classList.contains("is-dragging")) {
+          bottomSheet.classList.add("is-dragging");
+        }
+
+        const { yFull, yMid, yPeek } = getSheetSnapPoints();
+        let rawY = initialSheetY + deltaY;
+
+        // Rubber-band resistance at bounds
+        if (rawY < yFull) {
+          const over = yFull - rawY;
+          rawY = yFull - (over * 0.22);
+        } else if (rawY > yPeek) {
+          const over = rawY - yPeek;
+          rawY = yPeek + (over * 0.22);
+        }
+
+        currentSheetY = rawY;
+
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          if (bottomSheet && isDraggingSheet) {
+            bottomSheet.style.transform = `translateY(${Math.round(currentSheetY)}px)`;
+          }
+        });
+      }
     };
 
-    setupTouchHandle(sheetHandle);
-    setupTouchHandle(sheetHero);
+    const onTouchEnd = (e) => {
+      if (!isTouchActive) return;
+      isTouchActive = false;
+
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+
+      if (!isDraggingSheet) {
+        return;
+      }
+
+      isDraggingSheet = false;
+      bottomSheet.classList.remove("is-dragging");
+
+      const now = performance.now();
+      const firstPoint = touchVelocityPoints[0];
+      const lastPoint = touchVelocityPoints[touchVelocityPoints.length - 1];
+      let v = 0;
+      if (firstPoint && lastPoint && (lastPoint.t - firstPoint.t) > 10) {
+        v = (lastPoint.y - firstPoint.y) / (lastPoint.t - firstPoint.t);
+      }
+
+      const { yFull, yMid, yPeek } = getSheetSnapPoints();
+      const currentY = currentSheetY;
+      let targetState = "peek";
+
+      if (v < -0.42) {
+        // Flick UP
+        if (currentY > yMid + 40 && v > -1.0) {
+          targetState = "mid";
+        } else {
+          targetState = "full";
+        }
+      } else if (v > 0.42) {
+        // Flick DOWN
+        if (currentY < yMid - 40 && v < 1.0) {
+          targetState = "mid";
+        } else {
+          targetState = "peek";
+        }
+      } else {
+        // Slow release: Snap to closest point
+        const distFull = Math.abs(currentY - yFull);
+        const distMid = Math.abs(currentY - yMid);
+        const distPeek = Math.abs(currentY - yPeek);
+
+        if (distFull <= distMid && distFull <= distPeek) {
+          targetState = "full";
+        } else if (distMid <= distFull && distMid <= distPeek) {
+          targetState = "mid";
+        } else {
+          targetState = "peek";
+        }
+      }
+
+      setSheetState(targetState, true);
+    };
+
+    // Attach listeners to bottom sheet (Handle, Hero, Expanded Content)
+    bottomSheet.addEventListener("touchstart", onTouchStart, { passive: true });
+    bottomSheet.addEventListener("touchmove", onTouchMove, { passive: false });
+    bottomSheet.addEventListener("touchend", onTouchEnd, { passive: true });
+    bottomSheet.addEventListener("touchcancel", () => {
+      isTouchActive = false;
+      isDraggingSheet = false;
+      bottomSheet.classList.remove("is-dragging");
+      setSheetState(currentSheetState, true);
+    }, { passive: true });
+
+    // Handle Tap to Cycle (Peek -> Mid -> Full -> Peek)
+    const handleTapToggle = (e) => {
+      if (window.innerWidth >= 768) return;
+      if (hasMoved) {
+        hasMoved = false;
+        return;
+      }
+      if (e.target.closest("button") || e.target.closest("a") || e.target.closest("select") || e.target.closest("input")) {
+        return;
+      }
+
+      if (currentSheetState === "peek") {
+        setSheetState("mid");
+      } else if (currentSheetState === "mid") {
+        setSheetState("full");
+      } else {
+        setSheetState("peek");
+      }
+    };
+
+    sheetHandle?.addEventListener("click", handleTapToggle);
+    sheetHero?.addEventListener("click", handleTapToggle);
+
+    // Window resize handler: reset styles cleanly on orientation or window size changes
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 768) {
+        bottomSheet.style.transform = "";
+        bottomSheet.style.transition = "";
+        bottomSheet.classList.remove("is-dragging");
+      }
+    });
   }
 
   // === EVENT BINDINGS ===
@@ -2723,7 +2941,9 @@
       if (window.innerWidth >= 768) return;
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        bottomSheet.classList.toggle("expanded");
+        if (currentSheetState === "peek") setSheetState("mid");
+        else if (currentSheetState === "mid") setSheetState("full");
+        else setSheetState("peek");
       }
     });
 

@@ -258,9 +258,10 @@ html, body {
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
   z-index: 800;
   transform: translateY(calc(100% - var(--sheet-collapsed-height)));
-  transition: var(--transition-sheet);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   display: flex;
   flex-direction: column;
+  will-change: transform;
 }
 
 .bottom-sheet.expanded {
@@ -271,20 +272,33 @@ html, body {
   transform: translateY(50%);
 }
 
+.bottom-sheet.is-dragging {
+  transition: none !important;
+}
+
 /* DRAG HANDLE BAR */
 .sheet-handle-wrapper {
-  padding: 0.6rem 0 0.4rem 0;
+  padding: 0.65rem 0 0.35rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
 .drag-handle {
-  width: 40px;
+  width: 44px;
   height: 5px;
   border-radius: 3px;
   background: var(--border-subtle);
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+.sheet-handle-wrapper:active .drag-handle,
+.bottom-sheet.is-dragging .drag-handle {
+  background: var(--text-muted);
+  width: 50px;
 }
 
 /* COLLAPSED HERO HEADER (ALWAYS VISIBLE AT BOTTOM) */
@@ -297,6 +311,9 @@ html, body {
   min-width: 0;
   overflow: hidden;
   box-sizing: border-box;
+  touch-action: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 .hero-left {
@@ -381,6 +398,7 @@ html, body {
 .sheet-expanded-content {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
   padding: 0 1rem 1.5rem 1rem;
   display: flex;
   flex-direction: column;
