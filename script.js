@@ -210,6 +210,14 @@
   const btnDownloadSavedRouteGeoJson = document.getElementById("btnDownloadSavedRouteGeoJson");
   const btnResetCustomRoute = document.getElementById("btnResetCustomRoute");
 
+  // Route Import Modal Elements
+  const btnEditorImportMaps = document.getElementById("btnEditorImportMaps");
+  const routeImportModal = document.getElementById("routeImportModal");
+  const closeRouteImportModal = document.getElementById("closeRouteImportModal");
+  const importRouteInput = document.getElementById("importRouteInput");
+  const btnConfirmImportRoute = document.getElementById("btnConfirmImportRoute");
+  const btnCancelImportRoute = document.getElementById("btnCancelImportRoute");
+
   // === EASTER / PASQUETTA COMPUTUS ===
   function getEasterAndPasquetta(year) {
     const a = year % 19;
@@ -1673,6 +1681,123 @@
     URL.revokeObjectURL(url);
   }
 
+  // === IMPORT ROUTE FROM GOOGLE MAPS / KML / COORDS ===
+  function openImportRouteModal() {
+    if (importRouteInput) importRouteInput.value = "";
+    routeImportModal?.classList.add("active");
+    setTimeout(() => importRouteInput?.focus(), 150);
+  }
+
+  function closeImportRouteModal() {
+    routeImportModal?.classList.remove("active");
+  }
+
+  function parseGoogleMapsOrCoords(text) {
+    if (!text || typeof text !== "string") return [];
+    text = text.trim();
+    const points = [];
+
+    // 1. Google Maps Directions URL (contains /dir/...)
+    if (text.includes("/maps/dir/") || text.includes("/dir/")) {
+      const dirPart = text.split(/\/dir\//)[1]?.split(/[?#]/)[0] || "";
+      const segments = dirPart.split("/").filter(s => s && !s.startsWith("@") && !s.startsWith("data="));
+      for (const seg of segments) {
+        const m = seg.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+        if (m) {
+          const lat = parseFloat(m[1]);
+          const lng = parseFloat(m[2]);
+          if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+            points.push([lat, lng]);
+          }
+        }
+      }
+      if (points.length > 0) return points;
+    }
+
+    // 2. GeoJSON / JSON array check
+    if (text.startsWith("{") || text.startsWith("[")) {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.type === "LineString" && Array.isArray(parsed.coordinates)) {
+          return parsed.coordinates.map(c => [parseFloat(c[1]), parseFloat(c[0])]);
+        }
+        if (parsed.features && Array.isArray(parsed.features)) {
+          const lineFeature = parsed.features.find(f => f.geometry && f.geometry.type === "LineString");
+          if (lineFeature) {
+            return lineFeature.geometry.coordinates.map(c => [parseFloat(c[1]), parseFloat(c[0])]);
+          }
+        }
+        if (Array.isArray(parsed) && parsed.length > 0 && Array.isArray(parsed[0])) {
+          return parsed.map(p => [parseFloat(p[0]), parseFloat(p[1])]);
+        }
+      } catch {}
+    }
+
+    // 3. KML check (look for <coordinates>...)
+    if (text.includes("<coordinates>")) {
+      const coordMatch = text.match(/<coordinates>([\s\S]*?)<\/coordinates>/i);
+      if (coordMatch) {
+        const rawCoords = coordMatch[1].trim().split(/\s+/);
+        for (const rc of rawCoords) {
+          const parts = rc.split(",");
+          if (parts.length >= 2) {
+            const lng = parseFloat(parts[0]);
+            const lat = parseFloat(parts[1]);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              points.push([lat, lng]);
+            }
+          }
+        }
+        if (points.length > 0) return points;
+      }
+    }
+
+    // 4. Regex for raw coordinate pairs: lat, lng or lat lng
+    const regex = /(-?\d{1,2}\.\d{3,8})[,\s\t]+(-?\d{1,3}\.\d{3,8})/g;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        points.push([lat, lng]);
+      }
+    }
+
+    return points;
+  }
+
+  async function handleConfirmImportRoute() {
+    const rawText = importRouteInput ? importRouteInput.value.trim() : "";
+    if (!rawText) {
+      alert("Incolla prima un link di Google Maps o una serie di coordinate!");
+      return;
+    }
+
+    const points = parseGoogleMapsOrCoords(rawText);
+    if (!points || points.length < 2) {
+      alert("Nessun punto o coordinata valida trovata nel testo inserito. Assicurati che contenga almeno 2 punti (es. un link di indicazioni stradali di Google Maps o coordinate lat, lng).");
+      return;
+    }
+
+    closeImportRouteModal();
+
+    editorWaypoints = points;
+    if (editorHintText) {
+      editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importati ${points.length} punti! Ricalcolo aggancio stradale OSRM...`;
+    }
+
+    await recalculateEditorPath();
+
+    if (editorWaypoints.length > 0 && map) {
+      const bounds = L.latLngBounds(editorWaypoints);
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+
+    if (editorHintText) {
+      editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importati con successo ${points.length} punti da Google Maps! Clicca "Salva" per renderli attivi.`;
+    }
+  }
+
   // === MAIN DISPLAY LOOP ===
   function updateAllDisplays() {
     const now = getNow();
@@ -2239,7 +2364,16 @@
     btnEditorUndo?.addEventListener("click", editorUndo);
     btnEditorSnap?.addEventListener("click", editorToggleSnap);
     btnEditorClear?.addEventListener("click", editorClear);
+    btnEditorImportMaps?.addEventListener("click", openImportRouteModal);
     btnEditorSave?.addEventListener("click", editorSaveRoute);
+
+    // Route Import Modal Events
+    closeRouteImportModal?.addEventListener("click", closeImportRouteModal);
+    btnCancelImportRoute?.addEventListener("click", closeImportRouteModal);
+    btnConfirmImportRoute?.addEventListener("click", handleConfirmImportRoute);
+    routeImportModal?.addEventListener("click", (e) => {
+      if (e.target === routeImportModal) closeImportRouteModal();
+    });
 
     // Route Saved Modal Events
     closeRouteSavedModal?.addEventListener("click", () => routeSavedModal?.classList.remove("active"));

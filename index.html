@@ -88,6 +88,9 @@
           <button id="btnEditorClear" class="editor-btn" title="Svuota punti disegnati">
             <i class="fa-solid fa-trash" aria-hidden="true"></i> Svuota
           </button>
+          <button id="btnEditorImportMaps" class="editor-btn" title="Importa da link Google Maps o coordinate">
+            <i class="fa-solid fa-file-import" aria-hidden="true"></i> Importa
+          </button>
           <button id="btnEditorSave" class="editor-btn editor-btn-primary" title="Salva percorso nel sito">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salva
           </button>
@@ -444,6 +447,39 @@
           </button>
           <button id="btnResetCustomRoute" class="btn-mobile" style="width:100%; justify-content:center; color:var(--danger); border:1px solid var(--danger); background:transparent;">
             <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Ripristina Percorso Predefinito
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: IMPORTA PERCORSO DA GOOGLE MAPS / KML / COORDINATE -->
+  <div id="routeImportModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalRouteImportTitle">
+    <div class="modal-card modal-card-sm" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 id="modalRouteImportTitle"><i class="fa-solid fa-map-location-dot" style="color:var(--primary);" aria-hidden="true"></i> Importa da Google Maps</h3>
+        <button id="closeRouteImportModal" class="icon-btn-touch" aria-label="Chiudi modale">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 0.8rem; font-size: 0.88rem; color: var(--text-main); line-height: 1.45;">
+          Incolla qui il <strong>link di Google Maps</strong> (con le indicazioni stradali / percorso), oppure una <strong>lista di coordinate</strong> (lat, lng), oppure un tracciato <strong>GeoJSON / KML</strong>.
+        </p>
+        <textarea id="importRouteInput" rows="5" class="search-input" style="width: 100%; border-radius: var(--radius-md); font-family: monospace; font-size: 0.8rem; padding: 0.6rem; border: 1px solid var(--border-color); resize: vertical; background: var(--bg-surface); color: var(--text-main); margin-bottom: 0.5rem;" placeholder="Esempio link:
+https://www.google.com/maps/dir/41.9548,12.0738/41.9515,12.1564/41.9473,12.1557...
+
+Oppure coordinate:
+41.954823, 12.073812
+41.951524, 12.156492
+41.947363, 12.155786"></textarea>
+        
+        <div style="display: flex; gap: 0.6rem; margin-top: 0.75rem;">
+          <button id="btnConfirmImportRoute" class="btn-mobile btn-mobile-primary" style="flex: 1; justify-content: center;">
+            <i class="fa-solid fa-check" aria-hidden="true"></i> Carica nel Percorso
+          </button>
+          <button id="btnCancelImportRoute" class="btn-mobile btn-mobile-secondary" style="justify-content: center;">
+            Annulla
           </button>
         </div>
       </div>
