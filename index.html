@@ -38,12 +38,18 @@
       </button>
 
       <div class="app-bar-actions">
+        <a href="fogli-orari.html" class="icon-btn-touch" id="btnFogliOrari" title="Fogli Orari Cartacei" aria-label="Visualizza fogli orari cartacei originali">
+          <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+        </a>
         <button id="btnRouteEditor" class="icon-btn-touch" title="Disegna / Modifica Percorso" aria-label="Disegna o modifica percorso navetta">
           <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i>
         </button>
         <button id="btnTimetable" class="icon-btn-touch" title="Tabella Orari" aria-label="Visualizza tabella orari completa">
           <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
         </button>
+        <a href="note-legali.html" class="icon-btn-touch" id="btnNoteLegali" title="Note Legali & Privacy" aria-label="Note legali e privacy policy">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        </a>
         <button id="btnThemeToggle" class="icon-btn-touch" title="Tema" aria-label="Cambia tema chiaro o scuro">
           <i class="fa-solid fa-moon" aria-hidden="true"></i>
         </button>
@@ -266,6 +272,22 @@
 
         </div>
 
+        <!-- DRAWER INFO & LEGAL FOOTER -->
+        <div class="sheet-drawer-footer">
+          <div class="sheet-drawer-links">
+            <a href="fogli-orari.html" class="sheet-footer-link">
+              <i class="fa-solid fa-file-lines" aria-hidden="true"></i> Fogli Orari Cartacei
+            </a>
+            <span class="sheet-footer-sep">•</span>
+            <a href="note-legali.html" class="sheet-footer-link">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Note Legali & Privacy
+            </a>
+          </div>
+          <div class="sheet-disclaimer-note">
+            Applicazione civica indipendente non ufficiale. Orari soggetti a variazioni dell'ente gestore.
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -333,6 +355,11 @@
         <div class="timetable-notes-container" id="timetableNotesContainer" style="display: none;">
           <div class="timetable-notes-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Note e Deviazioni:</div>
           <ul class="timetable-notes-list" id="timetableNotesList"></ul>
+        </div>
+        <div style="margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); text-align: center;">
+          <a id="btnModalOriginalSheet" href="fogli-orari.html" class="doc-btn-action" style="display: inline-flex; font-size: 0.82rem; padding: 0.45rem 0.9rem;">
+            <i class="fa-solid fa-file-lines" aria-hidden="true"></i> Consulta il foglio cartaceo originale di questa linea
+          </a>
         </div>
       </div>
     </div>

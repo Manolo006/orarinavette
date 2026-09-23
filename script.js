@@ -526,7 +526,14 @@
     });
 
     if (lineSelect.options.length > 0) {
-      lineSelect.selectedIndex = 0;
+      // Support deep link via query params (?linea=27)
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqLine = urlParams.get("linea") || urlParams.get("line");
+      if (reqLine && SCHEDULES[reqLine]) {
+        lineSelect.value = reqLine;
+      } else {
+        lineSelect.selectedIndex = 0;
+      }
       aggiornaTratteEStops();
     }
   }
@@ -1237,6 +1244,11 @@
 
     updateModalDayTabs();
     renderTimetableMatrixForTab(currentModalDayTab);
+
+    const btnOriginalSheet = document.getElementById("btnModalOriginalSheet");
+    if (btnOriginalSheet) {
+      btnOriginalSheet.href = `fogli-orari.html?linea=${lineSelect.value}`;
+    }
 
     timetableModal.classList.add("active");
   }

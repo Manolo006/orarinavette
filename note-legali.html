@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Note Legali, Diritti & Privacy - Orari Navette</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="legal-page">
+
+  <!-- TOP STICKY NAVBAR -->
+  <header class="doc-navbar">
+    <div class="doc-nav-left">
+      <a href="index.html" class="doc-nav-back" title="Torna all'App">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Torna all'App</span>
+      </a>
+      <div class="doc-nav-title">
+        <h1>Note Legali & Privacy</h1>
+        <span>Trasparenza, diritti, disclaimer e tutela della privacy</span>
+      </div>
+    </div>
+
+    <div class="doc-nav-actions">
+      <a href="fogli-orari.html" class="doc-btn-action" title="Consulta i Fogli Orari Cartacei">
+        <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+        <span>Fogli Orari</span>
+      </a>
+      <button id="legalThemeToggle" class="icon-btn-touch" title="Cambia tema chiaro/scuro" aria-label="Cambia tema">
+        <i class="fa-solid fa-moon" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN LEGAL CONTENT CONTAINER -->
+  <main class="legal-container">
+
+    <!-- HEADER INTRO CARD -->
+    <div class="legal-header-card">
+      <div class="legal-badge-row">
+        <span class="legal-badge"><i class="fa-solid fa-shield-check"></i> Progetto Civico Aperto</span>
+        <span class="legal-badge"><i class="fa-solid fa-user-lock"></i> 100% Client-Side Privacy</span>
+        <span class="legal-badge"><i class="fa-solid fa-code-branch"></i> Open Data Friendly</span>
+      </div>
+      <h1>Trasparenza, Diritti e Tutela della Privacy</h1>
+      <p>
+        Questa piattaforma web nasce con finalità puramente civica, informativa e no-profit per agevolare cittadini, pendolari e turisti nella consultazione degli orari e dei percorsi delle navette del trasporto pubblico locale (TPL) di Cerveteri e Ladispoli.
+      </p>
+    </div>
+
+    <!-- 1. DISCLAIMER & NON UFFICIALITÀ -->
+    <article class="legal-card">
+      <div class="legal-card-header">
+        <div class="legal-card-icon">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        </div>
+        <h2>1. Esclusione di Responsabilità (Disclaimer)</h2>
+      </div>
+      <div class="legal-card-body">
+        <div class="legal-callout-box warning">
+          <strong>AVVISO DI NON UFFICIALITÀ:</strong> Questa applicazione è un'iniziativa indipendente sviluppata dalla comunità e <strong>NON costituisce in alcun modo un canale ufficiale</strong> né è affiliata, sponsorizzata, approvata o gestita dal Comune di Cerveteri, dal Comune di Ladispoli o dalla società esercente il servizio di trasporto pubblico locale (Seatour / Autoservizi o altri gestori).
+        </div>
+        <p>
+          Tutti gli orari, le fermate e le frequenze delle corse riportati nell'applicazione sono stati ricavati ed elaborati a partire dai prospetti orari pubblici distribuiti tramite avvisi cartacei o pubblicati online dal gestore del servizio.
+        </p>
+        <p>
+          Sebbene sia stato compiuto ogni sforzo per garantire la massima accuratezza dei dati, <strong>il titolare del progetto non garantisce la totale assenza di errori, ritardi o imprecisioni</strong> e declina ogni responsabilità per:
+        </p>
+        <ul>
+          <li>Mancata corrispondenza tra gli orari stimati nell'app e l'effettivo passaggio dei bus;</li>
+          <li>Ritardi causati da traffico, guasti meccanici o eventi atmosferici;</li>
+          <li>Soppressioni improvvise di corse, scioperi o modifiche temporanee ai percorsi decise unilateralmente dall'ente gestore o dall'amministrazione comunale;</li>
+          <li>Qualsiasi danno, diretto o indiretto, derivante dall'affidamento sulle informazioni fornite dall'applicazione.</li>
+        </ul>
+        <p>
+          Per conferme in tempo reale o comunicazioni urgenti su scioperi o guasti, si raccomanda sempre di fare riferimento alle comunicazioni istituzionali dell'ente gestore.
+        </p>
+      </div>
+    </article>
+
+    <!-- 2. DIRITTO D'AUTORE E OPEN DATA -->
+    <article class="legal-card">
+      <div class="legal-card-header">
+        <div class="legal-card-icon">
+          <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+        </div>
+        <h2>2. Diritto d'Autore, Dati Pubblici & Open Data</h2>
+      </div>
+      <div class="legal-card-body">
+        <p>
+          Ai sensi della <strong>Legge sul Diritto d'Autore (L. 633/1941)</strong> e della giurisprudenza consolidata italiana ed europea, le informazioni fattuali di pubblico interesse — quali <em>orari di partenza di corse pubbliche, toponimi stradali, denominazione e sequenza delle fermate</em> — non costituiscono opere dell'ingegno di carattere creativo e pertanto <strong>non sono coperte da copyright</strong>.
+        </p>
+        <p>
+          Il progetto opera nel pieno spirito della <strong>Direttiva Europea Open Data (UE 2019/1024)</strong> e delle linee guida dell'<strong>AgID</strong> (Agenzia per l'Italia Digitale) in conformità al <em>Codice dell'Amministrazione Digitale (D.Lgs. 82/2005)</em>, che promuovono l'apertura e il riutilizzo dei dati relativi ai servizi pubblici essenziali e alla mobilità urbana a beneficio dei cittadini.
+        </p>
+        <div class="legal-callout-box">
+          <strong>Proprietà di Marchi e Loghi:</strong> Eventuali marchi di fabbrica, denominazioni commerciali, loghi o simboli appartenenti ai rispettivi enti locali o ditte di trasporto compaiono esclusivamente con funzione descrittiva e referenziale, rimanendo di proprietà esclusiva dei rispettivi legittimi titolari.
+        </div>
+      </div>
+    </article>
+
+    <!-- 3. PRIVACY POLICY & GDPR -->
+    <article class="legal-card">
+      <div class="legal-card-header">
+        <div class="legal-card-icon">
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+        </div>
+        <h2>3. Informativa sulla Privacy (Regolamento UE 2016/679 - GDPR)</h2>
+      </div>
+      <div class="legal-card-body">
+        <div class="legal-callout-box success">
+          <strong>MASSIMA PRIVACY GARANTITA:</strong> Questa applicazione rispetta rigorosamente la tua riservatezza. <strong>Nessun dato personale viene raccolto, trasmesso, venduto o memorizzato su server remoti.</strong>
+        </div>
+        <p>
+          In particolare, si evidenzia quanto segue:
+        </p>
+        <ul>
+          <li>
+            <strong>Tracciamento Posizione GPS (Geolocalizzazione):</strong>
+            Quando attivi la funzione di geolocalizzazione per individuare la fermata più vicina, le tue coordinate geografiche (latitudine e longitudine) vengono elaborate <em>esclusivamente all'interno del browser del tuo dispositivo</em> (elaborazione client-side). Le coordinate <strong>non vengono mai inviate a nessun server web o servizio terzo</strong> e svaniscono non appena chiudi la sessione di navigazione.
+          </li>
+          <li>
+            <strong>Nessun Cookie di Profilazione:</strong>
+            Il sito non fa uso di cookie di tracciamento pubblicitario, cookie di terze parti o strumenti di fingerprinting.
+          </li>
+          <li>
+            <strong>Memoria Locale (localStorage):</strong>
+            L'applicazione memorizza unicamente sul tuo browser alcune preferenze tecniche anonime (come la preferenza del tema chiaro/scuro e le fermate contrassegnate come preferite), senza alcuna possibilità di risalire all'identità dell'utente.
+          </li>
+          <li>
+            <strong>Nessuna Registrazione:</strong>
+            L'accesso al servizio è completamente libero, anonimo e non richiede la creazione di alcun account o l'inserimento di credenziali o indirizzi email.
+          </li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- 4. ATTRIBUZIONI & RISORSE OPEN SOURCE -->
+    <article class="legal-card">
+      <div class="legal-card-header">
+        <div class="legal-card-icon">
+          <i class="fa-solid fa-code" aria-hidden="true"></i>
+        </div>
+        <h2>4. Licenze Tecniche & Attribuzioni Software</h2>
+      </div>
+      <div class="legal-card-body">
+        <p>
+          Il funzionamento dell'applicazione si basa su componenti e servizi open source di altissimo profilo nel campo geografico e web:
+        </p>
+        <ul>
+          <li><strong>Dati Cartografici:</strong> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, rilasciati con licenza Open Database License (ODbL).</li>
+          <li><strong>Mappe & Tiles:</strong> CARTO Basemaps e OpenStreetMap Foundation.</li>
+          <li><strong>Libreria Cartografica:</strong> <a href="https://leafletjs.com/" target="_blank" rel="noopener">Leaflet.js</a> (Licenza BSD-2-Clause).</li>
+          <li><strong>Motore di Routing Stradale:</strong> <a href="https://project-osrm.org/" target="_blank" rel="noopener">OSRM (Open Source Routing Machine)</a> basato sui dati stradali di OpenStreetMap.</li>
+          <li><strong>Iconografia & Tipografia:</strong> Font Awesome Free e caratteri Google Fonts (Inter & Outfit).</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- 5. SEGNALAZIONI & CONTATTI -->
+    <article class="legal-card">
+      <div class="legal-card-header">
+        <div class="legal-card-icon">
+          <i class="fa-solid fa-handshake-angle" aria-hidden="true"></i>
+        </div>
+        <h2>5. Segnalazioni, Aggiornamenti & Collaborazione Civica</h2>
+      </div>
+      <div class="legal-card-body">
+        <p>
+          Gli orari e i percorsi possono subire variazioni stagionali, chiusure per cantieri o revisioni da parte del Comune e del gestore. Se noti un errore, un orario non aggiornato o una fermata mancante:
+        </p>
+        <p>
+          Puoi segnalarlo direttamente aprendo una issue o contribuendo sul repository open-source del progetto:
+        </p>
+        <p>
+          <a href="https://github.com/Manolo006/orarinavette" target="_blank" rel="noopener" class="doc-btn-action primary">
+            <i class="fa-brands fa-github"></i> Repository GitHub del Progetto
+          </a>
+        </p>
+        <p>
+          Qualsiasi contributo volto a migliorare il servizio per la collettività è caldamente benvenuto!
+        </p>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- FOOTER NAVIGATION -->
+  <footer class="legal-footer-nav">
+    <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Torna alla Mappa Live</a>
+    <a href="fogli-orari.html"><i class="fa-solid fa-file-lines"></i> Fogli Orari Cartacei</a>
+    <span>Orari Navette Cerveteri - Ladispoli • Progetto Civico Aperto</span>
+  </footer>
+
+  <!-- THEME SYNC SCRIPT -->
+  <script>
+    (() => {
+      const legalThemeToggle = document.getElementById("legalThemeToggle");
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("bus_theme", theme);
+        if (legalThemeToggle) {
+          legalThemeToggle.innerHTML = theme === "dark"
+            ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>'
+            : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
+        }
+      }
+      const savedTheme = localStorage.getItem("bus_theme") || "light";
+      applyTheme(savedTheme);
+
+      legalThemeToggle?.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme");
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+    })();
+  </script>
+
+</body>
+</html>

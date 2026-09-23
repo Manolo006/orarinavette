@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Fogli Orari Originali - Orari Navette</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="doc-page">
+
+  <!-- TOP STICKY NAVBAR -->
+  <header class="doc-navbar">
+    <div class="doc-nav-left">
+      <a href="index.html" class="doc-nav-back" title="Torna alla Mappa e Orari Live">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Torna all'App</span>
+      </a>
+      <div class="doc-nav-title">
+        <h1>Fogli Orari Cartacei</h1>
+        <span>Prospetti ufficiali completi ad alta risoluzione</span>
+      </div>
+    </div>
+
+    <div class="doc-nav-actions">
+      <a href="note-legali.html" class="doc-btn-action" title="Note Legali e Privacy">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <span>Note Legali</span>
+      </a>
+      <button id="docThemeToggle" class="icon-btn-touch" title="Cambia tema chiaro/scuro" aria-label="Cambia tema">
+        <i class="fa-solid fa-moon" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- QUICK JUMP PILL NAVIGATION (HORIZONTAL SCROLLER) -->
+  <nav class="doc-pill-bar-wrapper" aria-label="Indice rapido linee">
+    <a href="#sheet-21" class="doc-pill-btn">Linea 21</a>
+    <a href="#sheet-22" class="doc-pill-btn">Linea 22</a>
+    <a href="#sheet-23-feriale" class="doc-pill-btn">Linea 23 (Feriale)</a>
+    <a href="#sheet-23-festivo" class="doc-pill-btn">Linea 23 (Sab/Festivi)</a>
+    <a href="#sheet-24" class="doc-pill-btn">Linea 24</a>
+    <a href="#sheet-25-feriale" class="doc-pill-btn">Linea 25 (Feriale)</a>
+    <a href="#sheet-25-festivo" class="doc-pill-btn">Linea 25 (Sab/Festivi)</a>
+    <a href="#sheet-26" class="doc-pill-btn">Linea 26</a>
+    <a href="#sheet-27" class="doc-pill-btn">Linea 27</a>
+    <a href="#sheet-28-feriale" class="doc-pill-btn">Linea 28 (Feriale)</a>
+    <a href="#sheet-28-festivo" class="doc-pill-btn">Linea 28 (Sab/Festivi)</a>
+    <a href="#sheet-29" class="doc-pill-btn">Linea 29</a>
+    <a href="#sheet-30" class="doc-pill-btn">Linea 30</a>
+    <a href="#sheet-32" class="doc-pill-btn">Linea 32</a>
+    <a href="#sheet-33" class="doc-pill-btn">Linea 33</a>
+    <a href="#sheet-festivita" class="doc-pill-btn">Festività & Sospensioni</a>
+  </nav>
+
+  <!-- MAIN DOCUMENT FEED -->
+  <main class="doc-feed-container">
+    
+    <!-- INTRODUCTORY BANNER -->
+    <div class="doc-intro-banner">
+      <div class="doc-intro-icon">
+        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+      </div>
+      <div class="doc-intro-text">
+        <h2>Consultazione Manuale Fogli Ufficiali</h2>
+        <p>
+          In questa pagina trovi tutti i prospetti orari originali diffusi dall'ente gestore, organizzati in sequenza come un unico documento.
+          Puoi cliccare su ciascun foglio per <strong>ingrandirlo a tutto schermo, fare zoom e trascinarlo</strong> per leggere con la massima nitidezza ogni singolo orario e fermata.
+        </p>
+      </div>
+    </div>
+
+    <!-- SHEET 1: LINEA 21 -->
+    <article class="doc-sheet-card" id="sheet-21" data-index="0" data-title="Linea 21 - Cerveteri / Sasso / Cerenova FS" data-src="21.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">21</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 21: Cerveteri - Sasso - Marina di Cerveteri FS</h3>
+            <p>Lunedì - Sabato (Feriali) • Transito Sasso, Due Casette e Stazione FS</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=21" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="21.jpg" alt="Orari ufficiali Linea 21" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 2: LINEA 22 -->
+    <article class="doc-sheet-card" id="sheet-22" data-index="1" data-title="Linea 22 - Cerveteri / Valcanneto / Ladispoli FS" data-src="22.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">22</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 22: Cerveteri - Valcanneto - Ladispoli FS</h3>
+            <p>Lunedì - Sabato (Servizio non attivo la domenica) • Transito Via Doganale</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=22" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="22.jpg" alt="Orari ufficiali Linea 22" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 3: LINEA 23 LUN-VEN -->
+    <article class="doc-sheet-card" id="sheet-23-feriale" data-index="2" data-title="Linea 23 (Lun-Ven) - Cerveteri / Cerenova / Campo di Mare" data-src="23 lun ven.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">23 LV</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 23 (Feriale): Cerveteri - Cerenova - Campo di Mare</h3>
+            <p>Lunedì - Venerdì • Servizio frequente di collegamento con il litorale e FS</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=23" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="23 lun ven.jpg" alt="Orari ufficiali Linea 23 Lunedì-Venerdì" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 4: LINEA 23 SAB-DOM -->
+    <article class="doc-sheet-card" id="sheet-23-festivo" data-index="3" data-title="Linea 23 (Sab-Dom) - Cerveteri / Cerenova / Campo di Mare" data-src="23 sab dom.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">23 SD</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 23 (Sabato e Festivi): Cerveteri - Cerenova - Campo di Mare</h3>
+            <p>Sabato, Domenica e Giorni Festivi • Orari per il fine settimana</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=23" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="23 sab dom.jpg" alt="Orari ufficiali Linea 23 Sabato e Domenica" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 5: LINEA 24 -->
+    <article class="doc-sheet-card" id="sheet-24" data-index="4" data-title="Linea 24 - Cerveteri / Ceri / Borgo San Martino / Valcanneto" data-src="24.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">24</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 24: Cerveteri - Ceri - B.go S. Martino - Valcanneto</h3>
+            <p>Lunedì - Sabato (Servizio non attivo la domenica) • Frazioni ed entroterra</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=24" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="24.jpg" alt="Orari ufficiali Linea 24" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 6: LINEA 25 LUN-VEN -->
+    <article class="doc-sheet-card" id="sheet-25-feriale" data-index="5" data-title="Linea 25 (Lun-Ven) - Cerveteri / Campo di Mare / Ladispoli FS" data-src="25 lun ven.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">25 LV</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 25 (Feriale): Cerveteri - Cerenova - Campo di Mare - Ladispoli FS</h3>
+            <p>Lunedì - Venerdì • Collegamento costiero interurbano</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=25" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="25 lun ven.jpg" alt="Orari ufficiali Linea 25 Lunedì-Venerdì" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 7: LINEA 25 SAB-DOM -->
+    <article class="doc-sheet-card" id="sheet-25-festivo" data-index="6" data-title="Linea 25 (Sab-Dom) - Cerveteri / Campo di Mare / Ladispoli FS" data-src="25 sab dom.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">25 SD</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 25 (Sabato e Festivi): Cerveteri - Cerenova - Campo di Mare - Ladispoli FS</h3>
+            <p>Sabato, Domenica e Giorni Festivi • Collegamento weekend litorale e stazioni</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=25" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="25 sab dom.jpg" alt="Orari ufficiali Linea 25 Sabato e Domenica" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 8: LINEA 26 -->
+    <article class="doc-sheet-card" id="sheet-26" data-index="7" data-title="Linea 26 - Cerveteri / Necropoli Banditaccia" data-src="26.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">26</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 26: Cerveteri (P.za Manzoni) - Necropoli Banditaccia</h3>
+            <p>Tutti i giorni • Navetta speciale sito archeologico UNESCO Banditaccia</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=26" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="26.jpg" alt="Orari ufficiali Linea 26" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 9: LINEA 27 -->
+    <article class="doc-sheet-card" id="sheet-27" data-index="8" data-title="Linea 27 - Ladispoli FS / Palo Laziale / Miami" data-src="27.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">27</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 27: Ladispoli FS - Palo Laziale - Miami - Stazione FS</h3>
+            <p>Tutti i giorni • Circolare urbana Ladispoli (Parigi, Londra, Atene, Mosca, Narcisi, Mimose)</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=27" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="27.jpg" alt="Orari ufficiali Linea 27" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 10: LINEA 28 LUN-VEN -->
+    <article class="doc-sheet-card" id="sheet-28-feriale" data-index="9" data-title="Linea 28 (Lun-Ven) - Ladispoli FS / Quartiere Cerreto" data-src="28 lun ven.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">28 LV</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 28 (Feriale): Ladispoli FS - Quartiere Cerreto - Stazione FS</h3>
+            <p>Lunedì - Venerdì • Circolare quartiere Cerreto ad alta frequenza (43 corse)</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=28" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="28 lun ven.jpg" alt="Orari ufficiali Linea 28 Lunedì-Venerdì" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 11: LINEA 28 SAB-DOM -->
+    <article class="doc-sheet-card" id="sheet-28-festivo" data-index="10" data-title="Linea 28 (Sab-Dom) - Ladispoli FS / Quartiere Cerreto" data-src="28 sab dom.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">28 SD</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 28 (Sabato e Festivi): Ladispoli FS - Quartiere Cerreto - Stazione FS</h3>
+            <p>Sabato, Domenica e Giorni Festivi • Orari festivi quartiere Cerreto</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=28" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="28 sab dom.jpg" alt="Orari ufficiali Linea 28 Sabato e Domenica" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 12: LINEA 29 -->
+    <article class="doc-sheet-card" id="sheet-29" data-index="11" data-title="Linea 29 - Ladispoli FS / Cerenova FS / Marina di San Nicola" data-src="29.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">29</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 29: Ladispoli FS - Cerveteri FS - Marina di San Nicola</h3>
+            <p>Tutti i giorni • Anello residenziale completo di San Nicola (Sole, Saturno, Venere, Diana, Marte)</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=29" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="29.jpg" alt="Orari ufficiali Linea 29" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 13: LINEA 30 -->
+    <article class="doc-sheet-card" id="sheet-30" data-index="12" data-title="Linea 30 - Ladispoli FS / Cerveteri Manzoni / Casalone" data-src="30.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">30</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 30: Ladispoli FS - Cerveteri (P.za Manzoni) - Casalone</h3>
+            <p>Tutti i giorni • Collegamento centrale e rapido tra Ladispoli e Cerveteri centro</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=30" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="30.jpg" alt="Orari ufficiali Linea 30" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 14: LINEA 32 -->
+    <article class="doc-sheet-card" id="sheet-32" data-index="13" data-title="Linea 32 - Ladispoli FS / San Nicola / Palidoro FS" data-src="32.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">32</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 32: Ladispoli FS - Marina di San Nicola - Palidoro FS</h3>
+            <p>Lunedì - Sabato (Servizio non attivo la domenica) • Transito per Ospedale Bambin Gesù di Palidoro</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=32" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="32.jpg" alt="Orari ufficiali Linea 32" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 15: LINEA 33 -->
+    <article class="doc-sheet-card" id="sheet-33" data-index="14" data-title="Linea 33 - Ladispoli FS / Cimitero" data-src="33.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge">33</span>
+          <div class="doc-sheet-title-box">
+            <h3>Linea 33: Ladispoli FS - Cimitero Ladispoli</h3>
+            <p>Lunedì - Venerdì (Servizio non attivo sabato e domenica) • Navetta cimiteriale</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <a href="index.html?linea=33" class="doc-btn-action" title="Vedi questa linea sulla Mappa Live">
+            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Mappa Live
+          </a>
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="33.jpg" alt="Orari ufficiali Linea 33" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+    <!-- SHEET 16: FESTIVITÀ & SOSPENSIONI -->
+    <article class="doc-sheet-card" id="sheet-festivita" data-index="15" data-title="Calendario Festività e Sospensione Corse" data-src="no corse.jpg">
+      <div class="doc-sheet-header">
+        <div class="doc-sheet-meta">
+          <span class="doc-sheet-badge" style="background: var(--danger);">FESTIVI</span>
+          <div class="doc-sheet-title-box">
+            <h3>Calendario Chiusure e Festività Ufficiali</h3>
+            <p>Giorni di servizio sospeso (Capodanno, Pasqua, 1° Maggio, Natale) e orari ridotti vigilia</p>
+          </div>
+        </div>
+        <div class="doc-sheet-actions">
+          <button class="doc-btn-action primary btn-open-zoom" title="Ingrandisci a schermo intero">
+            <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
+          </button>
+        </div>
+      </div>
+      <div class="doc-sheet-image-wrap">
+        <img class="doc-sheet-img" src="no corse.jpg" alt="Calendario Festività e Sospensioni del Servizio" loading="lazy">
+        <div class="doc-zoom-overlay-hint">
+          <i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i> Clicca per zoomare
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- FOOTER NAVIGATION -->
+  <footer class="legal-footer-nav">
+    <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Torna alla Mappa Live</a>
+    <a href="note-legali.html"><i class="fa-solid fa-shield-halved"></i> Note Legali, Diritti & Privacy</a>
+    <span>Orari Navette Cerveteri - Ladispoli • Progetto Civico Aperto</span>
+  </footer>
+
+  <!-- FULLSCREEN LIGHTBOX MODAL WITH ZOOM & PAN -->
+  <div class="doc-lightbox" id="docLightbox" role="dialog" aria-modal="true" aria-label="Visualizzatore foglio orario ingrandito">
+    <!-- TOOLBAR -->
+    <div class="doc-lightbox-toolbar">
+      <div class="doc-lightbox-info">
+        <strong id="lightboxTitle">Linea --</strong>
+        <span id="lightboxCounter">Foglio 1 di 16</span>
+      </div>
+
+      <div class="doc-lightbox-controls">
+        <button class="doc-lightbox-btn" id="btnZoomOut" title="Riduci Zoom (-)">
+          <i class="fa-solid fa-minus" aria-hidden="true"></i>
+        </button>
+        <button class="doc-lightbox-btn" id="btnZoomReset" title="Reimposta 100%">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+        </button>
+        <button class="doc-lightbox-btn" id="btnZoomIn" title="Aumenta Zoom (+)">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </button>
+        <a class="doc-lightbox-btn" id="btnDownloadImg" href="#" target="_blank" download title="Scarica immagine originale">
+          <i class="fa-solid fa-download" aria-hidden="true"></i>
+        </a>
+        <button class="doc-lightbox-btn" id="btnCloseLightbox" title="Chiudi (Esc)">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- STAGE AREA (PAN & PINCH-ZOOM) -->
+    <div class="doc-lightbox-stage" id="lightboxStage">
+      <img src="" alt="Foglio orario ingrandito" id="lightboxImg" class="doc-lightbox-img">
+    </div>
+
+    <!-- PREV / NEXT SHEET BUTTONS -->
+    <button class="doc-lightbox-arrow prev" id="btnPrevSheet" title="Foglio precedente (←)">
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <button class="doc-lightbox-arrow next" id="btnNextSheet" title="Foglio successivo (→)">
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- LIGHTBOX & PAN-ZOOM INTERACTIVE JAVASCRIPT -->
+  <script>
+    (() => {
+      // --- THEME SYNC WITH MAIN APP ---
+      const docThemeToggle = document.getElementById("docThemeToggle");
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("bus_theme", theme);
+        if (docThemeToggle) {
+          docThemeToggle.innerHTML = theme === "dark"
+            ? '<i class="fa-solid fa-sun" aria-hidden="true"></i>'
+            : '<i class="fa-solid fa-moon" aria-hidden="true"></i>';
+        }
+      }
+      const savedTheme = localStorage.getItem("bus_theme") || "light";
+      applyTheme(savedTheme);
+
+      docThemeToggle?.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme");
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+
+      // --- SHEET CARDS & LIGHTBOX STATE ---
+      const cards = Array.from(document.querySelectorAll(".doc-sheet-card"));
+      const lightbox = document.getElementById("docLightbox");
+      const lightboxImg = document.getElementById("lightboxImg");
+      const lightboxTitle = document.getElementById("lightboxTitle");
+      const lightboxCounter = document.getElementById("lightboxCounter");
+      const btnClose = document.getElementById("btnCloseLightbox");
+      const btnPrev = document.getElementById("btnPrevSheet");
+      const btnNext = document.getElementById("btnNextSheet");
+      const btnZoomIn = document.getElementById("btnZoomIn");
+      const btnZoomOut = document.getElementById("btnZoomOut");
+      const btnZoomReset = document.getElementById("btnZoomReset");
+      const btnDownload = document.getElementById("btnDownloadImg");
+      const stage = document.getElementById("lightboxStage");
+
+      let currentIndex = 0;
+      let zoomLevel = 1.0;
+      let posX = 0;
+      let posY = 0;
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+
+      function updateTransform() {
+        lightboxImg.style.transform = `translate(${posX}px, ${posY}px) scale(${zoomLevel})`;
+      }
+
+      function openLightbox(index) {
+        if (index < 0) index = 0;
+        if (index >= cards.length) index = cards.length - 1;
+        currentIndex = index;
+
+        const card = cards[currentIndex];
+        const src = card.getAttribute("data-src");
+        const title = card.getAttribute("data-title");
+
+        lightboxTitle.textContent = title;
+        lightboxCounter.textContent = `Foglio ${currentIndex + 1} di ${cards.length}`;
+        lightboxImg.src = src;
+        btnDownload.href = src;
+
+        // Reset transform
+        zoomLevel = 1.0;
+        posX = 0;
+        posY = 0;
+        updateTransform();
+
+        lightbox.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      function nextSheet() {
+        if (currentIndex < cards.length - 1) {
+          openLightbox(currentIndex + 1);
+        } else {
+          openLightbox(0); // loop
+        }
+      }
+
+      function prevSheet() {
+        if (currentIndex > 0) {
+          openLightbox(currentIndex - 1);
+        } else {
+          openLightbox(cards.length - 1); // loop
+        }
+      }
+
+      // Bind card clicks
+      cards.forEach((card, idx) => {
+        const triggerImg = card.querySelector(".doc-sheet-image-wrap");
+        const triggerBtn = card.querySelector(".btn-open-zoom");
+        
+        triggerImg?.addEventListener("click", () => openLightbox(idx));
+        triggerBtn?.addEventListener("click", () => openLightbox(idx));
+      });
+
+      // Controls
+      btnClose?.addEventListener("click", closeLightbox);
+      btnNext?.addEventListener("click", nextSheet);
+      btnPrev?.addEventListener("click", prevSheet);
+
+      btnZoomIn?.addEventListener("click", () => {
+        zoomLevel = Math.min(zoomLevel + 0.3, 4.0);
+        updateTransform();
+      });
+
+      btnZoomOut?.addEventListener("click", () => {
+        zoomLevel = Math.max(zoomLevel - 0.3, 0.6);
+        if (zoomLevel <= 1.0) { posX = 0; posY = 0; }
+        updateTransform();
+      });
+
+      btnZoomReset?.addEventListener("click", () => {
+        zoomLevel = 1.0;
+        posX = 0;
+        posY = 0;
+        updateTransform();
+      });
+
+      // Double click to toggle zoom (1x <-> 2x)
+      stage?.addEventListener("dblclick", (e) => {
+        if (zoomLevel > 1.2) {
+          zoomLevel = 1.0;
+          posX = 0;
+          posY = 0;
+        } else {
+          zoomLevel = 2.2;
+        }
+        updateTransform();
+      });
+
+      // Mouse Wheel Zoom
+      stage?.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.2 : -0.2;
+        zoomLevel = Math.min(Math.max(zoomLevel + delta, 0.6), 4.5);
+        if (zoomLevel <= 1.0) { posX = 0; posY = 0; }
+        updateTransform();
+      }, { passive: false });
+
+      // Pan & Dragging with Mouse
+      stage?.addEventListener("mousedown", (e) => {
+        if (e.target === btnClose || e.target.closest(".doc-lightbox-toolbar")) return;
+        isDragging = true;
+        startX = e.clientX - posX;
+        startY = e.clientY - posY;
+        stage.classList.add("dragging");
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        posX = e.clientX - startX;
+        posY = e.clientY - startY;
+        updateTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (isDragging) {
+          isDragging = false;
+          stage.classList.remove("dragging");
+        }
+      });
+
+      // Touch Events for Mobile (Drag & Pinch)
+      let initialDistance = 0;
+      let initialZoom = 1.0;
+
+      stage?.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          startX = e.touches[0].clientX - posX;
+          startY = e.touches[0].clientY - posY;
+        } else if (e.touches.length === 2) {
+          isDragging = false;
+          initialDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          initialZoom = zoomLevel;
+        }
+      }, { passive: true });
+
+      stage?.addEventListener("touchmove", (e) => {
+        if (e.touches.length === 1 && isDragging) {
+          posX = e.touches[0].clientX - startX;
+          posY = e.touches[0].clientY - startY;
+          updateTransform();
+        } else if (e.touches.length === 2 && initialDistance > 0) {
+          const currentDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          const ratio = currentDistance / initialDistance;
+          zoomLevel = Math.min(Math.max(initialZoom * ratio, 0.7), 4.5);
+          updateTransform();
+        }
+      }, { passive: true });
+
+      stage?.addEventListener("touchend", () => {
+        isDragging = false;
+        initialDistance = 0;
+      });
+
+      // Keyboard Shortcuts
+      window.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("active")) return;
+        if (e.key === "Escape") closeLightbox();
+        else if (e.key === "ArrowRight") nextSheet();
+        else if (e.key === "ArrowLeft") prevSheet();
+        else if (e.key === "+" || e.key === "=") {
+          zoomLevel = Math.min(zoomLevel + 0.3, 4.0);
+          updateTransform();
+        } else if (e.key === "-") {
+          zoomLevel = Math.max(zoomLevel - 0.3, 0.6);
+          updateTransform();
+        }
+      });
+
+      // Deep link to specific sheet via hash or URL param (e.g. ?linea=27 or #sheet-27)
+      window.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const reqLine = params.get("linea") || params.get("line");
+        if (reqLine) {
+          const targetCard = document.querySelector(`.doc-sheet-card[data-title*="Linea ${reqLine}"]`);
+          if (targetCard) {
+            setTimeout(() => {
+              targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 300);
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
