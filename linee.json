@@ -8697,7 +8697,7 @@
         },
         {
           "id": "33_s2",
-          "nome": "Via Pergolesi",
+          "nome": "Via Pergolesi / Via Vivaldi",
           "lat": 41.950126,
           "lng": 12.157912,
           "via": "Via Pergolesi",
@@ -8705,7 +8705,7 @@
         },
         {
           "id": "33_s3",
-          "nome": "Via Vivaldi / Largo Vivaldi",
+          "nome": "Via Vivaldi (Largo Vivaldi)",
           "lat": 41.946633,
           "lng": 12.15911,
           "via": "Largo Vivaldi",
@@ -8713,7 +8713,7 @@
         },
         {
           "id": "33_s4",
-          "nome": "Via Scarlatti",
+          "nome": "Via Scarlatti (Inizio)",
           "lat": 41.951849,
           "lng": 12.157096,
           "via": "Via Scarlatti",
@@ -8721,22 +8721,54 @@
         },
         {
           "id": "33_s5",
-          "nome": "Via A. Boito / Via U. Giordano",
+          "nome": "Via Scarlatti (Centro)",
           "lat": 41.954551,
           "lng": 12.162266,
-          "via": "Via A. Boito",
+          "via": "Via Scarlatti",
           "timing": false
         },
         {
           "id": "33_s6",
-          "nome": "Via Doganale (Uscita Valcanneto)",
-          "lat": 41.957014,
-          "lng": 12.159783,
-          "via": "Via Doganale",
+          "nome": "Via Scarlatti (Alta)",
+          "lat": 41.955779,
+          "lng": 12.163294,
+          "via": "Via Scarlatti",
           "timing": false
         },
         {
           "id": "33_s7",
+          "nome": "Via A. Boito (Inizio)",
+          "lat": 41.957014,
+          "lng": 12.159783,
+          "via": "Via A. Boito",
+          "timing": false
+        },
+        {
+          "id": "33_s8",
+          "nome": "Via A. Boito (Centro)",
+          "lat": 41.953533,
+          "lng": 12.157674,
+          "via": "Via A. Boito",
+          "timing": false
+        },
+        {
+          "id": "33_s9",
+          "nome": "Via U. Giordano",
+          "lat": 41.952135,
+          "lng": 12.154826,
+          "via": "Via U. Giordano",
+          "timing": false
+        },
+        {
+          "id": "33_s10",
+          "nome": "Via Doganale (Uscita Valcanneto)",
+          "lat": 41.946015,
+          "lng": 12.151668,
+          "via": "Via Doganale",
+          "timing": false
+        },
+        {
+          "id": "33_s11",
           "nome": "Via Doganale (Bivio Aurelia)",
           "lat": 41.935586,
           "lng": 12.153818,
@@ -8744,63 +8776,39 @@
           "timing": false
         },
         {
-          "id": "33_s8",
-          "nome": "Via Aurelia Sud",
-          "lat": 41.93103,
-          "lng": 12.17454,
-          "via": "Via Aurelia",
-          "timing": false
-        },
-        {
-          "id": "33_s9",
-          "nome": "Via S. Carlo a Palidoro",
-          "lat": 41.928897,
-          "lng": 12.177397,
-          "via": "Via S. Carlo a Palidoro",
-          "timing": false
-        },
-        {
-          "id": "33_s10",
-          "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
-          "lat": 41.924176,
-          "lng": 12.18302,
-          "via": "Via della Stazione di Palidoro",
-          "timing": true
-        },
-        {
-          "id": "33_s11",
-          "nome": "Via dei Tre Denari (Ritorno)",
-          "lat": 41.928897,
-          "lng": 12.177397,
-          "via": "Via dei Tre Denari",
-          "timing": false
-        },
-        {
           "id": "33_s12",
-          "nome": "Via S. Carlo a Palidoro (Ritorno)",
-          "lat": 41.9298,
-          "lng": 12.17727,
-          "via": "Via S. Carlo a Palidoro",
+          "nome": "Via Aurelia Sud / S. Carlo a Palidoro",
+          "lat": 41.928897,
+          "lng": 12.177397,
+          "via": "Via Aurelia",
           "timing": false
         },
         {
           "id": "33_s13",
-          "nome": "Via Aurelia (Ritorno)",
-          "lat": 41.9332,
-          "lng": 12.16656,
+          "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
+          "lat": 41.924176,
+          "lng": 12.18302,
+          "via": "Viale dei Tre Denari",
+          "timing": true
+        },
+        {
+          "id": "33_s14",
+          "nome": "Via Aurelia / Bivio Doganale (Ritorno)",
+          "lat": 41.936453,
+          "lng": 12.15408,
           "via": "Via Aurelia",
           "timing": false
         },
         {
-          "id": "33_s14",
-          "nome": "Via Doganale (Ritorno Valcanneto)",
-          "lat": 41.936453,
-          "lng": 12.15408,
+          "id": "33_s15",
+          "nome": "Via Doganale (Rientro Valcanneto)",
+          "lat": 41.941161,
+          "lng": 12.151869,
           "via": "Via Doganale",
           "timing": false
         },
         {
-          "id": "33_s15",
+          "id": "33_s16",
           "nome": "Via C. Monteverdi (Ingresso Valcanneto)",
           "lat": 41.949183,
           "lng": 12.152611,
@@ -8808,7 +8816,7 @@
           "timing": false
         },
         {
-          "id": "33_s16",
+          "id": "33_s17",
           "nome": "Largo Monteverdi (Arrivo Capolinea)",
           "lat": 41.947709,
           "lng": 12.156066,
@@ -8824,8 +8832,8 @@
             "note": "(B)",
             "stopTimes": {
               "33_s1": "06:40",
-              "33_s10": "06:55",
-              "33_s16": "07:15"
+              "33_s13": "06:55",
+              "33_s17": "07:15"
             }
           },
           {
@@ -8834,7 +8842,7 @@
             "note": "(A)",
             "stopTimes": {
               "33_s1": "06:50",
-              "33_s10": "07:05"
+              "33_s13": "07:05"
             }
           },
           {
@@ -8842,8 +8850,8 @@
             "partenza": "07:20",
             "stopTimes": {
               "33_s1": "07:20",
-              "33_s10": "07:35",
-              "33_s16": "07:55"
+              "33_s13": "07:35",
+              "33_s17": "07:55"
             }
           },
           {
@@ -8851,8 +8859,8 @@
             "partenza": "07:55",
             "stopTimes": {
               "33_s1": "07:55",
-              "33_s10": "08:15",
-              "33_s16": "08:30"
+              "33_s13": "08:15",
+              "33_s17": "08:30"
             }
           },
           {
@@ -8860,8 +8868,8 @@
             "partenza": "08:30",
             "stopTimes": {
               "33_s1": "08:30",
-              "33_s10": "08:50",
-              "33_s16": "09:05"
+              "33_s13": "08:50",
+              "33_s17": "09:05"
             }
           },
           {
@@ -8869,8 +8877,8 @@
             "partenza": "13:00",
             "stopTimes": {
               "33_s1": "13:00",
-              "33_s10": "13:20",
-              "33_s16": "14:05"
+              "33_s13": "13:20",
+              "33_s17": "14:05"
             }
           },
           {
@@ -8878,8 +8886,8 @@
             "partenza": "14:10",
             "stopTimes": {
               "33_s1": "14:10",
-              "33_s10": "14:25",
-              "33_s16": "15:00"
+              "33_s13": "14:25",
+              "33_s17": "15:00"
             }
           },
           {
@@ -8887,8 +8895,8 @@
             "partenza": "15:00",
             "stopTimes": {
               "33_s1": "15:00",
-              "33_s10": "15:20",
-              "33_s16": "15:55"
+              "33_s13": "15:20",
+              "33_s17": "15:55"
             }
           },
           {
@@ -8896,8 +8904,8 @@
             "partenza": "18:40",
             "note": "(A)",
             "stopTimes": {
-              "33_s10": "18:40",
-              "33_s16": "18:55"
+              "33_s13": "18:40",
+              "33_s17": "18:55"
             }
           },
           {
@@ -8905,8 +8913,8 @@
             "partenza": "19:40",
             "note": "(A)",
             "stopTimes": {
-              "33_s10": "19:40",
-              "33_s16": "19:55"
+              "33_s13": "19:40",
+              "33_s17": "19:55"
             }
           }
         ],
@@ -8920,8 +8928,8 @@
           "note": "(B)",
           "stopTimes": {
             "33_s1": "06:40",
-            "33_s10": "06:55",
-            "33_s16": "07:15"
+            "33_s13": "06:55",
+            "33_s17": "07:15"
           }
         },
         {
@@ -8930,7 +8938,7 @@
           "note": "(A)",
           "stopTimes": {
             "33_s1": "06:50",
-            "33_s10": "07:05"
+            "33_s13": "07:05"
           }
         },
         {
@@ -8938,8 +8946,8 @@
           "partenza": "07:20",
           "stopTimes": {
             "33_s1": "07:20",
-            "33_s10": "07:35",
-            "33_s16": "07:55"
+            "33_s13": "07:35",
+            "33_s17": "07:55"
           }
         },
         {
@@ -8947,8 +8955,8 @@
           "partenza": "07:55",
           "stopTimes": {
             "33_s1": "07:55",
-            "33_s10": "08:15",
-            "33_s16": "08:30"
+            "33_s13": "08:15",
+            "33_s17": "08:30"
           }
         },
         {
@@ -8956,8 +8964,8 @@
           "partenza": "08:30",
           "stopTimes": {
             "33_s1": "08:30",
-            "33_s10": "08:50",
-            "33_s16": "09:05"
+            "33_s13": "08:50",
+            "33_s17": "09:05"
           }
         },
         {
@@ -8965,8 +8973,8 @@
           "partenza": "13:00",
           "stopTimes": {
             "33_s1": "13:00",
-            "33_s10": "13:20",
-            "33_s16": "14:05"
+            "33_s13": "13:20",
+            "33_s17": "14:05"
           }
         },
         {
@@ -8974,8 +8982,8 @@
           "partenza": "14:10",
           "stopTimes": {
             "33_s1": "14:10",
-            "33_s10": "14:25",
-            "33_s16": "15:00"
+            "33_s13": "14:25",
+            "33_s17": "15:00"
           }
         },
         {
@@ -8983,8 +8991,8 @@
           "partenza": "15:00",
           "stopTimes": {
             "33_s1": "15:00",
-            "33_s10": "15:20",
-            "33_s16": "15:55"
+            "33_s13": "15:20",
+            "33_s17": "15:55"
           }
         },
         {
@@ -8992,8 +9000,8 @@
           "partenza": "18:40",
           "note": "(A)",
           "stopTimes": {
-            "33_s10": "18:40",
-            "33_s16": "18:55"
+            "33_s13": "18:40",
+            "33_s17": "18:55"
           }
         },
         {
@@ -9001,8 +9009,8 @@
           "partenza": "19:40",
           "note": "(A)",
           "stopTimes": {
-            "33_s10": "19:40",
-            "33_s16": "19:55"
+            "33_s13": "19:40",
+            "33_s17": "19:55"
           }
         }
       ]
@@ -17686,7 +17694,7 @@
       },
       {
         "id": "33_s2",
-        "nome": "Via Pergolesi",
+        "nome": "Via Pergolesi / Via Vivaldi",
         "lat": 41.950126,
         "lng": 12.157912,
         "via": "Via Pergolesi",
@@ -17694,7 +17702,7 @@
       },
       {
         "id": "33_s3",
-        "nome": "Via Vivaldi / Largo Vivaldi",
+        "nome": "Via Vivaldi (Largo Vivaldi)",
         "lat": 41.946633,
         "lng": 12.15911,
         "via": "Largo Vivaldi",
@@ -17702,7 +17710,7 @@
       },
       {
         "id": "33_s4",
-        "nome": "Via Scarlatti",
+        "nome": "Via Scarlatti (Inizio)",
         "lat": 41.951849,
         "lng": 12.157096,
         "via": "Via Scarlatti",
@@ -17710,22 +17718,54 @@
       },
       {
         "id": "33_s5",
-        "nome": "Via A. Boito / Via U. Giordano",
+        "nome": "Via Scarlatti (Centro)",
         "lat": 41.954551,
         "lng": 12.162266,
-        "via": "Via A. Boito",
+        "via": "Via Scarlatti",
         "timing": false
       },
       {
         "id": "33_s6",
-        "nome": "Via Doganale (Uscita Valcanneto)",
-        "lat": 41.957014,
-        "lng": 12.159783,
-        "via": "Via Doganale",
+        "nome": "Via Scarlatti (Alta)",
+        "lat": 41.955779,
+        "lng": 12.163294,
+        "via": "Via Scarlatti",
         "timing": false
       },
       {
         "id": "33_s7",
+        "nome": "Via A. Boito (Inizio)",
+        "lat": 41.957014,
+        "lng": 12.159783,
+        "via": "Via A. Boito",
+        "timing": false
+      },
+      {
+        "id": "33_s8",
+        "nome": "Via A. Boito (Centro)",
+        "lat": 41.953533,
+        "lng": 12.157674,
+        "via": "Via A. Boito",
+        "timing": false
+      },
+      {
+        "id": "33_s9",
+        "nome": "Via U. Giordano",
+        "lat": 41.952135,
+        "lng": 12.154826,
+        "via": "Via U. Giordano",
+        "timing": false
+      },
+      {
+        "id": "33_s10",
+        "nome": "Via Doganale (Uscita Valcanneto)",
+        "lat": 41.946015,
+        "lng": 12.151668,
+        "via": "Via Doganale",
+        "timing": false
+      },
+      {
+        "id": "33_s11",
         "nome": "Via Doganale (Bivio Aurelia)",
         "lat": 41.935586,
         "lng": 12.153818,
@@ -17733,63 +17773,39 @@
         "timing": false
       },
       {
-        "id": "33_s8",
-        "nome": "Via Aurelia Sud",
-        "lat": 41.93103,
-        "lng": 12.17454,
-        "via": "Via Aurelia",
-        "timing": false
-      },
-      {
-        "id": "33_s9",
-        "nome": "Via S. Carlo a Palidoro",
-        "lat": 41.928897,
-        "lng": 12.177397,
-        "via": "Via S. Carlo a Palidoro",
-        "timing": false
-      },
-      {
-        "id": "33_s10",
-        "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
-        "lat": 41.924176,
-        "lng": 12.18302,
-        "via": "Via della Stazione di Palidoro",
-        "timing": true
-      },
-      {
-        "id": "33_s11",
-        "nome": "Via dei Tre Denari (Ritorno)",
-        "lat": 41.928897,
-        "lng": 12.177397,
-        "via": "Via dei Tre Denari",
-        "timing": false
-      },
-      {
         "id": "33_s12",
-        "nome": "Via S. Carlo a Palidoro (Ritorno)",
-        "lat": 41.9298,
-        "lng": 12.17727,
-        "via": "Via S. Carlo a Palidoro",
+        "nome": "Via Aurelia Sud / S. Carlo a Palidoro",
+        "lat": 41.928897,
+        "lng": 12.177397,
+        "via": "Via Aurelia",
         "timing": false
       },
       {
         "id": "33_s13",
-        "nome": "Via Aurelia (Ritorno)",
-        "lat": 41.9332,
-        "lng": 12.16656,
+        "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
+        "lat": 41.924176,
+        "lng": 12.18302,
+        "via": "Viale dei Tre Denari",
+        "timing": true
+      },
+      {
+        "id": "33_s14",
+        "nome": "Via Aurelia / Bivio Doganale (Ritorno)",
+        "lat": 41.936453,
+        "lng": 12.15408,
         "via": "Via Aurelia",
         "timing": false
       },
       {
-        "id": "33_s14",
-        "nome": "Via Doganale (Ritorno Valcanneto)",
-        "lat": 41.936453,
-        "lng": 12.15408,
+        "id": "33_s15",
+        "nome": "Via Doganale (Rientro Valcanneto)",
+        "lat": 41.941161,
+        "lng": 12.151869,
         "via": "Via Doganale",
         "timing": false
       },
       {
-        "id": "33_s15",
+        "id": "33_s16",
         "nome": "Via C. Monteverdi (Ingresso Valcanneto)",
         "lat": 41.949183,
         "lng": 12.152611,
@@ -17797,7 +17813,7 @@
         "timing": false
       },
       {
-        "id": "33_s16",
+        "id": "33_s17",
         "nome": "Largo Monteverdi (Arrivo Capolinea)",
         "lat": 41.947709,
         "lng": 12.156066,
@@ -17813,8 +17829,8 @@
           "note": "(B)",
           "stopTimes": {
             "33_s1": "06:40",
-            "33_s10": "06:55",
-            "33_s16": "07:15"
+            "33_s13": "06:55",
+            "33_s17": "07:15"
           }
         },
         {
@@ -17823,7 +17839,7 @@
           "note": "(A)",
           "stopTimes": {
             "33_s1": "06:50",
-            "33_s10": "07:05"
+            "33_s13": "07:05"
           }
         },
         {
@@ -17831,8 +17847,8 @@
           "partenza": "07:20",
           "stopTimes": {
             "33_s1": "07:20",
-            "33_s10": "07:35",
-            "33_s16": "07:55"
+            "33_s13": "07:35",
+            "33_s17": "07:55"
           }
         },
         {
@@ -17840,8 +17856,8 @@
           "partenza": "07:55",
           "stopTimes": {
             "33_s1": "07:55",
-            "33_s10": "08:15",
-            "33_s16": "08:30"
+            "33_s13": "08:15",
+            "33_s17": "08:30"
           }
         },
         {
@@ -17849,8 +17865,8 @@
           "partenza": "08:30",
           "stopTimes": {
             "33_s1": "08:30",
-            "33_s10": "08:50",
-            "33_s16": "09:05"
+            "33_s13": "08:50",
+            "33_s17": "09:05"
           }
         },
         {
@@ -17858,8 +17874,8 @@
           "partenza": "13:00",
           "stopTimes": {
             "33_s1": "13:00",
-            "33_s10": "13:20",
-            "33_s16": "14:05"
+            "33_s13": "13:20",
+            "33_s17": "14:05"
           }
         },
         {
@@ -17867,8 +17883,8 @@
           "partenza": "14:10",
           "stopTimes": {
             "33_s1": "14:10",
-            "33_s10": "14:25",
-            "33_s16": "15:00"
+            "33_s13": "14:25",
+            "33_s17": "15:00"
           }
         },
         {
@@ -17876,8 +17892,8 @@
           "partenza": "15:00",
           "stopTimes": {
             "33_s1": "15:00",
-            "33_s10": "15:20",
-            "33_s16": "15:55"
+            "33_s13": "15:20",
+            "33_s17": "15:55"
           }
         },
         {
@@ -17885,8 +17901,8 @@
           "partenza": "18:40",
           "note": "(A)",
           "stopTimes": {
-            "33_s10": "18:40",
-            "33_s16": "18:55"
+            "33_s13": "18:40",
+            "33_s17": "18:55"
           }
         },
         {
@@ -17894,8 +17910,8 @@
           "partenza": "19:40",
           "note": "(A)",
           "stopTimes": {
-            "33_s10": "19:40",
-            "33_s16": "19:55"
+            "33_s13": "19:40",
+            "33_s17": "19:55"
           }
         }
       ],
@@ -17909,8 +17925,8 @@
         "note": "(B)",
         "stopTimes": {
           "33_s1": "06:40",
-          "33_s10": "06:55",
-          "33_s16": "07:15"
+          "33_s13": "06:55",
+          "33_s17": "07:15"
         }
       },
       {
@@ -17919,7 +17935,7 @@
         "note": "(A)",
         "stopTimes": {
           "33_s1": "06:50",
-          "33_s10": "07:05"
+          "33_s13": "07:05"
         }
       },
       {
@@ -17927,8 +17943,8 @@
         "partenza": "07:20",
         "stopTimes": {
           "33_s1": "07:20",
-          "33_s10": "07:35",
-          "33_s16": "07:55"
+          "33_s13": "07:35",
+          "33_s17": "07:55"
         }
       },
       {
@@ -17936,8 +17952,8 @@
         "partenza": "07:55",
         "stopTimes": {
           "33_s1": "07:55",
-          "33_s10": "08:15",
-          "33_s16": "08:30"
+          "33_s13": "08:15",
+          "33_s17": "08:30"
         }
       },
       {
@@ -17945,8 +17961,8 @@
         "partenza": "08:30",
         "stopTimes": {
           "33_s1": "08:30",
-          "33_s10": "08:50",
-          "33_s16": "09:05"
+          "33_s13": "08:50",
+          "33_s17": "09:05"
         }
       },
       {
@@ -17954,8 +17970,8 @@
         "partenza": "13:00",
         "stopTimes": {
           "33_s1": "13:00",
-          "33_s10": "13:20",
-          "33_s16": "14:05"
+          "33_s13": "13:20",
+          "33_s17": "14:05"
         }
       },
       {
@@ -17963,8 +17979,8 @@
         "partenza": "14:10",
         "stopTimes": {
           "33_s1": "14:10",
-          "33_s10": "14:25",
-          "33_s16": "15:00"
+          "33_s13": "14:25",
+          "33_s17": "15:00"
         }
       },
       {
@@ -17972,8 +17988,8 @@
         "partenza": "15:00",
         "stopTimes": {
           "33_s1": "15:00",
-          "33_s10": "15:20",
-          "33_s16": "15:55"
+          "33_s13": "15:20",
+          "33_s17": "15:55"
         }
       },
       {
@@ -17981,8 +17997,8 @@
         "partenza": "18:40",
         "note": "(A)",
         "stopTimes": {
-          "33_s10": "18:40",
-          "33_s16": "18:55"
+          "33_s13": "18:40",
+          "33_s17": "18:55"
         }
       },
       {
@@ -17990,8 +18006,8 @@
         "partenza": "19:40",
         "note": "(A)",
         "stopTimes": {
-          "33_s10": "19:40",
-          "33_s16": "19:55"
+          "33_s13": "19:40",
+          "33_s17": "19:55"
         }
       }
     ]

@@ -31,10 +31,23 @@
   let editorLayerGroup = null;
   let editorPolyline = null;
 
+  let editorImportedStops = null;
+
   function getCustomRoutePath(lineKey) {
     if (!lineKey) return null;
     try {
       const stored = localStorage.getItem(`custom_route_path_${lineKey}`);
+      if (stored) return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
+  function getCustomRouteStops(lineKey) {
+    if (!lineKey) return null;
+    try {
+      const stored = localStorage.getItem(`custom_route_stops_${lineKey}`);
       if (stored) return JSON.parse(stored);
     } catch {
       return null;
@@ -312,6 +325,25 @@
 
       const json = await res.json();
       SCHEDULES = json.linee || json;
+
+      // Clear obsolete custom test route for line 33 if previously saved with < 500 points
+      try {
+        const stored33 = localStorage.getItem("custom_route_path_33");
+        if (stored33) {
+          const parsed = JSON.parse(stored33);
+          if (Array.isArray(parsed) && parsed.length < 500) {
+            localStorage.removeItem("custom_route_path_33");
+          }
+        }
+        const storedStops33 = localStorage.getItem("custom_route_stops_33");
+        if (storedStops33) {
+          const parsedStops = JSON.parse(storedStops33);
+          if (Array.isArray(parsedStops) && parsedStops.length < 17) {
+            localStorage.removeItem("custom_route_stops_33");
+          }
+        }
+      } catch {}
+
       populateLinee();
       renderFavorites();
       startAutoUpdate();
@@ -459,7 +491,18 @@
   }
 
   function getCurrentLine() {
-    return SCHEDULES[lineSelect.value] || null;
+    const key = lineSelect.value;
+    const linea = SCHEDULES[key];
+    if (!linea) return null;
+    const customStops = getCustomRouteStops(key);
+    if (customStops && customStops.length > 0) {
+      linea.stops = customStops;
+    }
+    const customPath = getCustomRoutePath(key);
+    if (customPath && customPath.length > 0) {
+      linea.custom_path = customPath;
+    }
+    return linea;
   }
 
   // Returns trips array for current line and current active day key
@@ -1408,6 +1451,9 @@
       if (existingCustom && existingCustom.length > 0) {
         editorSnappedPath = [...existingCustom];
         editorWaypoints = (linea.stops || []).map(s => [s.lat, s.lng]);
+      } else if (linea.path && linea.path.length > 0) {
+        editorSnappedPath = [...linea.path];
+        editorWaypoints = (linea.stops || []).map(s => [s.lat, s.lng]);
       } else {
         // Start fresh with current stops as reference waypoints
         editorWaypoints = (linea.stops || []).map(s => [s.lat, s.lng]);
@@ -1613,6 +1659,20 @@
     localStorage.setItem(`custom_route_path_${lineKey}`, JSON.stringify(finalPath));
     if (linea) linea.custom_path = finalPath;
 
+    if (editorImportedStops && editorImportedStops.length > 0) {
+      const formattedStops = editorImportedStops.map((s, idx) => ({
+        id: `${lineKey}_custom_${idx + 1}`,
+        nome: s.desc ? `${s.name} (${s.desc})` : s.name,
+        lat: s.lat,
+        lng: s.lng,
+        via: s.desc || s.name,
+        timing: idx === 0 || idx === Math.floor(editorImportedStops.length / 2) || idx === editorImportedStops.length - 1
+      }));
+      localStorage.setItem(`custom_route_stops_${lineKey}`, JSON.stringify(formattedStops));
+      if (linea) linea.stops = formattedStops;
+      editorImportedStops = null;
+    }
+
     // Open route saved modal
     if (savedRouteLineTitle) savedRouteLineTitle.textContent = linea ? linea.nome : `Linea ${lineKey}`;
     if (routeSavedModal) routeSavedModal.classList.add("active");
@@ -1622,13 +1682,18 @@
 
   function resetCustomRoute() {
     const lineKey = lineSelect.value;
-    if (confirm(`Vuoi ripristinare il tracciato predefinito per la Linea ${lineKey}?`)) {
+    if (confirm(`Vuoi ripristinare il tracciato e le fermate predefinite per la Linea ${lineKey}?`)) {
       localStorage.removeItem(`custom_route_path_${lineKey}`);
-      const linea = getCurrentLine();
-      if (linea) delete linea.custom_path;
+      localStorage.removeItem(`custom_route_stops_${lineKey}`);
+      const baseLine = SCHEDULES[lineKey];
+      if (baseLine) {
+        delete baseLine.custom_path;
+        delete baseLine.custom_stops;
+      }
       if (routeSavedModal) routeSavedModal.classList.remove("active");
       drawRouteForSelectedTripOrDefault();
-      alert("✅ Percorso predefinito ripristinato!");
+      updateAllDisplays();
+      alert("✅ Percorso e fermate predefinite ripristinate!");
     }
   }
 
@@ -1832,7 +1897,100 @@
     }
   }
 
+  // Extract both stops (Placemark Points) and path (LineString) from KML
+  function parseKmlFull(kmlText) {
+    const result = { stops: [], path: [] };
+    if (!kmlText || typeof kmlText !== "string") return result;
+
+    // 1. LineString
+    const lsBlocks = [...kmlText.matchAll(/<LineString>[\s\S]*?<coordinates>([\s\S]*?)<\/coordinates>[\s\S]*?<\/LineString>/gi)];
+    let bestLine = [];
+    for (const b of lsBlocks) {
+      const coords = b[1].trim().split(/\s+/);
+      const curLine = [];
+      for (const c of coords) {
+        const p = c.split(",");
+        if (p.length >= 2) {
+          const lng = parseFloat(p[0]);
+          const lat = parseFloat(p[1]);
+          if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+            curLine.push([lat, lng]);
+          }
+        }
+      }
+      if (curLine.length > bestLine.length) bestLine = curLine;
+    }
+    result.path = bestLine;
+
+    // 2. Placemarks with Points
+    const pmRegex = /<Placemark>([\s\S]*?)<\/Placemark>/gi;
+    let pmMatch;
+    while ((pmMatch = pmRegex.exec(kmlText)) !== null) {
+      const block = pmMatch[1];
+      if (block.includes("<Point>") && block.includes("<coordinates>")) {
+        const nameM = block.match(/<name>([\s\S]*?)<\/name>/i);
+        const descM = block.match(/<description>([\s\S]*?)<\/description>/i);
+        const coordM = block.match(/<coordinates>([\s\S]*?)<\/coordinates>/i);
+        if (coordM) {
+          const parts = coordM[1].trim().split(",");
+          if (parts.length >= 2) {
+            const lng = parseFloat(parts[0]);
+            const lat = parseFloat(parts[1]);
+            const name = nameM ? nameM[1].trim() : "";
+            const desc = descM ? descM[1].trim() : "";
+            if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+              result.stops.push({ name, desc, lat, lng });
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   async function processAndApplyRouteText(rawText, sourceLabel = "") {
+    // 1. If it's a KML/KMZ structure, parse both user placemark pins and road linestring!
+    if (rawText.includes("<coordinates>")) {
+      const kmlData = parseKmlFull(rawText);
+      // Filter out auto-generated turn-by-turn directions endpoints if user pins exist
+      const userStops = kmlData.stops.filter(s => !s.name.startsWith("Via Giovan Battista Pergolesi"));
+      const effectiveStops = userStops.length > 0 ? userStops : kmlData.stops;
+
+      if (effectiveStops.length > 0) {
+        closeImportRouteModal();
+        editorWaypoints = effectiveStops.map(s => [s.lat, s.lng]);
+        editorImportedStops = effectiveStops;
+
+        if (kmlData.path.length > 0) {
+          editorSnappedPath = kmlData.path;
+          redrawEditorLayers();
+          if (map) {
+            map.fitBounds(L.latLngBounds(kmlData.path), { padding: [50, 50], maxZoom: 15 });
+          }
+          if (editorHintText) {
+            const src = sourceLabel ? ` da "${sourceLabel}"` : "";
+            editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importate ${effectiveStops.length} fermate e ${kmlData.path.length} punti di strada reali${src}! Clicca "Salva" per renderle attive sulla mappa.`;
+          }
+          return;
+        } else {
+          // No pre-traced line in KML, calculate road path via OSRM
+          if (editorHintText) {
+            editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importate ${effectiveStops.length} fermate! Ricalcolo aggancio stradale OSRM...`;
+          }
+          await recalculateEditorPath();
+          if (map && editorWaypoints.length > 0) {
+            map.fitBounds(L.latLngBounds(editorWaypoints), { padding: [50, 50], maxZoom: 15 });
+          }
+          if (editorHintText) {
+            editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importate ${effectiveStops.length} fermate! Clicca "Salva" per renderle attive.`;
+          }
+          return;
+        }
+      }
+    }
+
+    // 2. Regular fallback for URLs, lists of coordinates, or simple GeoJSON
     const points = parseGoogleMapsOrCoords(rawText);
     if (!points || points.length < 2) {
       alert("Nessun tracciato valido trovato nel file o testo inserito. Assicurati che contenga una linea o almeno 2 coordinate.");
@@ -1841,10 +1999,8 @@
 
     closeImportRouteModal();
 
-    // If points > 50, it is a detailed road geometry (like from Google My Maps KMZ or high-res GPS)
     if (points.length > 50) {
       editorSnappedPath = points;
-      // Sample ~15 waypoints for visual handles without overloading Leaflet or OSRM
       const sampleStep = Math.max(1, Math.floor(points.length / 15));
       const sampled = [];
       for (let i = 0; i < points.length; i += sampleStep) {
@@ -1866,7 +2022,6 @@
         editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importati ${points.length} punti di strada reali${src}! Clicca "Salva" per renderli attivi sulla mappa.`;
       }
     } else {
-      // Regular stop list or Google Maps directions link: recalculate via OSRM
       editorWaypoints = points;
       if (editorHintText) {
         editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importate ${points.length} tappe! Ricalcolo aggancio stradale OSRM...`;
