@@ -1124,48 +1124,48 @@
         {
           "id": "23_s15",
           "nome": "Via Doganale / Bivio Valcanneto",
-          "lat": 41.942,
-          "lng": 12.13,
+          "lat": 41.94837,
+          "lng": 12.153723,
           "via": "Via Doganale",
           "timing": false
         },
         {
           "id": "23_s16",
           "nome": "Largo Monteverdi (Valcanneto Transito)",
-          "lat": 41.935233,
-          "lng": 12.153563,
+          "lat": 41.947363,
+          "lng": 12.155786,
           "via": "Largo Monteverdi",
           "timing": true
         },
         {
           "id": "23_s17",
           "nome": "Via Pergolesi",
-          "lat": 41.936,
-          "lng": 12.152,
+          "lat": 41.949368,
+          "lng": 12.155753,
           "via": "Via Pergolesi",
           "timing": false
         },
         {
           "id": "23_s18",
           "nome": "Via Vivaldi / Largo Vivaldi",
-          "lat": 41.938,
-          "lng": 12.148,
+          "lat": 41.946474,
+          "lng": 12.159243,
           "via": "Via Vivaldi",
           "timing": false
         },
         {
           "id": "23_s19",
           "nome": "Via A. Boito / Via U. Giordano",
-          "lat": 41.9355,
-          "lng": 12.145,
+          "lat": 41.954997,
+          "lng": 12.159437,
           "via": "Via A. Boito",
           "timing": false
         },
         {
           "id": "23_s20",
           "nome": "Via Doganale (Ritorno)",
-          "lat": 41.942,
-          "lng": 12.13,
+          "lat": 41.94837,
+          "lng": 12.153723,
           "via": "Via Doganale",
           "timing": false
         },
@@ -6014,40 +6014,40 @@
         {
           "id": "32_s11",
           "nome": "Via S. Carlo a Palidoro",
-          "lat": 41.925,
-          "lng": 12.15,
+          "lat": 41.921485,
+          "lng": 12.170641,
           "via": "Via S. Carlo a Palidoro",
           "timing": false
         },
         {
           "id": "32_s12",
           "nome": "Via Torre a Palidoro",
-          "lat": 41.9225,
-          "lng": 12.1515,
+          "lat": 41.9205,
+          "lng": 12.155,
           "via": "Via Torre a Palidoro",
           "timing": false
         },
         {
           "id": "32_s13",
           "nome": "Ospedale Bambin Gesù Palidoro (Arrivo/Partenza)",
-          "lat": 41.9215,
-          "lng": 12.152,
+          "lat": 41.919232,
+          "lng": 12.14172,
           "via": "Via Torre a Palidoro",
           "timing": true
         },
         {
           "id": "32_s14",
           "nome": "Via Torre a Palidoro (Ritorno)",
-          "lat": 41.9225,
-          "lng": 12.1515,
+          "lat": 41.9205,
+          "lng": 12.155,
           "via": "Via Torre a Palidoro",
           "timing": false
         },
         {
           "id": "32_s15",
           "nome": "Via S. Carlo a Palidoro (Ritorno)",
-          "lat": 41.925,
-          "lng": 12.15,
+          "lat": 41.921485,
+          "lng": 12.170641,
           "via": "Via S. Carlo a Palidoro",
           "timing": false
         },
@@ -6436,128 +6436,128 @@
         {
           "id": "33_s1",
           "nome": "Largo Monteverdi (Valcanneto Capolinea Partenza)",
-          "lat": 41.935233,
-          "lng": 12.153563,
+          "lat": 41.947363,
+          "lng": 12.155786,
           "via": "Largo Monteverdi",
           "timing": true
         },
         {
           "id": "33_s2",
           "nome": "Via Pergolesi",
-          "lat": 41.936,
-          "lng": 12.152,
+          "lat": 41.949368,
+          "lng": 12.155753,
           "via": "Via Pergolesi",
           "timing": false
         },
         {
           "id": "33_s3",
           "nome": "Via Vivaldi / Largo Vivaldi",
-          "lat": 41.938,
-          "lng": 12.148,
-          "via": "Via Vivaldi",
+          "lat": 41.946474,
+          "lng": 12.159243,
+          "via": "Largo Vivaldi",
           "timing": false
         },
         {
           "id": "33_s4",
           "nome": "Via Scarlatti",
-          "lat": 41.937,
-          "lng": 12.1465,
+          "lat": 41.951524,
+          "lng": 12.156492,
           "via": "Via Scarlatti",
           "timing": false
         },
         {
           "id": "33_s5",
           "nome": "Via A. Boito / Via U. Giordano",
-          "lat": 41.9355,
-          "lng": 12.145,
+          "lat": 41.954997,
+          "lng": 12.159437,
           "via": "Via A. Boito",
           "timing": false
         },
         {
           "id": "33_s6",
-          "nome": "Via Doganale (Bivio Aurelia)",
-          "lat": 41.93,
-          "lng": 12.152,
+          "nome": "Via Doganale (Uscita Valcanneto)",
+          "lat": 41.94837,
+          "lng": 12.153723,
           "via": "Via Doganale",
           "timing": false
         },
         {
           "id": "33_s7",
-          "nome": "Via Aurelia Sud",
-          "lat": 41.9275,
-          "lng": 12.1525,
-          "via": "Via Aurelia",
+          "nome": "Via Doganale (Bivio Aurelia)",
+          "lat": 41.9365,
+          "lng": 12.151,
+          "via": "Via Doganale",
           "timing": false
         },
         {
           "id": "33_s8",
-          "nome": "Via S. Carlo a Palidoro",
-          "lat": 41.925,
-          "lng": 12.154,
-          "via": "Via S. Carlo a Palidoro",
+          "nome": "Via Aurelia Sud",
+          "lat": 41.928,
+          "lng": 12.158,
+          "via": "Via Aurelia",
           "timing": false
         },
         {
           "id": "33_s9",
-          "nome": "Via dei Tre Denari",
-          "lat": 41.9245,
-          "lng": 12.158,
-          "via": "Via dei Tre Denari",
+          "nome": "Via S. Carlo a Palidoro",
+          "lat": 41.921485,
+          "lng": 12.170641,
+          "via": "Via S. Carlo a Palidoro",
           "timing": false
         },
         {
           "id": "33_s10",
           "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
-          "lat": 41.925,
-          "lng": 12.161,
-          "via": "Via dei Tre Denari",
+          "lat": 41.924273,
+          "lng": 12.183337,
+          "via": "Via della Stazione di Palidoro",
           "timing": true
         },
         {
           "id": "33_s11",
           "nome": "Via dei Tre Denari (Ritorno)",
-          "lat": 41.9245,
-          "lng": 12.158,
+          "lat": 41.922,
+          "lng": 12.178,
           "via": "Via dei Tre Denari",
           "timing": false
         },
         {
           "id": "33_s12",
           "nome": "Via S. Carlo a Palidoro (Ritorno)",
-          "lat": 41.925,
-          "lng": 12.154,
+          "lat": 41.921485,
+          "lng": 12.170641,
           "via": "Via S. Carlo a Palidoro",
           "timing": false
         },
         {
           "id": "33_s13",
           "nome": "Via Aurelia (Ritorno)",
-          "lat": 41.9275,
-          "lng": 12.1525,
+          "lat": 41.928,
+          "lng": 12.158,
           "via": "Via Aurelia",
           "timing": false
         },
         {
           "id": "33_s14",
           "nome": "Via Doganale (Ritorno Valcanneto)",
-          "lat": 41.93,
-          "lng": 12.152,
+          "lat": 41.9365,
+          "lng": 12.151,
           "via": "Via Doganale",
           "timing": false
         },
         {
           "id": "33_s15",
-          "nome": "Via C. Monteverdi",
-          "lat": 41.934,
-          "lng": 12.153,
+          "nome": "Via C. Monteverdi (Ingresso Valcanneto)",
+          "lat": 41.94837,
+          "lng": 12.153723,
           "via": "Via C. Monteverdi",
           "timing": false
         },
         {
           "id": "33_s16",
           "nome": "Largo Monteverdi (Arrivo Capolinea)",
-          "lat": 41.935233,
-          "lng": 12.153563,
+          "lat": 41.947363,
+          "lng": 12.155786,
           "via": "Largo Monteverdi",
           "timing": true
         }
@@ -7859,48 +7859,48 @@
       {
         "id": "23_s15",
         "nome": "Via Doganale / Bivio Valcanneto",
-        "lat": 41.942,
-        "lng": 12.13,
+        "lat": 41.94837,
+        "lng": 12.153723,
         "via": "Via Doganale",
         "timing": false
       },
       {
         "id": "23_s16",
         "nome": "Largo Monteverdi (Valcanneto Transito)",
-        "lat": 41.935233,
-        "lng": 12.153563,
+        "lat": 41.947363,
+        "lng": 12.155786,
         "via": "Largo Monteverdi",
         "timing": true
       },
       {
         "id": "23_s17",
         "nome": "Via Pergolesi",
-        "lat": 41.936,
-        "lng": 12.152,
+        "lat": 41.949368,
+        "lng": 12.155753,
         "via": "Via Pergolesi",
         "timing": false
       },
       {
         "id": "23_s18",
         "nome": "Via Vivaldi / Largo Vivaldi",
-        "lat": 41.938,
-        "lng": 12.148,
+        "lat": 41.946474,
+        "lng": 12.159243,
         "via": "Via Vivaldi",
         "timing": false
       },
       {
         "id": "23_s19",
         "nome": "Via A. Boito / Via U. Giordano",
-        "lat": 41.9355,
-        "lng": 12.145,
+        "lat": 41.954997,
+        "lng": 12.159437,
         "via": "Via A. Boito",
         "timing": false
       },
       {
         "id": "23_s20",
         "nome": "Via Doganale (Ritorno)",
-        "lat": 41.942,
-        "lng": 12.13,
+        "lat": 41.94837,
+        "lng": 12.153723,
         "via": "Via Doganale",
         "timing": false
       },
@@ -12749,40 +12749,40 @@
       {
         "id": "32_s11",
         "nome": "Via S. Carlo a Palidoro",
-        "lat": 41.925,
-        "lng": 12.15,
+        "lat": 41.921485,
+        "lng": 12.170641,
         "via": "Via S. Carlo a Palidoro",
         "timing": false
       },
       {
         "id": "32_s12",
         "nome": "Via Torre a Palidoro",
-        "lat": 41.9225,
-        "lng": 12.1515,
+        "lat": 41.9205,
+        "lng": 12.155,
         "via": "Via Torre a Palidoro",
         "timing": false
       },
       {
         "id": "32_s13",
         "nome": "Ospedale Bambin Gesù Palidoro (Arrivo/Partenza)",
-        "lat": 41.9215,
-        "lng": 12.152,
+        "lat": 41.919232,
+        "lng": 12.14172,
         "via": "Via Torre a Palidoro",
         "timing": true
       },
       {
         "id": "32_s14",
         "nome": "Via Torre a Palidoro (Ritorno)",
-        "lat": 41.9225,
-        "lng": 12.1515,
+        "lat": 41.9205,
+        "lng": 12.155,
         "via": "Via Torre a Palidoro",
         "timing": false
       },
       {
         "id": "32_s15",
         "nome": "Via S. Carlo a Palidoro (Ritorno)",
-        "lat": 41.925,
-        "lng": 12.15,
+        "lat": 41.921485,
+        "lng": 12.170641,
         "via": "Via S. Carlo a Palidoro",
         "timing": false
       },
@@ -13171,128 +13171,128 @@
       {
         "id": "33_s1",
         "nome": "Largo Monteverdi (Valcanneto Capolinea Partenza)",
-        "lat": 41.935233,
-        "lng": 12.153563,
+        "lat": 41.947363,
+        "lng": 12.155786,
         "via": "Largo Monteverdi",
         "timing": true
       },
       {
         "id": "33_s2",
         "nome": "Via Pergolesi",
-        "lat": 41.936,
-        "lng": 12.152,
+        "lat": 41.949368,
+        "lng": 12.155753,
         "via": "Via Pergolesi",
         "timing": false
       },
       {
         "id": "33_s3",
         "nome": "Via Vivaldi / Largo Vivaldi",
-        "lat": 41.938,
-        "lng": 12.148,
-        "via": "Via Vivaldi",
+        "lat": 41.946474,
+        "lng": 12.159243,
+        "via": "Largo Vivaldi",
         "timing": false
       },
       {
         "id": "33_s4",
         "nome": "Via Scarlatti",
-        "lat": 41.937,
-        "lng": 12.1465,
+        "lat": 41.951524,
+        "lng": 12.156492,
         "via": "Via Scarlatti",
         "timing": false
       },
       {
         "id": "33_s5",
         "nome": "Via A. Boito / Via U. Giordano",
-        "lat": 41.9355,
-        "lng": 12.145,
+        "lat": 41.954997,
+        "lng": 12.159437,
         "via": "Via A. Boito",
         "timing": false
       },
       {
         "id": "33_s6",
-        "nome": "Via Doganale (Bivio Aurelia)",
-        "lat": 41.93,
-        "lng": 12.152,
+        "nome": "Via Doganale (Uscita Valcanneto)",
+        "lat": 41.94837,
+        "lng": 12.153723,
         "via": "Via Doganale",
         "timing": false
       },
       {
         "id": "33_s7",
-        "nome": "Via Aurelia Sud",
-        "lat": 41.9275,
-        "lng": 12.1525,
-        "via": "Via Aurelia",
+        "nome": "Via Doganale (Bivio Aurelia)",
+        "lat": 41.9365,
+        "lng": 12.151,
+        "via": "Via Doganale",
         "timing": false
       },
       {
         "id": "33_s8",
-        "nome": "Via S. Carlo a Palidoro",
-        "lat": 41.925,
-        "lng": 12.154,
-        "via": "Via S. Carlo a Palidoro",
+        "nome": "Via Aurelia Sud",
+        "lat": 41.928,
+        "lng": 12.158,
+        "via": "Via Aurelia",
         "timing": false
       },
       {
         "id": "33_s9",
-        "nome": "Via dei Tre Denari",
-        "lat": 41.9245,
-        "lng": 12.158,
-        "via": "Via dei Tre Denari",
+        "nome": "Via S. Carlo a Palidoro",
+        "lat": 41.921485,
+        "lng": 12.170641,
+        "via": "Via S. Carlo a Palidoro",
         "timing": false
       },
       {
         "id": "33_s10",
         "nome": "Stazione FS Palidoro (Arrivo/Partenza)",
-        "lat": 41.925,
-        "lng": 12.161,
-        "via": "Via dei Tre Denari",
+        "lat": 41.924273,
+        "lng": 12.183337,
+        "via": "Via della Stazione di Palidoro",
         "timing": true
       },
       {
         "id": "33_s11",
         "nome": "Via dei Tre Denari (Ritorno)",
-        "lat": 41.9245,
-        "lng": 12.158,
+        "lat": 41.922,
+        "lng": 12.178,
         "via": "Via dei Tre Denari",
         "timing": false
       },
       {
         "id": "33_s12",
         "nome": "Via S. Carlo a Palidoro (Ritorno)",
-        "lat": 41.925,
-        "lng": 12.154,
+        "lat": 41.921485,
+        "lng": 12.170641,
         "via": "Via S. Carlo a Palidoro",
         "timing": false
       },
       {
         "id": "33_s13",
         "nome": "Via Aurelia (Ritorno)",
-        "lat": 41.9275,
-        "lng": 12.1525,
+        "lat": 41.928,
+        "lng": 12.158,
         "via": "Via Aurelia",
         "timing": false
       },
       {
         "id": "33_s14",
         "nome": "Via Doganale (Ritorno Valcanneto)",
-        "lat": 41.93,
-        "lng": 12.152,
+        "lat": 41.9365,
+        "lng": 12.151,
         "via": "Via Doganale",
         "timing": false
       },
       {
         "id": "33_s15",
-        "nome": "Via C. Monteverdi",
-        "lat": 41.934,
-        "lng": 12.153,
+        "nome": "Via C. Monteverdi (Ingresso Valcanneto)",
+        "lat": 41.94837,
+        "lng": 12.153723,
         "via": "Via C. Monteverdi",
         "timing": false
       },
       {
         "id": "33_s16",
         "nome": "Largo Monteverdi (Arrivo Capolinea)",
-        "lat": 41.935233,
-        "lng": 12.153563,
+        "lat": 41.947363,
+        "lng": 12.155786,
         "via": "Largo Monteverdi",
         "timing": true
       }

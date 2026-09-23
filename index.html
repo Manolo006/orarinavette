@@ -38,6 +38,9 @@
       </button>
 
       <div class="app-bar-actions">
+        <button id="btnRouteEditor" class="icon-btn-touch" title="Disegna / Modifica Percorso" aria-label="Disegna o modifica percorso navetta">
+          <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i>
+        </button>
         <button id="btnTimetable" class="icon-btn-touch" title="Tabella Orari" aria-label="Visualizza tabella orari completa">
           <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
         </button>
@@ -50,6 +53,44 @@
     <!-- FULLSCREEN MAP -->
     <main class="map-container">
       <div id="map"></div>
+
+      <!-- FLOATING ROUTE EDITOR TOOLBAR -->
+      <div id="routeEditorToolbar" class="route-editor-toolbar" style="display: none;" role="region" aria-label="Editor tracciato percorso">
+        <div class="editor-header">
+          <div class="editor-title-wrap">
+            <i class="fa-solid fa-pen-nib" aria-hidden="true"></i>
+            <div class="editor-title-text">
+              <span class="editor-eyebrow">Modalità Tracciamento</span>
+              <strong id="editorLineName">Linea 33</strong>
+            </div>
+          </div>
+          <div class="editor-header-right">
+            <span id="editorPointCount" class="editor-count-badge">0 punti</span>
+            <button id="btnCloseEditor" class="editor-icon-btn" title="Chiudi editor" aria-label="Chiudi editor">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button id="btnEditorUndo" class="editor-btn" title="Annulla ultimo punto">
+            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Annulla
+          </button>
+          <button id="btnEditorSnap" class="editor-btn active" title="Aggancia automaticamente alle strade">
+            <i class="fa-solid fa-route" aria-hidden="true"></i> Snap Strade
+          </button>
+          <button id="btnEditorClear" class="editor-btn" title="Svuota punti disegnati">
+            <i class="fa-solid fa-trash" aria-hidden="true"></i> Svuota
+          </button>
+          <button id="btnEditorSave" class="editor-btn editor-btn-primary" title="Salva percorso nel sito">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salva
+          </button>
+        </div>
+
+        <div class="editor-hint" id="editorHintText">
+          <i class="fa-solid fa-mouse-pointer" aria-hidden="true"></i> Clicca sulle strade per disegnare il percorso. Con "Snap Strade" attivo il tracciato segue l'asfalto automaticamente.
+        </div>
+      </div>
 
       <!-- FLOATING MAP BUTTONS (FABs) -->
       <div class="map-fabs">
@@ -346,6 +387,34 @@
               Salva
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ROUTE SAVED / EXPORT -->
+  <div id="routeSavedModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalRouteSavedTitle">
+    <div class="modal-card modal-card-sm" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="modalRouteSavedTitle"><i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Percorso Salvato!</h3>
+        <button id="closeRouteSavedModal" class="icon-btn-touch" aria-label="Chiudi modale">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 0.8rem; font-size: 0.9rem; color: var(--text-main);">
+          Il tracciato per <strong id="savedRouteLineTitle">questa linea</strong> è stato salvato con successo ed è <strong>immediatamente attivo sulla mappa</strong>.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:0.6rem; margin-top:1.2rem;">
+          <button id="btnCopySavedRouteJson" class="btn-mobile btn-mobile-primary" style="width:100%; justify-content:center;">
+            <i class="fa-regular fa-copy" aria-hidden="true"></i> Copia Coordinate JSON
+          </button>
+          <button id="btnDownloadSavedRouteGeoJson" class="btn-mobile btn-mobile-secondary" style="width:100%; justify-content:center;">
+            <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> Scarica File GeoJSON
+          </button>
+          <button id="btnResetCustomRoute" class="btn-mobile" style="width:100%; justify-content:center; color:var(--danger); border:1px solid var(--danger); background:transparent;">
+            <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Ripristina Percorso Predefinito
+          </button>
         </div>
       </div>
     </div>

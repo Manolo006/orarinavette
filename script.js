@@ -16,6 +16,25 @@
   let osrmCache = {};
   let stopMarkersMap = {}; // Maps stopId -> L.Marker
 
+  // Route Editor State
+  let isEditorActive = false;
+  let editorWaypoints = [];
+  let editorSnappedPath = [];
+  let editorSnapEnabled = true;
+  let editorLayerGroup = null;
+  let editorPolyline = null;
+
+  function getCustomRoutePath(lineKey) {
+    if (!lineKey) return null;
+    try {
+      const stored = localStorage.getItem(`custom_route_path_${lineKey}`);
+      if (stored) return JSON.parse(stored);
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
   // Day filter: 'oggi' | 'lun_ven' | 'sabato' | 'domenica'
   let selectedDayFilter = "oggi";
   let currentModalDayTab = "lun_ven";
@@ -161,6 +180,26 @@
   const btnRecordGPS = document.getElementById("btnRecordGPS");
   const adminOutput = document.getElementById("adminOutput");
   const btnCopyAdminOutput = document.getElementById("btnCopyAdminOutput");
+
+  // Route Editor Elements
+  const btnRouteEditor = document.getElementById("btnRouteEditor");
+  const routeEditorToolbar = document.getElementById("routeEditorToolbar");
+  const editorLineName = document.getElementById("editorLineName");
+  const editorPointCount = document.getElementById("editorPointCount");
+  const btnCloseEditor = document.getElementById("btnCloseEditor");
+  const btnEditorUndo = document.getElementById("btnEditorUndo");
+  const btnEditorSnap = document.getElementById("btnEditorSnap");
+  const btnEditorClear = document.getElementById("btnEditorClear");
+  const btnEditorSave = document.getElementById("btnEditorSave");
+  const editorHintText = document.getElementById("editorHintText");
+
+  // Route Saved Modal Elements
+  const routeSavedModal = document.getElementById("routeSavedModal");
+  const closeRouteSavedModal = document.getElementById("closeRouteSavedModal");
+  const savedRouteLineTitle = document.getElementById("savedRouteLineTitle");
+  const btnCopySavedRouteJson = document.getElementById("btnCopySavedRouteJson");
+  const btnDownloadSavedRouteGeoJson = document.getElementById("btnDownloadSavedRouteGeoJson");
+  const btnResetCustomRoute = document.getElementById("btnResetCustomRoute");
 
   // === EASTER / PASQUETTA COMPUTUS ===
   function getEasterAndPasquetta(year) {
@@ -619,9 +658,38 @@
 
     let pathCoords = null;
 
-    if (tratta && Array.isArray(tratta.path) && tratta.path.length > 1) {
+    // A. Check for user-customized path first (highest priority)
+    const customPath = getCustomRoutePath(lineSelect.value);
+    if (customPath && customPath.length > 1) {
+      pathCoords = customPath;
+    } else if (tratta && Array.isArray(tratta.path) && tratta.path.length > 1) {
       pathCoords = tratta.path;
-    } else if (linea.stops && linea.stops.length > 1) {
+    } else if (linea && Array.isArray(linea.path) && linea.path.length > 1) {
+      pathCoords = linea.path;
+    }
+
+    if (pathCoords && pathCoords.length > 1) {
+      // Base road line
+      L.polyline(pathCoords, {
+        color: linea.colore || "#2563eb",
+        weight: 5,
+        opacity: 0.88,
+        lineCap: "round",
+        lineJoin: "round"
+      }).addTo(staticLayer);
+
+      // Direction flow dashes
+      L.polyline(pathCoords, {
+        color: "#ffffff",
+        weight: 2,
+        opacity: 0.7,
+        dashArray: "6, 12",
+        className: "animated-route-flow"
+      }).addTo(staticLayer);
+      return;
+    }
+
+    if (linea.stops && linea.stops.length > 1) {
       // Draw fallback straight lines along sequential stops
       const fallbackPolyline = L.polyline((linea.stops || []).map(s => [s.lat, s.lng]), {
         color: linea.colore || "#2563eb",
@@ -655,20 +723,6 @@
         }).addTo(staticLayer);
       }
       return;
-    }
-
-    if (!pathCoords) {
-      pathCoords = (linea.stops || []).map(s => [s.lat, s.lng]);
-    }
-
-    if (pathCoords && pathCoords.length > 1) {
-      L.polyline(pathCoords, {
-        color: linea.colore || "#2563eb",
-        weight: 5,
-        opacity: 0.88,
-        lineCap: "round",
-        lineJoin: "round"
-      }).addTo(staticLayer);
     }
   }
 
@@ -1284,6 +1338,309 @@
     }
   }
 
+  // === INTERACTIVE ROUTE EDITOR (VISUAL TRACCIATORE STRADALE) ===
+  function toggleRouteEditor() {
+    const linea = getCurrentLine();
+    if (!linea) {
+      alert("Seleziona prima una linea!");
+      return;
+    }
+
+    isEditorActive = !isEditorActive;
+    const mapContainer = document.querySelector(".map-container");
+
+    if (isEditorActive) {
+      mapContainer?.classList.add("editor-mode");
+      if (routeEditorToolbar) routeEditorToolbar.style.display = "flex";
+      if (editorLineName) editorLineName.textContent = linea.nome || `Linea ${lineSelect.value}`;
+      if (bottomSheet) bottomSheet.classList.remove("expanded");
+
+      if (!editorLayerGroup) {
+        editorLayerGroup = L.featureGroup().addTo(map);
+      } else {
+        editorLayerGroup.clearLayers();
+      }
+
+      // Check if custom path already exists for this line
+      const existingCustom = getCustomRoutePath(lineSelect.value);
+      if (existingCustom && existingCustom.length > 0) {
+        editorSnappedPath = [...existingCustom];
+        editorWaypoints = (linea.stops || []).map(s => [s.lat, s.lng]);
+      } else {
+        // Start fresh with current stops as reference waypoints
+        editorWaypoints = (linea.stops || []).map(s => [s.lat, s.lng]);
+        editorSnappedPath = [];
+      }
+
+      redrawEditorLayers();
+      map.on("click", onMapEditorClick);
+      if (editorHintText) {
+        editorHintText.innerHTML = '<i class="fa-solid fa-mouse-pointer" aria-hidden="true"></i> Clicca sulle strade per aggiungere tappe del percorso.';
+      }
+    } else {
+      exitRouteEditor();
+    }
+  }
+
+  function exitRouteEditor() {
+    isEditorActive = false;
+    const mapContainer = document.querySelector(".map-container");
+    mapContainer?.classList.remove("editor-mode");
+    if (routeEditorToolbar) routeEditorToolbar.style.display = "none";
+    if (editorLayerGroup) {
+      editorLayerGroup.clearLayers();
+    }
+    if (map) map.off("click", onMapEditorClick);
+    drawRouteForSelectedTripOrDefault();
+  }
+
+  async function onMapEditorClick(e) {
+    if (!isEditorActive || !map) return;
+
+    const lat = Number(e.latlng.lat.toFixed(6));
+    const lng = Number(e.latlng.lng.toFixed(6));
+    const newPt = [lat, lng];
+
+    const prevPt = editorWaypoints.length > 0 ? editorWaypoints[editorWaypoints.length - 1] : null;
+    editorWaypoints.push(newPt);
+
+    if (editorSnapEnabled && prevPt) {
+      if (editorHintText) {
+        editorHintText.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Aggancio alla strada in corso...';
+      }
+      const segmentCoords = await fetchOSRMSegment(prevPt, newPt);
+      if (segmentCoords && segmentCoords.length > 0) {
+        if (editorSnappedPath.length > 0) {
+          editorSnappedPath.push(...segmentCoords.slice(1));
+        } else {
+          editorSnappedPath.push(...segmentCoords);
+        }
+      } else {
+        editorSnappedPath.push(newPt);
+      }
+      if (editorHintText) {
+        editorHintText.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Tratto agganciato alla strada!';
+      }
+    } else {
+      editorSnappedPath.push(newPt);
+    }
+
+    redrawEditorLayers();
+  }
+
+  async function fetchOSRMSegment(p1, p2) {
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${p1[1].toFixed(6)},${p1[0].toFixed(6)};${p2[1].toFixed(6)},${p2[0].toFixed(6)}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.routes && data.routes.length > 0) {
+        return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
+  function redrawEditorLayers() {
+    if (!editorLayerGroup) return;
+    editorLayerGroup.clearLayers();
+
+    const linea = getCurrentLine();
+    const lineColor = linea?.colore || "#2563eb";
+
+    // 1. Draw waypoints
+    editorWaypoints.forEach((pt, idx) => {
+      const icon = L.divIcon({
+        className: 'editor-waypoint-wrapper',
+        html: `<div class="editor-waypoint-icon" title="Tappa ${idx + 1} (clicca per rimuovere)">${idx + 1}</div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      });
+
+      const m = L.marker(pt, { icon, draggable: true }).addTo(editorLayerGroup);
+      m.on("click", (evt) => {
+        L.DomEvent.stopPropagation(evt);
+        editorWaypoints.splice(idx, 1);
+        recalculateEditorPath();
+      });
+      m.on("dragend", (evt) => {
+        const pos = evt.target.getLatLng();
+        editorWaypoints[idx] = [Number(pos.lat.toFixed(6)), Number(pos.lng.toFixed(6))];
+        recalculateEditorPath();
+      });
+    });
+
+    // 2. Draw polyline
+    const displayCoords = editorSnappedPath.length > 1 ? editorSnappedPath : editorWaypoints;
+    if (displayCoords.length > 1) {
+      editorPolyline = L.polyline(displayCoords, {
+        color: lineColor,
+        weight: 6,
+        opacity: 0.9,
+        lineCap: "round",
+        lineJoin: "round"
+      }).addTo(editorLayerGroup);
+
+      L.polyline(displayCoords, {
+        color: "#ffffff",
+        weight: 2,
+        opacity: 0.8,
+        dashArray: "6, 12",
+        className: "animated-route-flow"
+      }).addTo(editorLayerGroup);
+    }
+
+    if (editorPointCount) {
+      editorPointCount.textContent = `${editorWaypoints.length} tappe (${displayCoords.length} pts)`;
+    }
+  }
+
+  async function recalculateEditorPath() {
+    if (editorWaypoints.length < 2) {
+      editorSnappedPath = [...editorWaypoints];
+      redrawEditorLayers();
+      return;
+    }
+
+    if (!editorSnapEnabled) {
+      editorSnappedPath = [...editorWaypoints];
+      redrawEditorLayers();
+      return;
+    }
+
+    if (editorHintText) {
+      editorHintText.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Ricalcolo percorso stradale...';
+    }
+    let full = [];
+    for (let i = 0; i < editorWaypoints.length - 1; i++) {
+      const seg = await fetchOSRMSegment(editorWaypoints[i], editorWaypoints[i + 1]);
+      if (seg && seg.length > 0) {
+        if (full.length > 0) full.push(...seg.slice(1));
+        else full.push(...seg);
+      } else {
+        if (full.length === 0) full.push(editorWaypoints[i]);
+        full.push(editorWaypoints[i + 1]);
+      }
+    }
+    editorSnappedPath = full;
+    if (editorHintText) {
+      editorHintText.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Percorso ricalcolato!';
+    }
+    redrawEditorLayers();
+  }
+
+  function editorUndo() {
+    if (editorWaypoints.length === 0) return;
+    editorWaypoints.pop();
+    recalculateEditorPath();
+  }
+
+  function editorClear() {
+    if (confirm("Vuoi davvero svuotare tutti i punti del percorso disegnato?")) {
+      editorWaypoints = [];
+      editorSnappedPath = [];
+      redrawEditorLayers();
+    }
+  }
+
+  function editorToggleSnap() {
+    editorSnapEnabled = !editorSnapEnabled;
+    if (btnEditorSnap) btnEditorSnap.classList.toggle("active", editorSnapEnabled);
+    if (editorSnapEnabled) {
+      if (editorHintText) editorHintText.innerHTML = '<i class="fa-solid fa-route" aria-hidden="true"></i> Snap Strade ATTIVO: i punti si agganciano all\'asfalto reale.';
+      recalculateEditorPath();
+    } else {
+      if (editorHintText) editorHintText.innerHTML = '<i class="fa-solid fa-pen" aria-hidden="true"></i> Snap Strade DISATTIVATO: linee dirette manuali.';
+      editorSnappedPath = [...editorWaypoints];
+      redrawEditorLayers();
+    }
+  }
+
+  function editorSaveRoute() {
+    const finalPath = editorSnappedPath.length > 1 ? editorSnappedPath : editorWaypoints;
+    if (finalPath.length < 2) {
+      alert("Disegna almeno 2 punti prima di salvare il percorso!");
+      return;
+    }
+
+    const lineKey = lineSelect.value;
+    const linea = getCurrentLine();
+
+    localStorage.setItem(`custom_route_path_${lineKey}`, JSON.stringify(finalPath));
+    if (linea) linea.custom_path = finalPath;
+
+    // Open route saved modal
+    if (savedRouteLineTitle) savedRouteLineTitle.textContent = linea ? linea.nome : `Linea ${lineKey}`;
+    if (routeSavedModal) routeSavedModal.classList.add("active");
+
+    exitRouteEditor();
+  }
+
+  function resetCustomRoute() {
+    const lineKey = lineSelect.value;
+    if (confirm(`Vuoi ripristinare il tracciato predefinito per la Linea ${lineKey}?`)) {
+      localStorage.removeItem(`custom_route_path_${lineKey}`);
+      const linea = getCurrentLine();
+      if (linea) delete linea.custom_path;
+      if (routeSavedModal) routeSavedModal.classList.remove("active");
+      drawRouteForSelectedTripOrDefault();
+      alert("✅ Percorso predefinito ripristinato!");
+    }
+  }
+
+  function copySavedRouteJson() {
+    const lineKey = lineSelect.value;
+    const path = getCustomRoutePath(lineKey);
+    if (!path) {
+      alert("Nessun percorso personalizzato salvato per questa linea.");
+      return;
+    }
+    const jsonStr = `"path": [\n${path.map(p => `  [${p[0].toFixed(6)}, ${p[1].toFixed(6)}]`).join(",\n")}\n]`;
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      alert("✅ Coordinate JSON copiate negli appunti!");
+    });
+  }
+
+  function downloadSavedRouteGeoJson() {
+    const lineKey = lineSelect.value;
+    const path = getCustomRoutePath(lineKey);
+    const linea = getCurrentLine();
+    if (!path) {
+      alert("Nessun percorso salvato da esportare.");
+      return;
+    }
+
+    const geojson = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {
+            lineId: lineKey,
+            lineName: linea?.nome || `Linea ${lineKey}`,
+            exportedAt: new Date().toISOString()
+          },
+          geometry: {
+            type: "LineString",
+            coordinates: path.map(p => [p[1], p[0]]) // GeoJSON requires [lng, lat]
+          }
+        }
+      ]
+    };
+
+    const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: "application/geo+json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `percorso_linea_${lineKey}.geojson`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   // === MAIN DISPLAY LOOP ===
   function updateAllDisplays() {
     const now = getNow();
@@ -1579,14 +1936,33 @@
       if (e.target === searchModal || e.target === searchResults) searchModal.classList.remove("active");
     });
 
-    // Escape key closes modals
+    // Escape key closes modals and exits editor
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         searchModal?.classList.remove("active");
         timetableModal?.classList.remove("active");
         adminModal?.classList.remove("active");
+        routeSavedModal?.classList.remove("active");
+        if (isEditorActive) exitRouteEditor();
       }
     });
+
+    // Route Editor Toolbar Events
+    btnRouteEditor?.addEventListener("click", toggleRouteEditor);
+    btnCloseEditor?.addEventListener("click", exitRouteEditor);
+    btnEditorUndo?.addEventListener("click", editorUndo);
+    btnEditorSnap?.addEventListener("click", editorToggleSnap);
+    btnEditorClear?.addEventListener("click", editorClear);
+    btnEditorSave?.addEventListener("click", editorSaveRoute);
+
+    // Route Saved Modal Events
+    closeRouteSavedModal?.addEventListener("click", () => routeSavedModal?.classList.remove("active"));
+    routeSavedModal?.addEventListener("click", (e) => {
+      if (e.target === routeSavedModal) routeSavedModal.classList.remove("active");
+    });
+    btnCopySavedRouteJson?.addEventListener("click", copySavedRouteJson);
+    btnDownloadSavedRouteGeoJson?.addEventListener("click", downloadSavedRouteGeoJson);
+    btnResetCustomRoute?.addEventListener("click", resetCustomRoute);
 
     // Keyboard accessibility for bottom sheet handle
     sheetHandle?.addEventListener("keydown", (e) => {
