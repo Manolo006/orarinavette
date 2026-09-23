@@ -463,10 +463,19 @@
         </button>
       </div>
       <div class="modal-body">
-        <p style="margin-bottom: 0.8rem; font-size: 0.88rem; color: var(--text-main); line-height: 1.45;">
-          Incolla qui il <strong>link di Google Maps</strong> (con le indicazioni stradali / percorso), oppure una <strong>lista di coordinate</strong> (lat, lng), oppure un tracciato <strong>GeoJSON / KML</strong>.
-        </p>
-        <textarea id="importRouteInput" rows="5" class="search-input" style="width: 100%; border-radius: var(--radius-md); font-family: monospace; font-size: 0.8rem; padding: 0.6rem; border: 1px solid var(--border-color); resize: vertical; background: var(--bg-surface); color: var(--text-main); margin-bottom: 0.5rem;" placeholder="Esempio link:
+        <div style="margin-bottom: 0.85rem;">
+          <input type="file" id="importRouteFileInput" accept=".kmz,.kml,.gpx,.geojson,.json,.txt" style="display: none;">
+          <button type="button" id="btnBrowseRouteFile" class="btn-mobile btn-mobile-secondary" style="width: 100%; justify-content: center; gap: 0.5rem;">
+            <i class="fa-solid fa-file-arrow-up" aria-hidden="true"></i> Carica file dal computer (.kmz, .kml, .geojson)
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;">
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+          <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">OPPURE INCOLLA TESTO O LINK</span>
+          <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        </div>
+
+        <textarea id="importRouteInput" rows="4" class="search-input" style="width: 100%; border-radius: var(--radius-md); font-family: monospace; font-size: 0.8rem; padding: 0.6rem; border: 1px solid var(--border-color); resize: vertical; background: var(--bg-surface); color: var(--text-main); margin-bottom: 0.5rem;" placeholder="Esempio link:
 https://www.google.com/maps/dir/41.9548,12.0738/41.9515,12.1564/41.9473,12.1557...
 
 Oppure coordinate:
@@ -486,6 +495,8 @@ Oppure coordinate:
     </div>
   </div>
 
+  <!-- JSZip (for Google My Maps .KMZ extraction) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Mobile-First JS -->

@@ -217,6 +217,8 @@
   const importRouteInput = document.getElementById("importRouteInput");
   const btnConfirmImportRoute = document.getElementById("btnConfirmImportRoute");
   const btnCancelImportRoute = document.getElementById("btnCancelImportRoute");
+  const btnBrowseRouteFile = document.getElementById("btnBrowseRouteFile");
+  const importRouteFileInput = document.getElementById("importRouteFileInput");
 
   // === EASTER / PASQUETTA COMPUTUS ===
   function getEasterAndPasquetta(year) {
@@ -1735,24 +1737,44 @@
 
     // 3. KML check (look for <coordinates>...)
     if (text.includes("<coordinates>")) {
-      const coordMatch = text.match(/<coordinates>([\s\S]*?)<\/coordinates>/i);
-      if (coordMatch) {
-        const rawCoords = coordMatch[1].trim().split(/\s+/);
+      const coordBlocks = [...text.matchAll(/<coordinates>([\s\S]*?)<\/coordinates>/gi)];
+      let bestBlockPoints = [];
+      const allPlacemarkPoints = [];
+
+      for (const block of coordBlocks) {
+        const rawCoords = block[1].trim().split(/\s+/);
+        const curPoints = [];
         for (const rc of rawCoords) {
           const parts = rc.split(",");
           if (parts.length >= 2) {
             const lng = parseFloat(parts[0]);
             const lat = parseFloat(parts[1]);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              points.push([lat, lng]);
+            if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+              curPoints.push([lat, lng]);
             }
           }
         }
-        if (points.length > 0) return points;
+        if (curPoints.length > bestBlockPoints.length) {
+          bestBlockPoints = curPoints;
+        }
+        if (curPoints.length === 1) {
+          allPlacemarkPoints.push(curPoints[0]);
+        }
+      }
+
+      if (bestBlockPoints.length > 1) return bestBlockPoints;
+      if (allPlacemarkPoints.length > 1) return allPlacemarkPoints;
+    }
+
+    // 4. GPX check (<trkpt> or <rtept>)
+    if (text.includes("<trkpt") || text.includes("<rtept")) {
+      const gpxMatches = [...text.matchAll(/<(?:trkpt|rtept)[^>]*lat="(-?\d+\.\d+)"[^>]*lon="(-?\d+\.\d+)"/gi)];
+      if (gpxMatches.length > 1) {
+        return gpxMatches.map(m => [parseFloat(m[1]), parseFloat(m[2])]);
       }
     }
 
-    // 4. Regex for raw coordinate pairs: lat, lng or lat lng
+    // 5. Regex for raw coordinate pairs: lat, lng or lat lng
     const regex = /(-?\d{1,2}\.\d{3,8})[,\s\t]+(-?\d{1,3}\.\d{3,8})/g;
     let match;
     while ((match = regex.exec(text)) !== null) {
@@ -1766,36 +1788,109 @@
     return points;
   }
 
-  async function handleConfirmImportRoute() {
-    const rawText = importRouteInput ? importRouteInput.value.trim() : "";
-    if (!rawText) {
-      alert("Incolla prima un link di Google Maps o una serie di coordinate!");
-      return;
+  // Extract text from file (supports .kmz via JSZip, .kml, .geojson, .txt, etc.)
+  async function extractTextFromFile(file) {
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith(".kmz")) {
+      if (typeof JSZip === "undefined") {
+        throw new Error("Libreria di decompressione KMZ non caricata.");
+      }
+      const zip = await JSZip.loadAsync(file);
+      let kmlEntry = zip.file("doc.kml");
+      if (!kmlEntry) {
+        const kmlKeys = Object.keys(zip.files).filter(k => k.toLowerCase().endsWith(".kml"));
+        if (kmlKeys.length > 0) {
+          kmlEntry = zip.file(kmlKeys[0]);
+        }
+      }
+      if (!kmlEntry) {
+        throw new Error("Nessun file KML trovato all'interno dell'archivio KMZ.");
+      }
+      return await kmlEntry.async("string");
     }
+    return await file.text();
+  }
 
+  async function handleRouteFileInputChange(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    try {
+      if (editorHintText) {
+        editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Lettura file in corso...`;
+      }
+      const fileText = await extractTextFromFile(file);
+      if (importRouteInput) {
+        importRouteInput.value = fileText.length > 3000 ? fileText.substring(0, 3000) + "\n... [Tracciato completo caricato]" : fileText;
+      }
+      await processAndApplyRouteText(fileText, file.name);
+    } catch (err) {
+      console.error("Errore lettura file percorso:", err);
+      alert("Errore durante la lettura del file: " + err.message);
+    } finally {
+      e.target.value = "";
+    }
+  }
+
+  async function processAndApplyRouteText(rawText, sourceLabel = "") {
     const points = parseGoogleMapsOrCoords(rawText);
     if (!points || points.length < 2) {
-      alert("Nessun punto o coordinata valida trovata nel testo inserito. Assicurati che contenga almeno 2 punti (es. un link di indicazioni stradali di Google Maps o coordinate lat, lng).");
+      alert("Nessun tracciato valido trovato nel file o testo inserito. Assicurati che contenga una linea o almeno 2 coordinate.");
       return;
     }
 
     closeImportRouteModal();
 
-    editorWaypoints = points;
-    if (editorHintText) {
-      editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importati ${points.length} punti! Ricalcolo aggancio stradale OSRM...`;
-    }
+    // If points > 50, it is a detailed road geometry (like from Google My Maps KMZ or high-res GPS)
+    if (points.length > 50) {
+      editorSnappedPath = points;
+      // Sample ~15 waypoints for visual handles without overloading Leaflet or OSRM
+      const sampleStep = Math.max(1, Math.floor(points.length / 15));
+      const sampled = [];
+      for (let i = 0; i < points.length; i += sampleStep) {
+        sampled.push(points[i]);
+      }
+      if (sampled[sampled.length - 1] !== points[points.length - 1]) {
+        sampled.push(points[points.length - 1]);
+      }
+      editorWaypoints = sampled;
+      redrawEditorLayers();
 
-    await recalculateEditorPath();
+      if (points.length > 0 && map) {
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+      }
 
-    if (editorWaypoints.length > 0 && map) {
-      const bounds = L.latLngBounds(editorWaypoints);
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
+      if (editorHintText) {
+        const src = sourceLabel ? ` da "${sourceLabel}"` : "";
+        editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importati ${points.length} punti di strada reali${src}! Clicca "Salva" per renderli attivi sulla mappa.`;
+      }
+    } else {
+      // Regular stop list or Google Maps directions link: recalculate via OSRM
+      editorWaypoints = points;
+      if (editorHintText) {
+        editorHintText.innerHTML = `<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importate ${points.length} tappe! Ricalcolo aggancio stradale OSRM...`;
+      }
+      await recalculateEditorPath();
 
-    if (editorHintText) {
-      editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importati con successo ${points.length} punti da Google Maps! Clicca "Salva" per renderli attivi.`;
+      if (editorWaypoints.length > 0 && map) {
+        const bounds = L.latLngBounds(editorWaypoints);
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+      }
+
+      if (editorHintText) {
+        editorHintText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--success);" aria-hidden="true"></i> Importate ${points.length} tappe! Clicca "Salva" per renderle attive sulla mappa.`;
+      }
     }
+  }
+
+  async function handleConfirmImportRoute() {
+    const rawText = importRouteInput ? importRouteInput.value.trim() : "";
+    if (!rawText) {
+      alert("Incolla prima un link di Google Maps o carica un file dal tuo computer!");
+      return;
+    }
+    await processAndApplyRouteText(rawText);
   }
 
   // === MAIN DISPLAY LOOP ===
@@ -2371,6 +2466,8 @@
     closeRouteImportModal?.addEventListener("click", closeImportRouteModal);
     btnCancelImportRoute?.addEventListener("click", closeImportRouteModal);
     btnConfirmImportRoute?.addEventListener("click", handleConfirmImportRoute);
+    btnBrowseRouteFile?.addEventListener("click", () => importRouteFileInput?.click());
+    importRouteFileInput?.addEventListener("change", handleRouteFileInputChange);
     routeImportModal?.addEventListener("click", (e) => {
       if (e.target === routeImportModal) closeImportRouteModal();
     });
