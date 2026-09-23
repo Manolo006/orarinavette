@@ -1491,3 +1491,104 @@ html, body {
   }
 }
 
+/* ==========================================================================
+   LIVE REAL-TIME USER LOCATION & NEAREST STOP HIGHLIGHT
+   ========================================================================== */
+.user-pulse-marker-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-pulse-dot {
+  width: 14px;
+  height: 14px;
+  background-color: #2563eb;
+  border: 2.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  position: relative;
+}
+
+.user-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  margin-left: -16px;
+  border-radius: 50%;
+  background-color: rgba(37, 99, 235, 0.28);
+  animation: userRadarPulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes userRadarPulse {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  70% {
+    transform: scale(1.6);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* User Walking Dotted Connection Line */
+.walking-dotted-line {
+  stroke-dasharray: 4, 8;
+  animation: walkingLineDash 1.2s linear infinite;
+}
+
+@keyframes walkingLineDash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* User Distance Badge */
+.user-distance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 0.15rem;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.user-distance-badge i {
+  color: var(--primary);
+  font-size: 0.75rem;
+}
+
+/* Animated Tracking FAB Button */
+#fabLocate.tracking {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.35), var(--shadow-md) !important;
+}
+
+#fabLocate.tracking i {
+  animation: fabCrosshairSpin 4s linear infinite;
+}
+
+@keyframes fabCrosshairSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

@@ -10,11 +10,18 @@
   let map = null;
   let staticLayer = null;
   let dynamicLayer = null;
-  let busMarker = null;
-  let userMarker = null;
+  let userLayer = null;
   let autoUpdateInterval = null;
   let osrmCache = {};
   let stopMarkersMap = {}; // Maps stopId -> L.Marker
+
+  // Live User Location Tracking State
+  let userLocation = null; // { lat, lng, accuracy }
+  let userWatchId = null;
+  let userMarker = null;
+  let userAccuracyCircle = null;
+  let userWalkingLine = null;
+  let isTrackingUser = false;
 
   // Route Editor State
   let isEditorActive = false;
@@ -120,6 +127,8 @@
   const heroStopName = document.getElementById("heroStopName");
   const heroEtaBadge = document.getElementById("heroEtaBadge");
   const heroNextTime = document.getElementById("heroNextTime");
+  const userDistanceBadge = document.getElementById("userDistanceBadge");
+  const userDistanceText = document.getElementById("userDistanceText");
 
   const timelineList = document.getElementById("timelineList");
   const upcomingList = document.getElementById("upcomingList");
@@ -296,6 +305,7 @@
       populateLinee();
       renderFavorites();
       startAutoUpdate();
+      startUserTracking(true);
     } catch (err) {
       console.error("Errore caricamento linee.json:", err);
       heroEtaBadge.textContent = "Err";
@@ -342,6 +352,7 @@
 
     staticLayer = L.featureGroup().addTo(map);
     dynamicLayer = L.layerGroup().addTo(map);
+    userLayer = L.layerGroup().addTo(map);
 
     window.addEventListener("resize", () => map.invalidateSize());
   }
@@ -569,10 +580,19 @@
       stopSelect.appendChild(opt);
     });
 
+    // Auto-seleziona la fermata più vicina alla posizione in tempo reale dell'utente
+    if (userLocation && linea.stops && linea.stops.length > 0) {
+      const nearestInfo = findNearestStopForUser(linea.stops, userLocation);
+      if (nearestInfo && nearestInfo.stop) {
+        stopSelect.value = nearestInfo.stop.id;
+      }
+    }
+
     updateServiceAlertBanner();
     updateFavoriteButtonState();
     drawRouteForSelectedTripOrDefault();
     updateAllDisplays();
+    updateUserDistanceDisplay();
   }
 
   // Updates Service Status Banner (Holidays, Sunday closures, Early termination)
@@ -1667,6 +1687,7 @@
       renderTimeline(linea, null, now, false);
       renderUpcomingTrips(linea, stopId, now);
       updateActiveStopMarkerPin(stopId);
+      updateUserDistanceDisplay();
       return;
     }
 
@@ -1683,6 +1704,7 @@
       renderTimeline(linea, null, now, false);
       renderUpcomingTrips(linea, stopId, now);
       updateActiveStopMarkerPin(stopId);
+      updateUserDistanceDisplay();
       return;
     }
 
@@ -1696,6 +1718,7 @@
     renderTimeline(linea, info.tratta, now, Boolean(info.tomorrow));
     renderUpcomingTrips(linea, stopId, now);
     updateActiveStopMarkerPin(stopId);
+    updateUserDistanceDisplay();
   }
 
   function startAutoUpdate() {
@@ -1718,6 +1741,257 @@
     updateAllDisplays();
     updateFavoriteButtonState();
     if (shouldZoom) zoomToSelectedStop();
+  }
+
+  // === REAL-TIME USER LOCATION & NEAREST STOP TRACKING ===
+  function findNearestStopForUser(stops, userLoc) {
+    if (!stops || !stops.length || !userLoc) return null;
+    const userLatLng = L.latLng(userLoc.lat, userLoc.lng);
+    let nearest = null;
+    let minDistance = Infinity;
+
+    stops.forEach((stop) => {
+      if (typeof stop.lat === "number" && typeof stop.lng === "number") {
+        const d = userLatLng.distanceTo(L.latLng(stop.lat, stop.lng));
+        if (d < minDistance) {
+          minDistance = d;
+          nearest = stop;
+        }
+      }
+    });
+
+    return nearest ? { stop: nearest, distance: minDistance } : null;
+  }
+
+  function renderUserLocationMarker() {
+    if (!userLocation || !userLayer) return;
+
+    const userLatLng = [userLocation.lat, userLocation.lng];
+
+    if (!userMarker) {
+      const userPulseIcon = L.divIcon({
+        className: "user-pulse-marker-wrapper",
+        html: '<div class="user-pulse-ring"></div><div class="user-pulse-dot"></div>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      userMarker = L.marker(userLatLng, { icon: userPulseIcon, zIndexOffset: 1000 }).addTo(userLayer);
+      userMarker.bindPopup("<b>La tua posizione in tempo reale</b>");
+    } else {
+      userMarker.setLatLng(userLatLng);
+      if (!userLayer.hasLayer(userMarker)) {
+        userLayer.addLayer(userMarker);
+      }
+    }
+
+    const accuracyRadius = Math.min(Math.max(userLocation.accuracy || 20, 15), 150);
+    if (!userAccuracyCircle) {
+      userAccuracyCircle = L.circle(userLatLng, {
+        radius: accuracyRadius,
+        color: "#2563eb",
+        weight: 1,
+        fillColor: "#3b82f6",
+        fillOpacity: 0.08,
+        interactive: false
+      }).addTo(userLayer);
+    } else {
+      userAccuracyCircle.setLatLng(userLatLng);
+      userAccuracyCircle.setRadius(accuracyRadius);
+      if (!userLayer.hasLayer(userAccuracyCircle)) {
+        userLayer.addLayer(userAccuracyCircle);
+      }
+    }
+  }
+
+  function updateUserDistanceDisplay(nearestInfo = null) {
+    if (!userLocation || !userLayer) {
+      if (userDistanceBadge) userDistanceBadge.style.display = "none";
+      if (userWalkingLine && userLayer) {
+        userLayer.removeLayer(userWalkingLine);
+        userWalkingLine = null;
+      }
+      return;
+    }
+
+    const linea = getCurrentLine();
+    if (!linea || !linea.stops || linea.stops.length === 0) {
+      if (userDistanceBadge) userDistanceBadge.style.display = "none";
+      return;
+    }
+
+    const selectedStop = linea.stops.find((s) => s.id === stopSelect.value);
+    if (!selectedStop) {
+      if (userDistanceBadge) userDistanceBadge.style.display = "none";
+      return;
+    }
+
+    const userLatLng = L.latLng(userLocation.lat, userLocation.lng);
+    const stopLatLng = L.latLng(selectedStop.lat, selectedStop.lng);
+    const distanceMeters = Math.round(userLatLng.distanceTo(stopLatLng));
+
+    if (!nearestInfo) {
+      nearestInfo = findNearestStopForUser(linea.stops, userLocation);
+    }
+    const isNearest = nearestInfo?.stop?.id === selectedStop.id;
+
+    // Stima tempo a piedi (~5 km/h ≈ 83 metri al minuto)
+    const walkingMinutes = Math.max(1, Math.round(distanceMeters / 80));
+
+    let distFormatted = `${distanceMeters} m`;
+    if (distanceMeters >= 1000) {
+      distFormatted = `${(distanceMeters / 1000).toFixed(1)} km`;
+    }
+
+    if (userDistanceBadge && userDistanceText) {
+      userDistanceBadge.style.display = "inline-flex";
+      const badgeSuffix = isNearest ? ' • Fermata più vicina' : '';
+      userDistanceText.textContent = `${distFormatted} • ~${walkingMinutes} min a piedi${badgeSuffix}`;
+    }
+
+    // Linea tratteggiata camminata dall'utente alla fermata selezionata
+    const lineCoords = [
+      [userLocation.lat, userLocation.lng],
+      [selectedStop.lat, selectedStop.lng]
+    ];
+
+    if (!userWalkingLine) {
+      userWalkingLine = L.polyline(lineCoords, {
+        color: "#2563eb",
+        weight: 3,
+        dashArray: "5, 8",
+        opacity: 0.85,
+        className: "walking-dotted-line"
+      }).addTo(userLayer);
+    } else {
+      userWalkingLine.setLatLngs(lineCoords);
+      if (!userLayer.hasLayer(userWalkingLine)) {
+        userLayer.addLayer(userWalkingLine);
+      }
+    }
+  }
+
+  function handleNewUserPosition(pos, isInitial = false) {
+    const { latitude, longitude, accuracy } = pos.coords;
+    userLocation = { lat: latitude, lng: longitude, accuracy: accuracy || 20 };
+
+    renderUserLocationMarker();
+
+    const linea = getCurrentLine();
+    if (!linea || !linea.stops || linea.stops.length === 0) return;
+
+    const nearestInfo = findNearestStopForUser(linea.stops, userLocation);
+    if (!nearestInfo || !nearestInfo.stop) return;
+
+    // Se la fermata è cambiata o è il primo fix, seleziona in automatico la più vicina
+    if (stopSelect.value !== nearestInfo.stop.id || isInitial) {
+      selectStop(nearestInfo.stop.id, false);
+    } else {
+      updateUserDistanceDisplay(nearestInfo);
+    }
+
+    if (isInitial && map) {
+      centerOnUserAndStop();
+    }
+  }
+
+  function centerOnUserAndStop() {
+    if (!userLocation || !map) return;
+    const linea = getCurrentLine();
+    const selectedStop = linea?.stops?.find((s) => s.id === stopSelect.value);
+
+    if (selectedStop) {
+      const bounds = L.latLngBounds([
+        [userLocation.lat, userLocation.lng],
+        [selectedStop.lat, selectedStop.lng]
+      ]);
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
+    } else {
+      map.setView([userLocation.lat, userLocation.lng], 16);
+    }
+  }
+
+  function startUserTracking(isInitial = false) {
+    if (!navigator.geolocation) {
+      if (!isInitial) alert("Geolocalizzazione non supportata dal tuo dispositivo o browser.");
+      return;
+    }
+
+    isTrackingUser = true;
+    if (fabLocate) {
+      fabLocate.classList.add("tracking");
+      fabLocate.title = "Tracciamento attivo (Clicca per ricentrare sulla fermata più vicina)";
+    }
+
+    let firstLockHandled = false;
+
+    const onPosSuccess = (pos) => {
+      const isFirst = !firstLockHandled;
+      firstLockHandled = true;
+      handleNewUserPosition(pos, isFirst);
+    };
+
+    const onPosError = (err) => {
+      console.warn("Geolocalizzazione GPS:", err.message);
+      if (!isInitial) {
+        alert("Impossibile rilevare la posizione GPS. Assicurati di aver concesso i permessi.");
+      }
+      stopUserTracking();
+    };
+
+    // Primo rilevamento rapido
+    navigator.geolocation.getCurrentPosition(onPosSuccess, onPosError, {
+      enableHighAccuracy: true,
+      maximumAge: 10000,
+      timeout: 10000
+    });
+
+    // Monitoraggio continuo in tempo reale
+    if (userWatchId !== null) {
+      navigator.geolocation.clearWatch(userWatchId);
+    }
+    userWatchId = navigator.geolocation.watchPosition(onPosSuccess, (err) => {
+      console.warn("watchPosition warning:", err.message);
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 4000,
+      timeout: 15000
+    });
+  }
+
+  function stopUserTracking() {
+    if (userWatchId !== null) {
+      navigator.geolocation.clearWatch(userWatchId);
+      userWatchId = null;
+    }
+    isTrackingUser = false;
+    if (fabLocate) {
+      fabLocate.classList.remove("tracking");
+      fabLocate.title = "Trova fermata più vicina";
+    }
+    if (userDistanceBadge) {
+      userDistanceBadge.style.display = "none";
+    }
+    if (userWalkingLine && userLayer) {
+      userLayer.removeLayer(userWalkingLine);
+      userWalkingLine = null;
+    }
+    if (userMarker && userLayer) {
+      userLayer.removeLayer(userMarker);
+      userMarker = null;
+    }
+    if (userAccuracyCircle && userLayer) {
+      userLayer.removeLayer(userAccuracyCircle);
+      userAccuracyCircle = null;
+    }
+    userLocation = null;
+  }
+
+  function toggleUserTracking() {
+    if (isTrackingUser && userLocation) {
+      centerOnUserAndStop();
+    } else {
+      startUserTracking(false);
+    }
   }
 
   // === DAY FILTER SYSTEM ===
@@ -2002,45 +2276,8 @@
       switchMapTile(currentTileType);
     });
 
-    // Locate Me FAB
-    fabLocate?.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        alert("Geolocalizzazione non supportata.");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          const userLatLng = L.latLng(latitude, longitude);
-          const linea = getCurrentLine();
-
-          if (!linea || !linea.stops || !linea.stops.length) return;
-
-          let nearestStop = null;
-          let nearestDistance = Infinity;
-
-          linea.stops.forEach((stop) => {
-            const d = userLatLng.distanceTo(L.latLng(stop.lat, stop.lng));
-            if (d < nearestDistance) {
-              nearestDistance = d;
-              nearestStop = stop;
-            }
-          });
-
-          if (!nearestStop) return;
-
-          selectStop(nearestStop.id, true);
-
-          if (userMarker) dynamicLayer.removeLayer(userMarker);
-          userMarker = L.marker([latitude, longitude])
-            .addTo(dynamicLayer)
-            .bindPopup(`<b>Sei qui</b><br>Fermata vicina: ${nearestStop.nome} (${Math.round(nearestDistance)} m)`)
-            .openPopup();
-        },
-        (err) => alert(`Impossibile trovare posizione: ${err.message}`)
-      );
-    });
+    // Locate Me FAB - Attiva/Centra tracciamento in tempo reale e fermata più vicina
+    fabLocate?.addEventListener("click", toggleUserTracking);
   }
 
   // Start app
