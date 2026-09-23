@@ -195,6 +195,42 @@
   const timetableNotesContainer = document.getElementById("timetableNotesContainer");
   const timetableNotesList = document.getElementById("timetableNotesList");
 
+  // App Menu Modal & Operator Elements
+  const appMenuModal = document.getElementById("appMenuModal");
+  const btnAppMenu = document.getElementById("btnAppMenu");
+  const btnCloseAppMenu = document.getElementById("btnCloseAppMenu");
+  const btnMenuTimetable = document.getElementById("btnMenuTimetable");
+  const adminModeToggle = document.getElementById("adminModeToggle");
+  const operatorToolsContainer = document.getElementById("operatorToolsContainer");
+  const btnMenuRouteEditor = document.getElementById("btnMenuRouteEditor");
+  const btnMenuAdminTools = document.getElementById("btnMenuAdminTools");
+
+  // Operator / Admin Mode State
+  let isAdminMode = localStorage.getItem("bus_admin_mode") === "true";
+  const urlCheck = new URLSearchParams(window.location.search);
+  if (urlCheck.get("admin") === "1" || urlCheck.get("admin") === "true") {
+    isAdminMode = true;
+    localStorage.setItem("bus_admin_mode", "true");
+  }
+
+  function updateAdminModeUI() {
+    if (adminModeToggle) {
+      adminModeToggle.checked = isAdminMode;
+    }
+    if (operatorToolsContainer) {
+      operatorToolsContainer.style.display = isAdminMode ? "flex" : "none";
+    }
+    if (fabAdmin) {
+      fabAdmin.style.display = isAdminMode ? "flex" : "none";
+    }
+  }
+
+  function setAdminMode(enabled) {
+    isAdminMode = Boolean(enabled);
+    localStorage.setItem("bus_admin_mode", isAdminMode ? "true" : "false");
+    updateAdminModeUI();
+  }
+
   // Admin Modal
   const adminModal = document.getElementById("adminModal");
   const closeAdminModal = document.getElementById("closeAdminModal");
@@ -312,6 +348,7 @@
   // === INIT ===
   async function init() {
     initTheme();
+    updateAdminModeUI();
     initMap();
     wireMobileEvents();
     wireNavSystem();
@@ -365,10 +402,26 @@
   function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute("data-theme");
     const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    // Suppress CSS transitions temporarily for clean instantaneous swap
+    const css = document.createElement("style");
+    css.appendChild(
+      document.createTextNode("*,*::before,*::after{transition:none !important}")
+    );
+    document.head.appendChild(css);
+
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("bus_theme", newTheme);
     updateThemeIcon(newTheme);
     switchMapTile(newTheme === "dark" ? "dark" : "positron");
+
+    // Force reflow and remove style rule on next frame
+    window.getComputedStyle(document.body).opacity;
+    requestAnimationFrame(() => {
+      if (document.head.contains(css)) {
+        document.head.removeChild(css);
+      }
+    });
   }
 
   function updateThemeIcon(theme) {
@@ -597,7 +650,9 @@
 
     // Update Line Badge Color
     const badgeTextColor = getContrastTextColor(linea.colore);
-    heroLineBadge.innerHTML = `<i class="fa-solid fa-bus" aria-hidden="true"></i> ${linea.nome || 'Linea ' + lineSelect.value}`;
+    const lineShortName = `Linea ${lineSelect.value || linea.id || ''}`;
+    heroLineBadge.innerHTML = `<i class="fa-solid fa-bus" aria-hidden="true"></i> ${lineShortName}`;
+    heroLineBadge.title = linea.nome || lineShortName;
     if (linea.colore) {
       heroLineBadge.style.backgroundColor = linea.colore;
       heroLineBadge.style.color = badgeTextColor;
@@ -2572,6 +2627,32 @@
     btnCloseSearch?.addEventListener("click", () => searchModal.classList.remove("active"));
     searchInput?.addEventListener("input", handleSearch);
 
+    // App Main Menu Modal Events
+    btnAppMenu?.addEventListener("click", () => {
+      appMenuModal?.classList.add("active");
+    });
+    btnCloseAppMenu?.addEventListener("click", () => {
+      appMenuModal?.classList.remove("active");
+    });
+    appMenuModal?.addEventListener("click", (e) => {
+      if (e.target === appMenuModal) appMenuModal.classList.remove("active");
+    });
+    btnMenuTimetable?.addEventListener("click", () => {
+      appMenuModal?.classList.remove("active");
+      openTimetableMatrix();
+    });
+    adminModeToggle?.addEventListener("change", (e) => {
+      setAdminMode(e.target.checked);
+    });
+    btnMenuRouteEditor?.addEventListener("click", () => {
+      appMenuModal?.classList.remove("active");
+      startRouteEditor(lineSelect.value);
+    });
+    btnMenuAdminTools?.addEventListener("click", () => {
+      appMenuModal?.classList.remove("active");
+      adminModal?.classList.add("active");
+    });
+
     // Timetable Modal
     btnTimetable?.addEventListener("click", openTimetableMatrix);
     closeTimetableModal?.addEventListener("click", () => timetableModal.classList.remove("active"));
@@ -2600,6 +2681,7 @@
     // Escape key closes modals and exits editor
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        appMenuModal?.classList.remove("active");
         searchModal?.classList.remove("active");
         timetableModal?.classList.remove("active");
         adminModal?.classList.remove("active");

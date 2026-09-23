@@ -38,20 +38,11 @@
       </button>
 
       <div class="app-bar-actions">
-        <a href="fogli-orari.html" class="icon-btn-touch" id="btnFogliOrari" title="Fogli Orari Cartacei" aria-label="Visualizza fogli orari cartacei originali">
-          <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
-        </a>
-        <button id="btnRouteEditor" class="icon-btn-touch" title="Disegna / Modifica Percorso" aria-label="Disegna o modifica percorso navetta">
-          <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i>
-        </button>
-        <button id="btnTimetable" class="icon-btn-touch" title="Tabella Orari" aria-label="Visualizza tabella orari completa">
-          <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
-        </button>
-        <a href="note-legali.html" class="icon-btn-touch" id="btnNoteLegali" title="Note Legali & Privacy" aria-label="Note legali e privacy policy">
-          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        </a>
-        <button id="btnThemeToggle" class="icon-btn-touch" title="Tema" aria-label="Cambia tema chiaro o scuro">
+        <button id="btnThemeToggle" class="icon-btn-touch" title="Cambia tema chiaro/scuro" aria-label="Cambia tema chiaro o scuro">
           <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
+        <button id="btnAppMenu" class="icon-btn-touch" title="Menu e altre opzioni" aria-label="Apri menu dell'applicazione" aria-expanded="false" aria-controls="appMenuModal">
+          <i class="fa-solid fa-bars" aria-hidden="true"></i>
         </button>
       </div>
     </header>
@@ -109,7 +100,7 @@
         <button id="fabLayer" class="fab" title="Cambia stile mappa" aria-label="Cambia stile mappa">
           <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
         </button>
-        <button id="fabAdmin" class="fab" title="Strumenti GPS/OSRM" aria-label="Strumenti percorsi e GPS">
+        <button id="fabAdmin" class="fab" title="Strumenti GPS/OSRM" aria-label="Strumenti percorsi e GPS" style="display: none;">
           <i class="fa-solid fa-route" aria-hidden="true"></i>
         </button>
       </div>
@@ -225,7 +216,7 @@
         </div>
 
         <!-- DESKTOP / SIDEBAR TAB SWITCHER -->
-        <div class="sidebar-tab-switcher" id="sidebarTabSwitcher" role="tablist" aria-label="Sezioni orari e percorso">
+        <div class="sidebar-tab-switcher desktop-only-tabs" id="sidebarTabSwitcher" role="tablist" aria-label="Sezioni orari e percorso">
           <button class="sidebar-tab-btn active" data-tab="timeline" role="tab" aria-selected="true">
             <i class="fa-solid fa-list-check" aria-hidden="true"></i>
             <span>Percorso</span>
@@ -324,6 +315,75 @@
       <button class="icon-btn-touch" id="btnCloseSearch" aria-label="Chiudi ricerca"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
     </div>
     <div class="search-body" id="searchResults"></div>
+  </div>
+
+  <!-- APP MAIN MENU DRAWER / MODAL -->
+  <div class="modal-overlay" id="appMenuModal" role="dialog" aria-modal="true" aria-labelledby="appMenuTitle">
+    <div class="modal-sheet menu-sheet">
+      <div class="modal-sheet-header">
+        <div class="modal-sheet-title" id="appMenuTitle">
+          <i class="fa-solid fa-bars" style="color: var(--primary);" aria-hidden="true"></i>
+          <span>Menu & Strumenti</span>
+        </div>
+        <button class="icon-btn-touch" id="btnCloseAppMenu" aria-label="Chiudi menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+      <div class="modal-sheet-body">
+        <div class="menu-list-group">
+          <a href="fogli-orari.html" class="menu-list-item">
+            <div class="menu-item-icon"><i class="fa-solid fa-file-lines" aria-hidden="true"></i></div>
+            <div class="menu-item-text">
+              <strong>Fogli Orari Cartacei</strong>
+              <span>Prospetti ufficiali originali ad alta risoluzione</span>
+            </div>
+            <i class="fa-solid fa-chevron-right menu-item-chevron" aria-hidden="true"></i>
+          </a>
+
+          <button type="button" class="menu-list-item" id="btnMenuTimetable">
+            <div class="menu-item-icon"><i class="fa-solid fa-table-cells" aria-hidden="true"></i></div>
+            <div class="menu-item-text">
+              <strong>Tabella Orari Completa</strong>
+              <span>Matrice con partenze, corse e fermate per giorno</span>
+            </div>
+            <i class="fa-solid fa-chevron-right menu-item-chevron" aria-hidden="true"></i>
+          </button>
+
+          <a href="note-legali.html" class="menu-list-item">
+            <div class="menu-item-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+            <div class="menu-item-text">
+              <strong>Note Legali, Diritti & Privacy</strong>
+              <span>Informativa privacy, clausola di non responsabilità e note civiche</span>
+            </div>
+            <i class="fa-solid fa-chevron-right menu-item-chevron" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <!-- OPERATOR / ADMIN SECTION -->
+        <div class="operator-section">
+          <div class="operator-toggle-row">
+            <div class="operator-toggle-info">
+              <div class="operator-badge"><i class="fa-solid fa-user-gear" aria-hidden="true"></i> Operatore</div>
+              <strong>Modalità Amministrazione</strong>
+              <span>Abilita editor percorsi, tracciamento strade e strumenti OSRM/GPS</span>
+            </div>
+            <label class="switch-control" for="adminModeToggle" aria-label="Attiva modalità operatore">
+              <input type="checkbox" id="adminModeToggle">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div id="operatorToolsContainer" class="operator-tools-container" style="display: none;">
+            <button type="button" id="btnMenuRouteEditor" class="btn-mobile btn-mobile-primary" style="justify-content: flex-start; gap: 0.65rem; width: 100%;">
+              <i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> Disegna / Modifica Percorso Linea
+            </button>
+            <button type="button" id="btnMenuAdminTools" class="btn-mobile btn-mobile-secondary" style="justify-content: flex-start; gap: 0.65rem; width: 100%;">
+              <i class="fa-solid fa-route" aria-hidden="true"></i> Generatore OSRM & Registratore GPS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: TIMETABLE MATRIX SHEET -->

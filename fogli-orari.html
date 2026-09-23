@@ -519,7 +519,7 @@
 
   <!-- FULLSCREEN LIGHTBOX MODAL WITH ZOOM & PAN -->
   <div class="doc-lightbox" id="docLightbox" role="dialog" aria-modal="true" aria-label="Visualizzatore foglio orario ingrandito">
-    <!-- TOOLBAR -->
+    <!-- TOP TOOLBAR -->
     <div class="doc-lightbox-toolbar">
       <div class="doc-lightbox-info">
         <strong id="lightboxTitle">Linea --</strong>
@@ -527,19 +527,7 @@
       </div>
 
       <div class="doc-lightbox-controls">
-        <button class="doc-lightbox-btn" id="btnZoomOut" title="Riduci Zoom (-)">
-          <i class="fa-solid fa-minus" aria-hidden="true"></i>
-        </button>
-        <button class="doc-lightbox-btn" id="btnZoomReset" title="Reimposta 100%">
-          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
-        </button>
-        <button class="doc-lightbox-btn" id="btnZoomIn" title="Aumenta Zoom (+)">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-        </button>
-        <a class="doc-lightbox-btn" id="btnDownloadImg" href="#" target="_blank" download title="Scarica immagine originale">
-          <i class="fa-solid fa-download" aria-hidden="true"></i>
-        </a>
-        <button class="doc-lightbox-btn" id="btnCloseLightbox" title="Chiudi (Esc)">
+        <button class="doc-lightbox-btn" id="btnCloseLightbox" title="Chiudi (Esc)" aria-label="Chiudi visualizzatore">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
@@ -550,11 +538,34 @@
       <img src="" alt="Foglio orario ingrandito" id="lightboxImg" class="doc-lightbox-img">
     </div>
 
-    <!-- PREV / NEXT SHEET BUTTONS -->
-    <button class="doc-lightbox-arrow prev" id="btnPrevSheet" title="Foglio precedente (←)">
+    <!-- FLOATING BOTTOM CONTROL CAPSULE (NON INTRUSIVE) -->
+    <div class="doc-lightbox-bottom-bar" id="lightboxBottomBar">
+      <button class="doc-lightbox-btn" id="btnPrevSheet" title="Foglio precedente" aria-label="Foglio precedente">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <button class="doc-lightbox-btn" id="btnZoomOut" title="Riduci Zoom (-)" aria-label="Riduci Zoom">
+        <i class="fa-solid fa-minus" aria-hidden="true"></i>
+      </button>
+      <button class="doc-lightbox-btn" id="btnZoomReset" title="Reimposta zoom (Doppio tocco)" aria-label="Reimposta zoom">
+        <span id="zoomLevelText" class="doc-lightbox-zoom-text">100%</span>
+      </button>
+      <button class="doc-lightbox-btn" id="btnZoomIn" title="Aumenta Zoom (+)" aria-label="Aumenta Zoom">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      </button>
+      <button class="doc-lightbox-btn" id="btnNextSheet" title="Foglio successivo" aria-label="Foglio successivo">
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </button>
+      <div class="doc-lightbox-divider"></div>
+      <a class="doc-lightbox-btn" id="btnDownloadImg" href="#" target="_blank" download title="Scarica immagine originale" aria-label="Scarica immagine originale">
+        <i class="fa-solid fa-download" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <!-- DESKTOP PERIPHERAL SIDE ARROWS -->
+    <button class="doc-lightbox-arrow prev" id="btnPrevSheetDesktop" title="Foglio precedente (←)">
       <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
     </button>
-    <button class="doc-lightbox-arrow next" id="btnNextSheet" title="Foglio successivo (→)">
+    <button class="doc-lightbox-arrow next" id="btnNextSheetDesktop" title="Foglio successivo (→)">
       <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
     </button>
   </div>
@@ -590,9 +601,12 @@
       const btnClose = document.getElementById("btnCloseLightbox");
       const btnPrev = document.getElementById("btnPrevSheet");
       const btnNext = document.getElementById("btnNextSheet");
+      const btnPrevDesktop = document.getElementById("btnPrevSheetDesktop");
+      const btnNextDesktop = document.getElementById("btnNextSheetDesktop");
       const btnZoomIn = document.getElementById("btnZoomIn");
       const btnZoomOut = document.getElementById("btnZoomOut");
       const btnZoomReset = document.getElementById("btnZoomReset");
+      const zoomLevelText = document.getElementById("zoomLevelText");
       const btnDownload = document.getElementById("btnDownloadImg");
       const stage = document.getElementById("lightboxStage");
 
@@ -604,8 +618,32 @@
       let startX = 0;
       let startY = 0;
 
+      // Touch gesture state
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let lastTapTime = 0;
+      let initialPinchDistance = 0;
+      let initialPinchZoom = 1.0;
+
       function updateTransform() {
         lightboxImg.style.transform = `translate(${posX}px, ${posY}px) scale(${zoomLevel})`;
+        if (zoomLevelText) {
+          zoomLevelText.textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+      }
+
+      function clampPosition() {
+        if (zoomLevel <= 1.05) {
+          posX = 0;
+          posY = 0;
+          return;
+        }
+        const stageW = stage.clientWidth;
+        const stageH = stage.clientHeight;
+        const maxPanX = (stageW * (zoomLevel - 1)) / 1.8;
+        const maxPanY = (stageH * (zoomLevel - 1)) / 1.8;
+        posX = Math.max(-maxPanX, Math.min(maxPanX, posX));
+        posY = Math.max(-maxPanY, Math.min(maxPanY, posY));
       }
 
       function openLightbox(index) {
@@ -666,49 +704,59 @@
       btnClose?.addEventListener("click", closeLightbox);
       btnNext?.addEventListener("click", nextSheet);
       btnPrev?.addEventListener("click", prevSheet);
+      btnNextDesktop?.addEventListener("click", nextSheet);
+      btnPrevDesktop?.addEventListener("click", prevSheet);
 
       btnZoomIn?.addEventListener("click", () => {
-        zoomLevel = Math.min(zoomLevel + 0.3, 4.0);
+        zoomLevel = Math.min(zoomLevel + 0.35, 4.0);
+        clampPosition();
         updateTransform();
       });
 
       btnZoomOut?.addEventListener("click", () => {
-        zoomLevel = Math.max(zoomLevel - 0.3, 0.6);
-        if (zoomLevel <= 1.0) { posX = 0; posY = 0; }
+        zoomLevel = Math.max(zoomLevel - 0.35, 0.7);
+        clampPosition();
         updateTransform();
       });
 
       btnZoomReset?.addEventListener("click", () => {
-        zoomLevel = 1.0;
-        posX = 0;
-        posY = 0;
-        updateTransform();
-      });
-
-      // Double click to toggle zoom (1x <-> 2x)
-      stage?.addEventListener("dblclick", (e) => {
         if (zoomLevel > 1.2) {
           zoomLevel = 1.0;
           posX = 0;
           posY = 0;
         } else {
-          zoomLevel = 2.2;
+          zoomLevel = 2.4;
         }
+        clampPosition();
+        updateTransform();
+      });
+
+      // Desktop Double click to toggle zoom (1x <-> 2.4x)
+      stage?.addEventListener("dblclick", (e) => {
+        if (e.target.closest("#lightboxBottomBar") || e.target.closest(".doc-lightbox-toolbar")) return;
+        if (zoomLevel > 1.2) {
+          zoomLevel = 1.0;
+          posX = 0;
+          posY = 0;
+        } else {
+          zoomLevel = 2.4;
+        }
+        clampPosition();
         updateTransform();
       });
 
       // Mouse Wheel Zoom
       stage?.addEventListener("wheel", (e) => {
         e.preventDefault();
-        const delta = e.deltaY < 0 ? 0.2 : -0.2;
-        zoomLevel = Math.min(Math.max(zoomLevel + delta, 0.6), 4.5);
-        if (zoomLevel <= 1.0) { posX = 0; posY = 0; }
+        const delta = e.deltaY < 0 ? 0.25 : -0.25;
+        zoomLevel = Math.min(Math.max(zoomLevel + delta, 0.7), 4.5);
+        clampPosition();
         updateTransform();
       }, { passive: false });
 
       // Pan & Dragging with Mouse
       stage?.addEventListener("mousedown", (e) => {
-        if (e.target === btnClose || e.target.closest(".doc-lightbox-toolbar")) return;
+        if (e.target.closest("#lightboxBottomBar") || e.target.closest(".doc-lightbox-toolbar") || e.target.closest(".doc-lightbox-arrow")) return;
         isDragging = true;
         startX = e.clientX - posX;
         startY = e.clientY - posY;
@@ -719,6 +767,7 @@
         if (!isDragging) return;
         posX = e.clientX - startX;
         posY = e.clientY - startY;
+        clampPosition();
         updateTransform();
       });
 
@@ -729,44 +778,91 @@
         }
       });
 
-      // Touch Events for Mobile (Drag & Pinch)
-      let initialDistance = 0;
-      let initialZoom = 1.0;
-
+      // --- MOBILE TOUCH EVENTS (DRAG, PINCH-ZOOM, DOUBLE-TAP, SWIPE) ---
       stage?.addEventListener("touchstart", (e) => {
+        if (e.target.closest("#lightboxBottomBar") || e.target.closest(".doc-lightbox-toolbar") || e.target.closest(".doc-lightbox-arrow")) return;
+
+        // Double-tap detection
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        if (tapLength < 320 && tapLength > 0 && e.touches.length === 1) {
+          // Double-tap triggered!
+          e.preventDefault();
+          if (zoomLevel > 1.2) {
+            zoomLevel = 1.0;
+            posX = 0;
+            posY = 0;
+          } else {
+            zoomLevel = 2.5;
+          }
+          clampPosition();
+          updateTransform();
+          lastTapTime = 0;
+          return;
+        }
+        lastTapTime = currentTime;
+
         if (e.touches.length === 1) {
           isDragging = true;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
           startX = e.touches[0].clientX - posX;
           startY = e.touches[0].clientY - posY;
+          stage.classList.add("dragging");
         } else if (e.touches.length === 2) {
           isDragging = false;
-          initialDistance = Math.hypot(
+          stage.classList.remove("dragging");
+          initialPinchDistance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
           );
-          initialZoom = zoomLevel;
+          initialPinchZoom = zoomLevel;
         }
-      }, { passive: true });
+      }, { passive: false });
 
       stage?.addEventListener("touchmove", (e) => {
         if (e.touches.length === 1 && isDragging) {
+          // If zoomed in or user moves significantly, prevent native scroll
+          if (zoomLevel > 1.05 || Math.abs(e.touches[0].clientX - touchStartX) > 10) {
+            e.preventDefault();
+          }
           posX = e.touches[0].clientX - startX;
           posY = e.touches[0].clientY - startY;
+          clampPosition();
           updateTransform();
-        } else if (e.touches.length === 2 && initialDistance > 0) {
+        } else if (e.touches.length === 2 && initialPinchDistance > 0) {
+          e.preventDefault();
           const currentDistance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
           );
-          const ratio = currentDistance / initialDistance;
-          zoomLevel = Math.min(Math.max(initialZoom * ratio, 0.7), 4.5);
+          const ratio = currentDistance / initialPinchDistance;
+          zoomLevel = Math.min(Math.max(initialPinchZoom * ratio, 0.7), 4.5);
+          clampPosition();
           updateTransform();
         }
-      }, { passive: true });
+      }, { passive: false });
 
-      stage?.addEventListener("touchend", () => {
+      stage?.addEventListener("touchend", (e) => {
+        stage.classList.remove("dragging");
+
+        // Horizontal swipe navigation when at normal scale (zoomLevel <= 1.05)
+        if (isDragging && zoomLevel <= 1.05 && e.changedTouches.length === 1) {
+          const deltaX = e.changedTouches[0].clientX - touchStartX;
+          const deltaY = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(deltaX) > 55 && Math.abs(deltaY) < 65) {
+            if (deltaX < 0) {
+              nextSheet(); // swiped left
+            } else {
+              prevSheet(); // swiped right
+            }
+          }
+        }
+
         isDragging = false;
-        initialDistance = 0;
+        initialPinchDistance = 0;
+        clampPosition();
+        updateTransform();
       });
 
       // Keyboard Shortcuts
@@ -776,10 +872,12 @@
         else if (e.key === "ArrowRight") nextSheet();
         else if (e.key === "ArrowLeft") prevSheet();
         else if (e.key === "+" || e.key === "=") {
-          zoomLevel = Math.min(zoomLevel + 0.3, 4.0);
+          zoomLevel = Math.min(zoomLevel + 0.35, 4.0);
+          clampPosition();
           updateTransform();
         } else if (e.key === "-") {
-          zoomLevel = Math.max(zoomLevel - 0.3, 0.6);
+          zoomLevel = Math.max(zoomLevel - 0.35, 0.7);
+          clampPosition();
           updateTransform();
         }
       });
